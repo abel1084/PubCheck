@@ -1,7 +1,7 @@
 # Project State: PubCheck
 
 **Current Phase:** 6 (In Progress)
-**Status:** Plan 06-04 Complete - Frontend PDF generation integration
+**Status:** Plan 06-03 Complete - Frontend learning integration with toast and ignore button
 
 ## Project Reference
 
@@ -16,7 +16,7 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 Phase: 6 of 6 - Learning System & Output Generation (IN PROGRESS)
 Plan:  4 of 6
 Status: In progress
-Last activity: 2026-01-31 - Completed 06-04-PLAN.md
+Last activity: 2026-01-31 - Completed 06-03-PLAN.md
 
 [==========================] 97%
 ```
@@ -112,6 +112,9 @@ Last activity: 2026-01-31 - Completed 06-04-PLAN.md
 | Blob download for PDF generation | Standard browser pattern for file downloads | 06-04 |
 | Native dialog for ProgressModal | Accessible by default, no library needed | 06-04 |
 | isGenerating placeholder in CheckResults | Full integration in 06-05/06 with pdfFile access | 06-04 |
+| Sonner for toast - 5s duration, bottom-right | Simple API, undo-friendly | 06-03 |
+| Ignore button appears on hover only | Keeps UI clean | 06-03 |
+| useIgnoredRules hook filters by documentType | Scoped lookups for efficiency | 06-03 |
 
 ### Technical Debt / TODOs
 
@@ -123,8 +126,8 @@ Last activity: 2026-01-31 - Completed 06-04-PLAN.md
 
 ## Session Continuity
 
-Last session: 2026-01-31T20:04:00Z
-Stopped at: Completed 06-04-PLAN.md
+Last session: 2026-01-31T20:10:00Z
+Stopped at: Completed 06-03-PLAN.md
 Resume file: None
 
 ## Session Log
@@ -162,7 +165,8 @@ Resume file: None
 | 2026-01-31 | Completed 06-01 | Learning module backend with models, service, and API (3 min) |
 | 2026-01-31 | Completed 06-02 | PDF annotation output: models, annotator, API endpoint (4 min) |
 | 2026-01-31 | Completed 06-04 | Frontend PDF generation: types, hook, ProgressModal, button wiring (3 min) |
+| 2026-01-31 | Completed 06-03 | Frontend learning integration: Sonner toast, useIgnoredRules, ignore button (8 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-01-31T20:04:00Z*
+*Last updated: 2026-01-31T20:10:00Z*
