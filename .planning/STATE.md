@@ -14,18 +14,18 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 
 ```
 Phase: 1 of 6 - PDF Foundation & Extraction
-Plan:  2 of 5
+Plan:  4 of 5
 Status: In Progress
-Last activity: 2026-01-31 - Completed 01-02-PLAN.md
+Last activity: 2026-01-31 - Completed 01-04-PLAN.md
 
-[========............] 40%
+[================....] 80%
 ```
 
 ## Progress
 
 | Phase | Name | Status | Plans |
 |-------|------|--------|-------|
-| 1 | PDF Foundation & Extraction | In Progress | 2/5 |
+| 1 | PDF Foundation & Extraction | In Progress | 4/5 |
 | 2 | Rule Configuration Engine | Pending | 0/? |
 | 3 | Design Compliance Checks | Pending | 0/? |
 | 4 | AI Verification | Pending | 0/? |
@@ -36,9 +36,9 @@ Last activity: 2026-01-31 - Completed 01-02-PLAN.md
 
 | Metric | Value |
 |--------|-------|
-| Plans completed | 2 |
+| Plans completed | 4 |
 | Plans failed | 0 |
-| Total iterations | 2 |
+| Total iterations | 4 |
 | Avg iterations/plan | 1.0 |
 
 ## Accumulated Context
@@ -52,6 +52,9 @@ Last activity: 2026-01-31 - Completed 01-02-PLAN.md
 | Inside/outside margin derivation | Page 0 = right-hand page assumption | 01-01 |
 | 95% image coverage threshold | Reliable rasterized detection without false positives | 01-02 |
 | Router-based API organization | Cleaner structure for multiple endpoints | 01-02 |
+| Images sorted by DPI ascending | Surfaces low-res images first for quick review | 01-04 |
+| Margins displayed in mm | More readable than points for print-focused users | 01-04 |
+| Document type override via dropdown | Auto-detection may be wrong, user knows best | 01-04 |
 
 ### Technical Debt / TODOs
 
@@ -63,8 +66,8 @@ Last activity: 2026-01-31 - Completed 01-02-PLAN.md
 
 ## Session Continuity
 
-Last session: 2026-01-31T09:54:52Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-01-31T09:55:51Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None
 
 ## Session Log
@@ -74,6 +77,7 @@ Resume file: None
 | 2026-01-31 | Project initialized | Roadmap created with 6 phases, 43 requirements mapped |
 | 2026-01-31 | Completed 01-01 | Project scaffolding and PDF extraction service (8 min) |
 | 2026-01-31 | Completed 01-02 | Upload API with detection pipeline (7 min) |
+| 2026-01-31 | Completed 01-04 | API integration and data tabs with sidebar (5 min) |
 
 ---
 *State initialized: 2026-01-31*
