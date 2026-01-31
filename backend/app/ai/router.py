@@ -22,16 +22,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 
 
-@router.post("/test")
-async def test_endpoint(
-    file: UploadFile = File(...),
-):
-    """Simple test endpoint - file only."""
-    content = await file.read()
-    logger.info(f"TEST - file: {file.filename}, size: {len(content)}")
-    return {"status": "ok", "filename": file.filename, "size": len(content)}
-
-
 @router.post("/analyze", response_model=DocumentAnalysisResult)
 async def analyze_pdf(
     file: UploadFile = File(...),
