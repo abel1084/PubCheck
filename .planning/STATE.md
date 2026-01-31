@@ -1,7 +1,7 @@
 # Project State: PubCheck
 
 **Current Phase:** 6 (In Progress)
-**Status:** Plan 06-03 Complete - Frontend learning integration with toast and ignore button
+**Status:** Plan 06-05 Complete - Complete integration: Settings tab, filtering, PDF generation
 
 ## Project Reference
 
@@ -14,11 +14,11 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 
 ```
 Phase: 6 of 6 - Learning System & Output Generation (IN PROGRESS)
-Plan:  4 of 6
+Plan:  5 of 6
 Status: In progress
-Last activity: 2026-01-31 - Completed 06-03-PLAN.md
+Last activity: 2026-01-31 - Completed 06-05-PLAN.md
 
-[==========================] 97%
+[===========================] 98%
 ```
 
 ## Progress
@@ -30,15 +30,15 @@ Last activity: 2026-01-31 - Completed 06-03-PLAN.md
 | 3 | Design Compliance Checks | Complete | 5/5 |
 | 4 | AI Verification | Complete | 4/4 |
 | 5 | Review Interface | Complete | 4/4 |
-| 6 | Learning System & Output Generation | In Progress | 4/6 |
+| 6 | Learning System & Output Generation | In Progress | 5/6 |
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans completed | 26 |
+| Plans completed | 27 |
 | Plans failed | 0 |
-| Total iterations | 26 |
+| Total iterations | 27 |
 | Avg iterations/plan | 1.0 |
 
 ## Accumulated Context
@@ -115,6 +115,9 @@ Last activity: 2026-01-31 - Completed 06-03-PLAN.md
 | Sonner for toast - 5s duration, bottom-right | Simple API, undo-friendly | 06-03 |
 | Ignore button appears on hover only | Keeps UI clean | 06-03 |
 | useIgnoredRules hook filters by documentType | Scoped lookups for efficiency | 06-03 |
+| Ignored Rules tab after document type tabs | Natural placement in Settings | 06-05 |
+| Footer buttons hidden on Ignored Rules tab | They only apply to rule settings | 06-05 |
+| Toast with 5s duration and Undo action | Time for undo without being intrusive | 06-05 |
 
 ### Technical Debt / TODOs
 
@@ -126,8 +129,8 @@ Last activity: 2026-01-31 - Completed 06-03-PLAN.md
 
 ## Session Continuity
 
-Last session: 2026-01-31T20:10:00Z
-Stopped at: Completed 06-03-PLAN.md
+Last session: 2026-01-31T21:08:00Z
+Stopped at: Completed 06-05-PLAN.md
 Resume file: None
 
 ## Session Log
@@ -166,7 +169,8 @@ Resume file: None
 | 2026-01-31 | Completed 06-02 | PDF annotation output: models, annotator, API endpoint (4 min) |
 | 2026-01-31 | Completed 06-04 | Frontend PDF generation: types, hook, ProgressModal, button wiring (3 min) |
 | 2026-01-31 | Completed 06-03 | Frontend learning integration: Sonner toast, useIgnoredRules, ignore button (8 min) |
+| 2026-01-31 | Completed 06-05 | Complete integration: IgnoredRulesTab, filtering, PDF generation wiring (8 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-01-31T20:10:00Z*
+*Last updated: 2026-01-31T21:08:00Z*
