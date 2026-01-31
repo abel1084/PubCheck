@@ -11,7 +11,8 @@ import './SortableTable.css';
 
 interface SortableTableProps<T> {
   data: T[];
-  columns: ColumnDef<T, unknown>[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  columns: ColumnDef<T, any>[];
   defaultSort?: SortingState;
   emptyMessage?: string;
 }
