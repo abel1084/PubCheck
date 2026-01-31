@@ -3,6 +3,7 @@ import { DropZone } from './components/DropZone';
 import { DataTabs } from './components/DataTabs';
 import { Sidebar } from './components/Sidebar';
 import { Settings } from './components/Settings';
+import { ToastProvider } from './components/Toast/ToastProvider';
 import { useExtraction } from './hooks/useExtraction';
 import { useComplianceCheck } from './hooks/useComplianceCheck';
 import { useAIAnalysis } from './hooks/useAIAnalysis';
@@ -72,6 +73,7 @@ function App() {
   if (showSettings) {
     return (
       <div className="app app--settings">
+        <ToastProvider />
         <header className="app__header app__header--compact">
           <h1>PubCheck</h1>
           <button
@@ -93,6 +95,7 @@ function App() {
   if (!result) {
     return (
       <div className="app app--upload">
+        <ToastProvider />
         <header className="app__header">
           <div className="app__header-content">
             <div>
@@ -122,6 +125,7 @@ function App() {
   // Show results view
   return (
     <div className="app app--results">
+      <ToastProvider />
       <header className="app__header app__header--compact">
         <h1>PubCheck</h1>
         <div className="app__header-buttons">

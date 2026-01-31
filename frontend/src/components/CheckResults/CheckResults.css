@@ -291,6 +291,31 @@
   text-overflow: ellipsis;
 }
 
+/* Ignore button */
+.issue-card__ignore-btn {
+  background: transparent;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  color: #666;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, background-color 0.15s;
+  margin-left: auto;
+}
+
+.issue-card:hover .issue-card__ignore-btn,
+.issue-card__summary:focus .issue-card__ignore-btn {
+  opacity: 1;
+}
+
+.issue-card__ignore-btn:hover {
+  background-color: #f8d7da;
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
 .issue-card__details {
   padding: 8px 12px 12px;
   padding-left: 40px;

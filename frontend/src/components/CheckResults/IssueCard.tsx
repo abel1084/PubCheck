@@ -8,6 +8,8 @@ interface IssueCardProps {
   note?: string;
   onToggleSelect?: () => void;
   onNoteChange?: (note: string) => void;
+  // Ignore rule callback (optional - only provided when ignore feature is enabled)
+  onIgnoreRule?: (ruleId: string) => void;
 }
 
 /**
@@ -21,7 +23,8 @@ export function IssueCard({
   isSelected,
   note,
   onToggleSelect,
-  onNoteChange
+  onNoteChange,
+  onIgnoreRule
 }: IssueCardProps) {
   // Determine if in review mode based on presence of review callbacks
   const isReviewMode = onToggleSelect !== undefined;
@@ -90,6 +93,20 @@ export function IssueCard({
           </span>
         )}
         {pages && <span className="issue-card__pages">{pages}</span>}
+        {onIgnoreRule && (
+          <button
+            type="button"
+            className="issue-card__ignore-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              onIgnoreRule(issue.rule_id);
+            }}
+            title="Ignore this rule for this document type"
+            aria-label={`Ignore rule ${issue.rule_id}`}
+          >
+            <span aria-hidden="true">&#10005;</span>
+          </button>
+        )}
       </summary>
       {hasDetails && (
         <div className="issue-card__details">
