@@ -34,20 +34,20 @@ async def test_endpoint(
 
 @router.post("/analyze", response_model=DocumentAnalysisResult)
 async def analyze_pdf(
-    document_type: str = Form(...),  # Accept any string, validate later
-    extraction: str = Form(...),  # JSON string of ExtractionResult
     file: UploadFile = File(...),
+    extraction_file: UploadFile = File(...),
+    document_type: str = Form(...),
 ) -> DocumentAnalysisResult:
     """
     Run AI analysis on uploaded PDF.
 
     Receives PDF file and extraction data, returns AI findings.
-    Uses multipart form to send PDF alongside extraction JSON.
+    Extraction is sent as a JSON file to avoid Form field size limits.
 
     Args:
-        document_type: Type of document for rule selection
-        extraction: JSON-serialized ExtractionResult
         file: The PDF file to analyze
+        extraction_file: JSON file containing ExtractionResult
+        document_type: Type of document for rule selection
 
     Returns:
         DocumentAnalysisResult with per-page findings
@@ -55,16 +55,18 @@ async def analyze_pdf(
     tmp_path = None
     try:
         logger.info(f"AI analyze request: document_type={document_type}")
-        logger.info(f"Extraction length: {len(extraction)} chars")
         logger.info(f"File: {file.filename}, content_type={file.content_type}")
+        logger.info(f"Extraction file: {extraction_file.filename}")
 
         # Validate document_type
         valid_types = ["factsheet", "policy-brief", "issue-note", "working-paper", "publication"]
         if document_type not in valid_types:
             raise HTTPException(status_code=400, detail=f"Invalid document_type: {document_type}. Must be one of: {valid_types}")
 
-        # Parse extraction from JSON (Pydantic v2 method)
-        extraction_data = ExtractionResult.model_validate_json(extraction)
+        # Read and parse extraction from JSON file
+        extraction_content = await extraction_file.read()
+        logger.info(f"Extraction size: {len(extraction_content)} bytes")
+        extraction_data = ExtractionResult.model_validate_json(extraction_content)
         logger.info(f"Extraction parsed: {extraction_data.metadata.page_count} pages")
 
         # Save uploaded file to temp location

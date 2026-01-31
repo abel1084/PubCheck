@@ -32,24 +32,18 @@ export function useAIAnalysis(): UseAIAnalysisReturn {
     setAIResult(null);
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('extraction', JSON.stringify(extraction));
-      formData.append('document_type', documentType);
-
       // Show progress based on page count
       const pageCount = extraction.metadata.page_count;
       setProgress(`Analyzing ${pageCount} page${pageCount !== 1 ? 's' : ''}...`);
 
-      // Note: Uses relative URL per project learnings
-      // DEBUG: Test endpoint with file only
-      const testFormData = new FormData();
-      testFormData.append('file', file);
-      const testResponse = await fetch('/api/ai/test', {
-        method: 'POST',
-        body: testFormData,
-      });
-      console.log('Test response:', testResponse.status, await testResponse.clone().text());
+      // Send extraction as a JSON file to avoid Form field size limits
+      const extractionBlob = new Blob([JSON.stringify(extraction)], { type: 'application/json' });
+      const extractionFile = new File([extractionBlob], 'extraction.json', { type: 'application/json' });
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('extraction_file', extractionFile);
+      formData.append('document_type', documentType);
 
       const response = await fetch('/api/ai/analyze', {
         method: 'POST',
