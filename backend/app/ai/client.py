@@ -97,9 +97,9 @@ class AIClient:
         # Build content parts
         contents = []
 
-        # Add image
+        # Add image (JPEG for smaller size)
         contents.append(
-            types.Part.from_bytes(data=image_bytes, mime_type="image/png")
+            types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg")
         )
 
         # Add text prompt

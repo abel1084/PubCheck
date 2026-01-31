@@ -1,14 +1,24 @@
 """
 PDF page to base64 image renderer using PyMuPDF.
+Uses JPEG compression to stay under Gemini's 1MB limit.
 """
 import base64
+import io
 
 import pymupdf
+from PIL import Image
+
+
+# Gemini API limit is 1MB per part, leave margin for base64 overhead
+MAX_IMAGE_BYTES = 900 * 1024  # 900KB to be safe
 
 
 def render_page_to_base64(pdf_path: str, page_num: int, dpi: int = 72) -> str:
     """
-    Render a PDF page to base64-encoded PNG.
+    Render a PDF page to base64-encoded JPEG.
+
+    Uses JPEG compression and quality adjustment to stay under API size limits.
+    Falls back to lower quality/resolution if needed.
 
     Args:
         pdf_path: Path to the PDF file
@@ -16,7 +26,7 @@ def render_page_to_base64(pdf_path: str, page_num: int, dpi: int = 72) -> str:
         dpi: Resolution for rendering (default 72 for screen)
 
     Returns:
-        Base64-encoded PNG image data
+        Base64-encoded JPEG image data
     """
     doc = None
     try:
@@ -30,11 +40,39 @@ def render_page_to_base64(pdf_path: str, page_num: int, dpi: int = 72) -> str:
         # Render page to pixmap (no alpha for smaller size)
         pix = page.get_pixmap(matrix=matrix, alpha=False)
 
-        # Convert to PNG bytes
-        png_bytes = pix.tobytes("png")
+        # Convert to PIL Image for JPEG compression
+        img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
 
-        # Encode to base64
-        return base64.standard_b64encode(png_bytes).decode("utf-8")
+        # Try progressively lower quality until under size limit
+        for quality in [85, 70, 55, 40]:
+            buffer = io.BytesIO()
+            img.save(buffer, format="JPEG", quality=quality, optimize=True)
+            jpeg_bytes = buffer.getvalue()
+
+            if len(jpeg_bytes) <= MAX_IMAGE_BYTES:
+                return base64.standard_b64encode(jpeg_bytes).decode("utf-8")
+
+        # If still too large, resize the image
+        scale = 0.7
+        while scale > 0.3:
+            new_size = (int(img.width * scale), int(img.height * scale))
+            resized = img.resize(new_size, Image.Resampling.LANCZOS)
+
+            buffer = io.BytesIO()
+            resized.save(buffer, format="JPEG", quality=60, optimize=True)
+            jpeg_bytes = buffer.getvalue()
+
+            if len(jpeg_bytes) <= MAX_IMAGE_BYTES:
+                return base64.standard_b64encode(jpeg_bytes).decode("utf-8")
+
+            scale -= 0.1
+
+        # Last resort: very small image
+        new_size = (int(img.width * 0.3), int(img.height * 0.3))
+        resized = img.resize(new_size, Image.Resampling.LANCZOS)
+        buffer = io.BytesIO()
+        resized.save(buffer, format="JPEG", quality=50, optimize=True)
+        return base64.standard_b64encode(buffer.getvalue()).decode("utf-8")
 
     finally:
         if doc:
