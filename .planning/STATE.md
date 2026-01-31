@@ -14,18 +14,18 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 
 ```
 Phase: 1 of 6 - PDF Foundation & Extraction
-Plan:  1 of 5
+Plan:  2 of 5
 Status: In Progress
-Last activity: 2026-01-31 - Completed 01-01-PLAN.md
+Last activity: 2026-01-31 - Completed 01-02-PLAN.md
 
-[====................] 20%
+[========............] 40%
 ```
 
 ## Progress
 
 | Phase | Name | Status | Plans |
 |-------|------|--------|-------|
-| 1 | PDF Foundation & Extraction | In Progress | 1/5 |
+| 1 | PDF Foundation & Extraction | In Progress | 2/5 |
 | 2 | Rule Configuration Engine | Pending | 0/? |
 | 3 | Design Compliance Checks | Pending | 0/? |
 | 4 | AI Verification | Pending | 0/? |
@@ -36,9 +36,9 @@ Last activity: 2026-01-31 - Completed 01-01-PLAN.md
 
 | Metric | Value |
 |--------|-------|
-| Plans completed | 1 |
+| Plans completed | 2 |
 | Plans failed | 0 |
-| Total iterations | 1 |
+| Total iterations | 2 |
 | Avg iterations/plan | 1.0 |
 
 ## Accumulated Context
@@ -50,6 +50,8 @@ Last activity: 2026-01-31 - Completed 01-01-PLAN.md
 | Pydantic v1 for Python 3.14 | v2 requires Rust compilation, failed on system | 01-01 |
 | DPI from rendered size | Embedded metadata values often incorrect | 01-01 |
 | Inside/outside margin derivation | Page 0 = right-hand page assumption | 01-01 |
+| 95% image coverage threshold | Reliable rasterized detection without false positives | 01-02 |
+| Router-based API organization | Cleaner structure for multiple endpoints | 01-02 |
 
 ### Technical Debt / TODOs
 
@@ -61,8 +63,8 @@ Last activity: 2026-01-31 - Completed 01-01-PLAN.md
 
 ## Session Continuity
 
-Last session: 2026-01-31T09:54:07Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-01-31T09:54:52Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
 
 ## Session Log
@@ -71,6 +73,7 @@ Resume file: None
 |------|--------|-------|
 | 2026-01-31 | Project initialized | Roadmap created with 6 phases, 43 requirements mapped |
 | 2026-01-31 | Completed 01-01 | Project scaffolding and PDF extraction service (8 min) |
+| 2026-01-31 | Completed 01-02 | Upload API with detection pipeline (7 min) |
 
 ---
 *State initialized: 2026-01-31*
