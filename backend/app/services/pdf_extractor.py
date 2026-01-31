@@ -73,8 +73,10 @@ class PDFExtractor:
         all_images: list = []
         all_margins: list = []
 
-        for page_num in range(doc.page_count):
-            page = doc[page_num]
+        for page_idx in range(doc.page_count):
+            page = doc[page_idx]
+            # Use 1-indexed page numbers for display
+            page_num = page_idx + 1
 
             # Extract text blocks
             text_blocks = extract_text_blocks(page, page_num)

@@ -15,14 +15,12 @@ def calculate_margins(page: pymupdf.Page, page_num: int) -> PageMargins:
     margins as the distance from content to page edges.
 
     Inside/outside margins are derived assuming standard book binding:
-    - Odd pages (1, 3, 5...): inside = left, outside = right
-    - Even pages (0, 2, 4...): inside = right, outside = left
-
-    Note: page_num is 0-indexed, but page 0 is typically a right-hand page (odd in book terms).
+    - Odd pages (1, 3, 5...): inside = left, outside = right (right-hand pages)
+    - Even pages (2, 4, 6...): inside = right, outside = left (left-hand pages)
 
     Args:
         page: PyMuPDF page object
-        page_num: Page number (0-indexed)
+        page_num: Page number (1-indexed for display)
 
     Returns:
         PageMargins with top, bottom, left, right, inside, outside values in points
@@ -90,10 +88,9 @@ def calculate_margins(page: pymupdf.Page, page_num: int) -> PageMargins:
     bottom_margin = max(0.0, page_height - max_y)
 
     # Determine inside/outside based on page position
-    # Page 0 is typically page 1 in a book (right-hand, odd page)
-    # For odd book pages: inside = left (gutter side)
-    # For even book pages: inside = right (gutter side)
-    is_odd_book_page = (page_num % 2) == 0  # 0-indexed, so 0, 2, 4 are odd book pages
+    # For odd pages (1, 3, 5): inside = left (gutter side), right-hand page
+    # For even pages (2, 4, 6): inside = right (gutter side), left-hand page
+    is_odd_book_page = (page_num % 2) == 1  # 1-indexed, so 1, 3, 5 are odd book pages
 
     if is_odd_book_page:
         inside_margin = left_margin
