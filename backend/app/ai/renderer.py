@@ -22,17 +22,22 @@ MAX_IMAGE_BYTES = 700 * 1024  # 700KB raw = ~930KB base64
 
 def _compress_to_webp(img: Image.Image, quality: int) -> bytes:
     """Compress PIL Image to WebP using webptools (has bundled binaries)."""
-    # Save as temp PNG first
-    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp_png:
-        img.save(tmp_png.name, 'PNG')
-        tmp_png_path = tmp_png.name
-
-    # Convert to WebP using webptools
-    with tempfile.NamedTemporaryFile(suffix='.webp', delete=False) as tmp_webp:
-        tmp_webp_path = tmp_webp.name
+    # Create temp file paths (don't keep files open - Windows locking issue)
+    import uuid
+    temp_dir = tempfile.gettempdir()
+    unique_id = uuid.uuid4().hex[:8]
+    tmp_png_path = os.path.join(temp_dir, f"pubcheck_{unique_id}.png")
+    tmp_webp_path = os.path.join(temp_dir, f"pubcheck_{unique_id}.webp")
 
     try:
+        # Save as PNG
+        img.save(tmp_png_path, 'PNG')
+
+        # Convert to WebP using webptools
         result = cwebp(input_image=tmp_png_path, output_image=tmp_webp_path, option=f"-q {quality}")
+
+        if result.get('exit_code', 1) != 0:
+            raise RuntimeError(f"cwebp failed: {result}")
 
         # Read result
         with open(tmp_webp_path, 'rb') as f:
