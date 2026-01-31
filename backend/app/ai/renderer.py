@@ -1,13 +1,16 @@
 """
 PDF page to base64 image renderer using PyMuPDF.
-Compresses images to stay under Gemini's 1MB limit.
+Uses webptools for reliable WebP compression (bundles its own binaries).
 """
 import base64
 import io
 import logging
+import os
+import tempfile
 
 import pymupdf
 from PIL import Image
+from webptools import cwebp
 
 
 logger = logging.getLogger(__name__)
@@ -17,67 +20,97 @@ logger = logging.getLogger(__name__)
 MAX_IMAGE_BYTES = 700 * 1024  # 700KB raw = ~930KB base64
 
 
-def _save_image(img: Image.Image, format: str, quality: int) -> bytes:
-    """Save image to bytes with given format and quality."""
+def _compress_to_webp(img: Image.Image, quality: int) -> bytes:
+    """Compress PIL Image to WebP using webptools (has bundled binaries)."""
+    # Save as temp PNG first
+    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp_png:
+        img.save(tmp_png.name, 'PNG')
+        tmp_png_path = tmp_png.name
+
+    # Convert to WebP using webptools
+    with tempfile.NamedTemporaryFile(suffix='.webp', delete=False) as tmp_webp:
+        tmp_webp_path = tmp_webp.name
+
+    try:
+        result = cwebp(input_image=tmp_png_path, output_image=tmp_webp_path, option=f"-q {quality}")
+
+        # Read result
+        with open(tmp_webp_path, 'rb') as f:
+            webp_bytes = f.read()
+
+        return webp_bytes
+    finally:
+        # Cleanup temp files
+        if os.path.exists(tmp_png_path):
+            os.unlink(tmp_png_path)
+        if os.path.exists(tmp_webp_path):
+            os.unlink(tmp_webp_path)
+
+
+def _compress_to_jpeg(img: Image.Image, quality: int) -> bytes:
+    """Compress PIL Image to JPEG."""
     buffer = io.BytesIO()
-    if format == "WEBP":
-        img.save(buffer, format="WEBP", quality=quality, method=4)
-    else:
-        img.save(buffer, format="JPEG", quality=quality, optimize=True)
+    img.save(buffer, format="JPEG", quality=quality, optimize=True)
     return buffer.getvalue()
 
 
-def _try_compress(img: Image.Image, use_webp: bool) -> tuple[bytes, str]:
+def _try_compress(img: Image.Image) -> tuple[bytes, str]:
     """
     Try to compress image under MAX_IMAGE_BYTES.
+    Uses WebP (smaller files), falls back to JPEG if WebP fails.
     Returns (image_bytes, mime_type).
     """
-    fmt = "WEBP" if use_webp else "JPEG"
-    mime = "image/webp" if use_webp else "image/jpeg"
-
-    # Try progressively lower quality
+    # Try WebP first (typically 30% smaller than JPEG)
     for quality in [80, 65, 50, 35, 20]:
         try:
-            img_bytes = _save_image(img, fmt, quality)
+            img_bytes = _compress_to_webp(img, quality)
             if len(img_bytes) <= MAX_IMAGE_BYTES:
-                logger.debug(f"Compressed to {len(img_bytes)//1024}KB at quality={quality}")
-                return img_bytes, mime
+                logger.info(f"WebP compressed to {len(img_bytes)//1024}KB at q={quality}")
+                return img_bytes, "image/webp"
         except Exception as e:
-            if use_webp:
-                # WebP failed, fall back to JPEG
-                logger.warning(f"WebP failed: {e}, falling back to JPEG")
-                return _try_compress(img, use_webp=False)
-            raise
+            logger.warning(f"WebP compression failed: {e}, trying JPEG")
+            break
+
+    # Fall back to JPEG
+    for quality in [80, 65, 50, 35, 20]:
+        img_bytes = _compress_to_jpeg(img, quality)
+        if len(img_bytes) <= MAX_IMAGE_BYTES:
+            logger.info(f"JPEG compressed to {len(img_bytes)//1024}KB at q={quality}")
+            return img_bytes, "image/jpeg"
 
     # If still too large, resize the image
     for scale in [0.8, 0.65, 0.5, 0.4, 0.3]:
         new_size = (int(img.width * scale), int(img.height * scale))
         resized = img.resize(new_size, Image.Resampling.LANCZOS)
 
+        # Try WebP for resized
         try:
-            img_bytes = _save_image(resized, fmt, 50)
+            img_bytes = _compress_to_webp(resized, 60)
             if len(img_bytes) <= MAX_IMAGE_BYTES:
-                logger.debug(f"Resized to {scale*100:.0f}% = {len(img_bytes)//1024}KB")
-                return img_bytes, mime
-        except Exception as e:
-            if use_webp:
-                logger.warning(f"WebP resize failed: {e}, falling back to JPEG")
-                return _try_compress(img, use_webp=False)
-            raise
+                logger.info(f"WebP resized to {scale*100:.0f}% = {len(img_bytes)//1024}KB")
+                return img_bytes, "image/webp"
+        except:
+            pass
+
+        # Try JPEG for resized
+        img_bytes = _compress_to_jpeg(resized, 60)
+        if len(img_bytes) <= MAX_IMAGE_BYTES:
+            logger.info(f"JPEG resized to {scale*100:.0f}% = {len(img_bytes)//1024}KB")
+            return img_bytes, "image/jpeg"
 
     # Last resort: very small image
     new_size = (int(img.width * 0.25), int(img.height * 0.25))
     resized = img.resize(new_size, Image.Resampling.LANCZOS)
-    img_bytes = _save_image(resized, fmt, 40)
+    img_bytes = _compress_to_jpeg(resized, 50)
     logger.warning(f"Last resort: 25% size = {len(img_bytes)//1024}KB")
-    return img_bytes, mime
+    return img_bytes, "image/jpeg"
 
 
 def render_page_to_base64(pdf_path: str, page_num: int, dpi: int = 72) -> tuple[str, str]:
     """
     Render a PDF page to base64-encoded image.
 
-    Uses WebP if available, falls back to JPEG.
+    Uses WebP for smallest size (via webptools), falls back to JPEG.
     Automatically compresses/resizes to stay under API size limits.
 
     Args:
@@ -104,8 +137,8 @@ def render_page_to_base64(pdf_path: str, page_num: int, dpi: int = 72) -> tuple[
         # Convert to PIL Image
         img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
 
-        # Try WebP first (smaller), fall back to JPEG
-        img_bytes, mime_type = _try_compress(img, use_webp=True)
+        # Compress with WebP/JPEG
+        img_bytes, mime_type = _try_compress(img)
 
         return base64.standard_b64encode(img_bytes).decode("utf-8"), mime_type
 
