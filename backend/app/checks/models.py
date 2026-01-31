@@ -18,6 +18,11 @@ class CheckIssue(BaseModel):
     pages: List[int]  # 1-indexed page numbers
     how_to_fix: Optional[str] = None  # Hint for obvious fixes
 
+    # AI analysis fields
+    ai_verified: bool = False  # True if this came from AI analysis
+    ai_confidence: Optional[Literal["high", "medium", "low"]] = None
+    ai_reasoning: Optional[str] = None  # One sentence, only for non-obvious findings
+
     class Config:
         arbitrary_types_allowed = True
 
