@@ -222,7 +222,8 @@ export interface UseRuleSettingsResult {
   setSeverity: (categoryId: string, ruleId: string, severity: Severity) => void;
   updateExpected: (categoryId: string, ruleId: string, field: string, value: unknown) => void;
   save: () => Promise<void>;
-  reset: () => Promise<void>;
+  discardChanges: () => void;
+  resetToDefaults: () => Promise<void>;
   reload: () => Promise<void>;
 }
 
@@ -237,7 +238,7 @@ export function useRuleSettings(documentType: DocumentTypeId): UseRuleSettingsRe
   const loadRules = useCallback(async () => {
     dispatch({ type: 'LOADING' });
     try {
-      const response = await fetch(`http://localhost:8001/api/rules/${documentType}`);
+      const response = await fetch(`http://localhost:8002/api/rules/${documentType}`);
       if (!response.ok) {
         throw new Error(`Failed to load rules: ${response.statusText}`);
       }
@@ -288,7 +289,7 @@ export function useRuleSettings(documentType: DocumentTypeId): UseRuleSettingsRe
     dispatch({ type: 'SAVE_START' });
     try {
       const overrides = computeOverrides(state.originalRules, state.rules);
-      const response = await fetch(`http://localhost:8001/api/rules/${documentType}`, {
+      const response = await fetch(`http://localhost:8002/api/rules/${documentType}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(overrides),
@@ -305,10 +306,15 @@ export function useRuleSettings(documentType: DocumentTypeId): UseRuleSettingsRe
     }
   }, [documentType, state.rules, state.originalRules]);
 
-  // Reset to defaults via API
-  const reset = useCallback(async () => {
+  // Discard local unsaved changes (revert to last saved state)
+  const discardChanges = useCallback(() => {
+    dispatch({ type: 'RESET' });
+  }, []);
+
+  // Reset to template defaults via API (deletes user overrides)
+  const resetToDefaults = useCallback(async () => {
     try {
-      const response = await fetch(`http://localhost:8001/api/rules/${documentType}/reset`, {
+      const response = await fetch(`http://localhost:8002/api/rules/${documentType}/reset`, {
         method: 'POST',
       });
       if (!response.ok) {
@@ -340,7 +346,8 @@ export function useRuleSettings(documentType: DocumentTypeId): UseRuleSettingsRe
     setSeverity,
     updateExpected,
     save,
-    reset,
+    discardChanges,
+    resetToDefaults,
     reload,
   };
 }

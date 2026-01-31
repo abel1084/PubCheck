@@ -25,7 +25,8 @@ export function Settings({ onClose }: SettingsProps) {
     toggleRule,
     setSeverity,
     save,
-    reset,
+    discardChanges,
+    resetToDefaults,
   } = useRuleSettings(activeTab);
 
   // Warn when leaving with unsaved changes
@@ -53,13 +54,18 @@ export function Settings({ onClose }: SettingsProps) {
     onClose();
   };
 
-  // Handle reset with confirmation
-  const handleReset = async () => {
+  // Handle discard changes (local only, no API call)
+  const handleDiscard = () => {
+    discardChanges();
+  };
+
+  // Handle reset to defaults with confirmation (deletes saved overrides)
+  const handleResetToDefaults = async () => {
     const confirmed = window.confirm(
-      'Are you sure you want to reset all rules to defaults? This cannot be undone.'
+      'Are you sure you want to revert to the starter profile? This will delete your saved customizations and cannot be undone.'
     );
     if (!confirmed) return;
-    await reset();
+    await resetToDefaults();
   };
 
   // Get save button text based on status
@@ -136,19 +142,29 @@ export function Settings({ onClose }: SettingsProps) {
         <button
           type="button"
           className="settings__button settings__button--reset"
-          onClick={handleReset}
+          onClick={handleResetToDefaults}
           disabled={isSaving}
         >
-          Reset to Defaults
+          Revert to Starter Profile
         </button>
-        <button
-          type="button"
-          className={`settings__button settings__button--save ${saveStatus === 'saved' ? 'settings__button--saved' : ''}`}
-          onClick={save}
-          disabled={!isDirty || isSaving}
-        >
-          {getSaveButtonText()}
-        </button>
+        <div className="settings__footer-right">
+          <button
+            type="button"
+            className="settings__button settings__button--discard"
+            onClick={handleDiscard}
+            disabled={!isDirty || isSaving}
+          >
+            Discard
+          </button>
+          <button
+            type="button"
+            className={`settings__button settings__button--save ${saveStatus === 'saved' ? 'settings__button--saved' : ''}`}
+            onClick={save}
+            disabled={!isDirty || isSaving}
+          >
+            {getSaveButtonText()}
+          </button>
+        </div>
       </div>
     </div>
   );
