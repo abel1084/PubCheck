@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { ExtractionResult } from '../../types/extraction';
 import type { CheckResult } from '../../types/checks';
+import type { DocumentAnalysisResult } from '../../types/ai';
 import { TextTab } from './TextTab';
 import { ImagesTab } from './ImagesTab';
 import { MarginsTab } from './MarginsTab';
@@ -13,28 +14,54 @@ interface DataTabsProps {
   checkResult?: CheckResult | null;
   isChecking?: boolean;
   onRecheck?: () => void;
+  // AI analysis props
+  aiResult?: DocumentAnalysisResult | null;
+  isAnalyzing?: boolean;
+  aiProgress?: string;
+  onReanalyze?: () => void;
 }
 
 type TabId = 'text' | 'images' | 'margins' | 'metadata' | 'check-results';
 
-export function DataTabs({ extraction, checkResult, isChecking, onRecheck }: DataTabsProps) {
+export function DataTabs({
+  extraction,
+  checkResult,
+  isChecking,
+  onRecheck,
+  aiResult,
+  isAnalyzing,
+  aiProgress,
+  onReanalyze
+}: DataTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>('text');
 
-  // Auto-switch to check-results tab when checking starts or result arrives
+  // Auto-switch to check-results tab when checking/analyzing starts or result arrives
   useEffect(() => {
-    if (isChecking || checkResult) {
+    if (isChecking || checkResult || isAnalyzing || aiResult) {
       setActiveTab('check-results');
     }
-  }, [isChecking, checkResult]);
+  }, [isChecking, checkResult, isAnalyzing, aiResult]);
 
-  const showCheckResultsTab = Boolean(isChecking || checkResult);
+  const showCheckResultsTab = Boolean(isChecking || checkResult || isAnalyzing || aiResult);
+
+  // Calculate combined issue count for tab label
+  const getCheckResultsCount = (): number | null => {
+    let count = 0;
+    if (checkResult) {
+      count += checkResult.total_errors + checkResult.total_warnings;
+    }
+    if (aiResult) {
+      count += aiResult.total_findings;
+    }
+    return count > 0 ? count : (checkResult || aiResult ? 0 : null);
+  };
 
   const tabs: { id: TabId; label: string; count: number | null; visible: boolean }[] = [
     { id: 'text', label: 'Text', count: extraction.fonts.length, visible: true },
     { id: 'images', label: 'Images', count: extraction.images.length, visible: true },
     { id: 'margins', label: 'Margins', count: extraction.margins.length, visible: true },
     { id: 'metadata', label: 'Metadata', count: 1, visible: true },
-    { id: 'check-results', label: 'Check Results', count: checkResult ? checkResult.total_errors + checkResult.total_warnings : null, visible: showCheckResultsTab },
+    { id: 'check-results', label: 'Check Results', count: getCheckResultsCount(), visible: showCheckResultsTab },
   ];
 
   return (
@@ -61,13 +88,20 @@ export function DataTabs({ extraction, checkResult, isChecking, onRecheck }: Dat
         {activeTab === 'margins' && <MarginsTab margins={extraction.margins} />}
         {activeTab === 'metadata' && <MetadataTab metadata={extraction.metadata} />}
         {activeTab === 'check-results' && (
-          isChecking ? (
+          (isChecking && !checkResult) ? (
             <div className="data-tabs__loading">
               <span className="data-tabs__spinner"></span>
               Checking...
             </div>
           ) : (
-            checkResult && <CheckResults result={checkResult} onRecheck={onRecheck} />
+            <CheckResults
+              result={checkResult}
+              onRecheck={onRecheck}
+              aiResult={aiResult}
+              isAnalyzing={isAnalyzing}
+              aiProgress={aiProgress}
+              onReanalyze={onReanalyze}
+            />
           )
         )}
       </div>

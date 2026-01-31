@@ -85,6 +85,37 @@
   gap: 8px;
 }
 
+/* Empty state */
+.check-results__empty {
+  padding: 40px;
+  text-align: center;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+/* AI Summary */
+.check-results__ai-summary {
+  margin-top: 24px;
+  padding: 16px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+}
+
+.check-results__ai-summary-title {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.check-results__ai-summary-text {
+  margin: 0;
+  font-size: 14px;
+  color: #495057;
+  line-height: 1.5;
+}
+
 /* Footer */
 .check-results__footer {
   margin-top: 24px;
