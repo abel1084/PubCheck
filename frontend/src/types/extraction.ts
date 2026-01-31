@@ -95,3 +95,25 @@ export interface ExtractionResult {
   margins: PageMargins[];
   fonts: FontSummary[];
 }
+
+/**
+ * Successful upload response with extraction results.
+ */
+export interface UploadResponse {
+  success: true;
+  filename: string;
+  document_type: DocumentType;
+  confidence: Confidence;
+  extraction: ExtractionResult;
+}
+
+/**
+ * Response when a PDF is rejected (e.g., rasterized/scanned).
+ */
+export interface RejectionResponse {
+  success: false;
+  error: string;
+  message: string;
+  details: string;
+  accessibility_info: string;
+}
