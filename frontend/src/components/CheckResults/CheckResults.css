@@ -372,3 +372,253 @@
   font-size: 13px;
   color: #495057;
 }
+
+/* ===== REVIEW INTERFACE STYLES ===== */
+
+/* Padding for fixed summary bar */
+.check-results--has-summary-bar {
+  padding-bottom: 80px;
+}
+
+/* Category filter dropdown */
+.check-results__filters {
+  margin-left: auto;
+}
+
+.check-results__category-filter {
+  padding: 6px 12px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 13px;
+  color: #495057;
+  cursor: pointer;
+}
+
+.check-results__category-filter:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+}
+
+/* Filter empty state */
+.check-results__filter-empty {
+  padding: 40px;
+  text-align: center;
+  color: #6c757d;
+  font-size: 14px;
+  background: #f8f9fa;
+  border: 1px dashed #dee2e6;
+  border-radius: 6px;
+}
+
+/* ===== IssueCard Review Styles ===== */
+
+.issue-card--selected {
+  background: #e3f2fd;
+  border-color: #1976d2;
+}
+
+.issue-card__selection {
+  display: flex;
+  align-items: center;
+  padding-right: 8px;
+}
+
+.issue-card__checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #1976d2;
+}
+
+.issue-card__notes-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e9ecef;
+}
+
+.issue-card__notes-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+}
+
+.issue-card__notes {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 50px;
+}
+
+.issue-card__notes:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+}
+
+.issue-card__notes-count {
+  display: block;
+  margin-top: 4px;
+  text-align: right;
+  font-size: 11px;
+  color: #999;
+}
+
+/* ===== CategorySection Review Styles ===== */
+
+.category-section__selection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  margin-right: 12px;
+}
+
+.category-section__checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #1976d2;
+}
+
+.category-section__selection-count {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: normal;
+}
+
+/* ===== ReviewSummaryBar Styles ===== */
+
+.review-summary-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  background: #fff;
+  border-top: 1px solid #dee2e6;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.review-summary-bar__counts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+.review-summary-bar__total {
+  font-weight: 600;
+}
+
+.review-summary-bar__selected {
+  color: #1976d2;
+}
+
+.review-summary-bar__breakdown {
+  color: #6c757d;
+}
+
+.review-summary-bar__error-count {
+  color: #dc3545;
+}
+
+.review-summary-bar__warning-count {
+  color: #856404;
+}
+
+.review-summary-bar__filters {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.review-summary-bar__filter-btn {
+  padding: 6px 12px;
+  border: 1px solid #dee2e6;
+  background: #fff;
+  font-size: 13px;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.review-summary-bar__filter-btn:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.review-summary-bar__filter-btn:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.review-summary-bar__filter-btn:not(:last-child) {
+  border-right: none;
+}
+
+.review-summary-bar__filter-btn:hover {
+  background: #f8f9fa;
+}
+
+.review-summary-bar__filter-btn--active {
+  background: #1976d2;
+  border-color: #1976d2;
+  color: #fff;
+}
+
+.review-summary-bar__filter-btn--active:hover {
+  background: #1565c0;
+}
+
+.review-summary-bar__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.review-summary-bar__action-btn {
+  padding: 6px 12px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 13px;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.review-summary-bar__action-btn:hover {
+  background: #f8f9fa;
+  border-color: #ced4da;
+}
+
+.review-summary-bar__report-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background: #1976d2;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.review-summary-bar__report-btn:hover:not(:disabled) {
+  background: #1565c0;
+}
+
+.review-summary-bar__report-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
