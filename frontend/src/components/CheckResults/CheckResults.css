@@ -280,12 +280,15 @@
 }
 
 .issue-card__pages {
-  flex-shrink: 0;
   font-size: 12px;
   color: #6c757d;
   background: #e9ecef;
   padding: 2px 8px;
   border-radius: 10px;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .issue-card__details {

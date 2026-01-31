@@ -1,4 +1,4 @@
-import { useReducer, useCallback, useEffect, useMemo } from 'react';
+import { useReducer, useCallback, useEffect, useMemo, useRef } from 'react';
 import type { CheckIssue, CategoryResult } from '../types/checks';
 import type {
   ReviewState,
@@ -138,20 +138,38 @@ export interface UseReviewStateResult {
 export function useReviewState(categories: CategoryResult[]): UseReviewStateResult {
   const [state, dispatch] = useReducer(reviewReducer, initialState);
 
-  // Initialize selection with all error issues when categories change
+  // Track if we've already initialized to prevent infinite loops
+  const initializedRef = useRef(false);
+  const prevCategoriesLengthRef = useRef(0);
+
+  // Initialize selection with all error issues ONCE when categories first have content
+  // Only re-initialize if total issue count changes significantly (new check results)
   useEffect(() => {
-    const errorIds: string[] = [];
-    for (const category of categories) {
-      category.issues.forEach((issue, index) => {
-        if (issue.severity === 'error') {
-          errorIds.push(getIssueId(issue, category.category_id, index));
-        }
-      });
-    }
-    if (errorIds.length > 0) {
+    const totalIssues = categories.reduce((sum, cat) => sum + cat.issues.length, 0);
+
+    // Only initialize if:
+    // 1. We have categories with issues AND
+    // 2. Either we haven't initialized yet OR the issue count changed dramatically (new data)
+    const shouldInitialize = totalIssues > 0 && (
+      !initializedRef.current ||
+      Math.abs(totalIssues - prevCategoriesLengthRef.current) > 0 && prevCategoriesLengthRef.current === 0
+    );
+
+    if (shouldInitialize) {
+      const errorIds: string[] = [];
+      for (const category of categories) {
+        category.issues.forEach((issue, index) => {
+          if (issue.severity === 'error') {
+            errorIds.push(getIssueId(issue, category.category_id, index));
+          }
+        });
+      }
       dispatch({ type: 'INITIALIZE_SELECTION', errorIds });
+      initializedRef.current = true;
     }
-  }, [categories]);
+
+    prevCategoriesLengthRef.current = totalIssues;
+  }, [categories.length]); // Only depend on length, not array identity
 
   // Filter categories by severity and category filters
   const filteredCategories = useMemo(() => {

@@ -93,14 +93,13 @@ export function CheckResults({
     warning_count: aiIssues.filter(i => i.severity === 'warning').length,
   } : null;
 
-  // Combine categories
-  const allCategories: CategoryResult[] = [
-    ...(result?.categories || []),
-    ...(aiCategory ? [aiCategory] : []),
-  ];
-
-  // Sort categories by fixed order
+  // Sort and combine categories - memoize to prevent infinite loops
   const sortedCategories = useMemo(() => {
+    const allCategories: CategoryResult[] = [
+      ...(result?.categories || []),
+      ...(aiCategory ? [aiCategory] : []),
+    ];
+
     return [...allCategories].sort((a: CategoryResult, b: CategoryResult) => {
       const aIndex = CATEGORY_ORDER.indexOf(a.category_id);
       const bIndex = CATEGORY_ORDER.indexOf(b.category_id);
@@ -109,7 +108,7 @@ export function CheckResults({
       const bOrder = bIndex === -1 ? CATEGORY_ORDER.length : bIndex;
       return aOrder - bOrder;
     });
-  }, [allCategories]);
+  }, [result?.categories, aiCategory]);
 
   // Initialize review state with all categories (sorted)
   const {

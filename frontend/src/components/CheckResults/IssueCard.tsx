@@ -35,10 +35,14 @@ export function IssueCard({
   // Add selected styling in review mode
   const selectedClass = isReviewMode && isSelected ? 'issue-card--selected' : '';
 
-  // Format page numbers: "Page 1" or "Pages 1, 3, 5"
+  // Format page numbers: "Page 1", "Pages 1, 3, 5", or "92 pages" for many
   const formatPages = (pages: number[]): string => {
     if (pages.length === 0) return '';
     if (pages.length === 1) return `Page ${pages[0]}`;
+    // If many pages, show count instead of full list
+    if (pages.length > 5) {
+      return `${pages.length} pages`;
+    }
     return `Pages ${pages.join(', ')}`;
   };
 
