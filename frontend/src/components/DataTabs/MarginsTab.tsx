@@ -1,4 +1,4 @@
-import { createColumnHelper } from '@tanstack/react-table';
+import { createColumnHelper, ColumnDef } from '@tanstack/react-table';
 import { SortableTable } from '../SortableTable';
 import type { PageMargins } from '../../types/extraction';
 
@@ -11,7 +11,7 @@ const columnHelper = createColumnHelper<PageMargins>();
 // Convert points to mm for display (72 points = 25.4 mm)
 const ptToMm = (pt: number) => (pt / 72 * 25.4).toFixed(1);
 
-const columns = [
+const columns: ColumnDef<PageMargins, any>[] = [
   columnHelper.accessor('page', { header: 'Page' }),
   columnHelper.accessor('top', {
     header: 'Top (mm)',

@@ -1,4 +1,4 @@
-import { createColumnHelper } from '@tanstack/react-table';
+import { createColumnHelper, ColumnDef } from '@tanstack/react-table';
 import { SortableTable } from '../SortableTable';
 import type { ImageInfo } from '../../types/extraction';
 
@@ -8,7 +8,7 @@ interface ImagesTabProps {
 
 const columnHelper = createColumnHelper<ImageInfo>();
 
-const columns = [
+const columns: ColumnDef<ImageInfo, any>[] = [
   columnHelper.accessor('page', { header: 'Page' }),
   columnHelper.accessor(row => `${row.width} x ${row.height}`, {
     id: 'dimensions',

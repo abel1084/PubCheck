@@ -1,4 +1,4 @@
-import { createColumnHelper } from '@tanstack/react-table';
+import { createColumnHelper, ColumnDef } from '@tanstack/react-table';
 import { SortableTable } from '../SortableTable';
 import type { FontSummary, TextBlock } from '../../types/extraction';
 
@@ -9,7 +9,7 @@ interface TextTabProps {
 
 const columnHelper = createColumnHelper<FontSummary>();
 
-const columns = [
+const columns: ColumnDef<FontSummary, any>[] = [
   columnHelper.accessor('name', { header: 'Font Name' }),
   columnHelper.accessor('count', { header: 'Occurrences' }),
   columnHelper.accessor('pages', {
