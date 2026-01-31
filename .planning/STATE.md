@@ -1,24 +1,24 @@
 # Project State: PubCheck
 
-**Current Phase:** 3 (In Progress)
-**Status:** Phase 3 Plan 4 Complete
+**Current Phase:** 4 (In Progress)
+**Status:** Phase 4 Plan 02 Complete
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-31)
 
 **Core value:** Catch 95%+ of design compliance issues automatically, producing professional review outputs
-**Current focus:** Phase 3 - Design Compliance Checks
+**Current focus:** Phase 4 - AI Verification (in progress)
 
 ## Current Position
 
 ```
-Phase: 3 of 6 - Design Compliance Checks
-Plan:  4 of 5
-Status: In Progress
-Last activity: 2026-01-31 - Completed 03-04-PLAN.md
+Phase: 4 of 6 - AI Verification (IN PROGRESS)
+Plan:  2 of ? (04-02-PLAN.md complete)
+Status: In progress
+Last activity: 2026-01-31 - Completed 04-02-PLAN.md
 
-[=============-------] 52%
+[================----] 65%
 ```
 
 ## Progress
@@ -27,8 +27,8 @@ Last activity: 2026-01-31 - Completed 03-04-PLAN.md
 |-------|------|--------|-------|
 | 1 | PDF Foundation & Extraction | Complete | 5/5 |
 | 2 | Rule Configuration Engine | Complete | 4/4 |
-| 3 | Design Compliance Checks | In Progress | 4/5 |
-| 4 | AI Verification | Pending | 0/? |
+| 3 | Design Compliance Checks | Complete | 5/5 |
+| 4 | AI Verification | In Progress | 2/? |
 | 5 | Review Interface | Pending | 0/? |
 | 6 | Learning System & Output Generation | Pending | 0/? |
 
@@ -36,9 +36,9 @@ Last activity: 2026-01-31 - Completed 03-04-PLAN.md
 
 | Metric | Value |
 |--------|-------|
-| Plans completed | 13 |
+| Plans completed | 16 |
 | Plans failed | 0 |
-| Total iterations | 13 |
+| Total iterations | 16 |
 | Avg iterations/plan | 1.0 |
 
 ## Accumulated Context
@@ -78,11 +78,16 @@ Last activity: 2026-01-31 - Completed 03-04-PLAN.md
 | Position heuristics for logo | Quadrant-based detection, full AI in Phase 4 | 03-02 |
 | SDG icon size heuristic | Square images 10-30mm on last page | 03-02 |
 | Singleton executor/service | Created once at module load for check API performance | 03-03 |
+| Relative API URLs + Vite proxy | Avoids hardcoded ports, IPv4/IPv6 issues | 03-05 |
+| Backend port 8003 | Standardized port, configured in start.py | 03-05 |
+| python start.py launcher | Single command starts backend, frontend, opens browser | 03-05 |
+| 5-page concurrent limit | Balanced parallelism without overwhelming API rate limits | 04-02 |
+| 30-second timeout per page | Graceful timeout handling per CONTEXT.md | 04-02 |
+| Multipart form for PDF upload | Avoids re-extraction by passing existing ExtractionResult as JSON | 04-02 |
 
 ### Technical Debt / TODOs
 
 - Upgrade to Pydantic v2 when prebuilt wheels available for Python 3.14
-- Standardize API port (currently using 8002)
 
 ### Blockers
 
@@ -90,8 +95,8 @@ Last activity: 2026-01-31 - Completed 03-04-PLAN.md
 
 ## Session Continuity
 
-Last session: 2026-01-31T17:33:00Z
-Stopped at: Completed 03-03-PLAN.md
+Last session: 2026-01-31T15:37:00Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
 
 ## Session Log
@@ -114,7 +119,11 @@ Resume file: None
 | 2026-01-31 | Completed 03-02 | 6 check handlers: range, regex, font, position, presence, color (7 min) |
 | 2026-01-31 | Completed 03-03 | Check API router: POST /api/check/{document_type} (3 min) |
 | 2026-01-31 | Completed 03-04 | Check Results UI: types, hook, components, App integration (8 min) |
+| 2026-01-31 | Completed 03-05 | User verification + server config fixes - Phase 3 approved |
+| 2026-01-31 | Phase 3 Complete | All 5 plans executed, user verified |
+| 2026-01-31 | Completed 04-01 | AI infrastructure: client, schemas, prompts, renderer |
+| 2026-01-31 | Completed 04-02 | Document analyzer with concurrent page processing (3 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-01-31T17:33:00Z*
+*Last updated: 2026-01-31T15:37:00Z*
