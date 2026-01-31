@@ -131,10 +131,10 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — AI infrastructure (client, schemas, prompts, renderer)
-- [ ] 04-02-PLAN.md — Document analyzer and REST API endpoint
-- [ ] 04-03-PLAN.md — Frontend AI integration with progress and confidence display
-- [ ] 04-04-PLAN.md — User verification checkpoint
+- [x] 04-01-PLAN.md — AI infrastructure (client, schemas, prompts, renderer)
+- [x] 04-02-PLAN.md — Document analyzer and REST API endpoint
+- [x] 04-03-PLAN.md — Frontend AI integration with progress and confidence display
+- [x] 04-04-PLAN.md — User verification checkpoint
 
 **Requirements:**
 - AIVR-01: Detect UNEP logo and verify position/size via Claude vision
@@ -209,8 +209,8 @@ Plans:
 | 1 | PDF Foundation & Extraction | Complete | 7 |
 | 2 | Rule Configuration Engine | Complete | 4 |
 | 3 | Design Compliance Checks | Complete | 21 |
-| 4 | AI Verification | Ready | 3 |
-| 5 | Review Interface | Pending | 5 |
+| 4 | AI Verification | Complete | 3 |
+| 5 | Review Interface | Ready | 5 |
 | 6 | Learning System & Output Generation | Pending | 6 |
 
 **Total:** 46 requirement mappings (43 unique, some phases share extraction foundation)
