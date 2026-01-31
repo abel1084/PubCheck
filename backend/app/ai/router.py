@@ -37,8 +37,8 @@ async def analyze_pdf(
     Returns:
         DocumentAnalysisResult with per-page findings
     """
-    # Parse extraction from JSON
-    extraction_data = ExtractionResult.parse_raw(extraction)
+    # Parse extraction from JSON (Pydantic v2 method)
+    extraction_data = ExtractionResult.model_validate_json(extraction)
 
     # Save uploaded file to temp location
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:

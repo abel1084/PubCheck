@@ -9,6 +9,16 @@ import { useAIAnalysis } from './hooks/useAIAnalysis';
 import type { DocumentType } from './types/extraction';
 import './App.css';
 
+// Map frontend DocumentType to backend document_type IDs
+// Backend expects: factsheet, policy-brief, issue-note, working-paper, publication
+const DOCUMENT_TYPE_MAP: Record<DocumentType, string> = {
+  'Factsheet': 'factsheet',
+  'Policy Brief': 'policy-brief',
+  'Working Paper': 'working-paper',
+  'Technical Report': 'issue-note',  // Technical Report maps to issue-note template
+  'Publication': 'publication',
+};
+
 function App() {
   const { isUploading, error, result, upload, reset } = useExtraction();
   const { isChecking, checkResult, checkError, runCheck, clearResult } = useComplianceCheck();
@@ -43,9 +53,8 @@ function App() {
   // Handle check button click
   const handleCheck = () => {
     if (result && documentType) {
-      // Convert DocumentType to lowercase with hyphens for API endpoint
-      // Backend expects: factsheet, policy-brief, issue-note, working-paper, publication
-      const docTypeId = documentType.toLowerCase().replace(/\s+/g, '-');
+      // Use mapping to convert DocumentType to backend document_type ID
+      const docTypeId = DOCUMENT_TYPE_MAP[documentType];
       runCheck(docTypeId, result.extraction);
     }
   };
@@ -53,7 +62,8 @@ function App() {
   // Handle AI analyze button click
   const handleAIAnalyze = () => {
     if (result && documentType && uploadedFileRef.current) {
-      const docTypeId = documentType.toLowerCase().replace(/\s+/g, '-');
+      // Use mapping to convert DocumentType to backend document_type ID
+      const docTypeId = DOCUMENT_TYPE_MAP[documentType];
       analyze(uploadedFileRef.current, result.extraction, docTypeId);
     }
   };
