@@ -15,11 +15,14 @@ from .renderer import render_page_to_base64
 from .schemas import AIFinding, DocumentAnalysisResult, PageAnalysisResult
 
 
-# Concurrency limit for parallel page analysis
-MAX_CONCURRENT_PAGES = 5
+# Concurrency limit for parallel page analysis (reduced for rate limits)
+MAX_CONCURRENT_PAGES = 2
 
 # Timeout per page in seconds
-PAGE_TIMEOUT = 30
+PAGE_TIMEOUT = 60
+
+# Delay between API calls to avoid rate limits (seconds)
+RATE_LIMIT_DELAY = 1.0
 
 
 class DocumentAnalyzer:
@@ -121,6 +124,9 @@ class DocumentAnalyzer:
         """
         async with semaphore:
             try:
+                # Add delay to avoid rate limits
+                await asyncio.sleep(RATE_LIMIT_DELAY * (page_num - 1) % 3)
+
                 # Run with timeout
                 return await asyncio.wait_for(
                     self._analyze_page_impl(page_num, checklist),

@@ -31,9 +31,9 @@ class AIClient:
     """
 
     DEFAULT_MODEL = "gemini-2.0-flash"
-    DEFAULT_TIMEOUT = 30.0  # seconds
-    MAX_RETRIES = 3
-    RETRY_DELAYS = [1.0, 2.0, 4.0]  # exponential backoff
+    DEFAULT_TIMEOUT = 60.0  # seconds
+    MAX_RETRIES = 5
+    RETRY_DELAYS = [2.0, 5.0, 10.0, 20.0, 30.0]  # longer backoff for rate limits
 
     def __init__(self):
         """
