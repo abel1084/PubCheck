@@ -9,8 +9,9 @@ import pymupdf
 from PIL import Image
 
 
-# Gemini API limit is 1MB per part, leave margin for base64 overhead
-MAX_IMAGE_BYTES = 900 * 1024  # 900KB to be safe
+# Gemini API limit is 1MB per part. Base64 adds ~33% overhead.
+# So raw bytes must be under ~750KB to stay under 1MB after encoding.
+MAX_IMAGE_BYTES = 700 * 1024  # 700KB raw = ~930KB base64
 
 
 def render_page_to_base64(pdf_path: str, page_num: int, dpi: int = 72) -> str:
