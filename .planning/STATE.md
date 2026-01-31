@@ -52,6 +52,8 @@ Last activity: 2026-01-31 - Completed 01-04-PLAN.md
 | Inside/outside margin derivation | Page 0 = right-hand page assumption | 01-01 |
 | 95% image coverage threshold | Reliable rasterized detection without false positives | 01-02 |
 | Router-based API organization | Cleaner structure for multiple endpoints | 01-02 |
+| ColumnDef<T, any> for TanStack Table | Avoids TypeScript variance issues with typed accessors | 01-03 |
+| BEM CSS naming convention | Clear component scoping, maintainable styles | 01-03 |
 | Images sorted by DPI ascending | Surfaces low-res images first for quick review | 01-04 |
 | Margins displayed in mm | More readable than points for print-focused users | 01-04 |
 | Document type override via dropdown | Auto-detection may be wrong, user knows best | 01-04 |
@@ -77,6 +79,7 @@ Resume file: None
 | 2026-01-31 | Project initialized | Roadmap created with 6 phases, 43 requirements mapped |
 | 2026-01-31 | Completed 01-01 | Project scaffolding and PDF extraction service (8 min) |
 | 2026-01-31 | Completed 01-02 | Upload API with detection pipeline (7 min) |
+| 2026-01-31 | Completed 01-03 | DropZone and SortableTable components (12 min) |
 | 2026-01-31 | Completed 01-04 | API integration and data tabs with sidebar (5 min) |
 
 ---
