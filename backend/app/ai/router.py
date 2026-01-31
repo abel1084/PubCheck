@@ -6,7 +6,8 @@ import os
 import tempfile
 import traceback
 
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
+from fastapi.responses import JSONResponse
 
 from app.config.service import DocumentTypeId
 from app.models.extraction import ExtractionResult
@@ -21,9 +22,27 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 
 
+@router.post("/analyze-debug")
+async def analyze_debug(request: Request):
+    """Debug endpoint to see raw request data."""
+    try:
+        form = await request.form()
+        logger.info(f"Form keys: {list(form.keys())}")
+        for key in form.keys():
+            value = form[key]
+            if hasattr(value, 'filename'):
+                logger.info(f"  {key}: file={value.filename}, size={value.size}")
+            else:
+                logger.info(f"  {key}: {str(value)[:100]}...")
+        return {"status": "ok", "keys": list(form.keys())}
+    except Exception as e:
+        logger.error(f"Debug error: {e}")
+        return {"status": "error", "error": str(e)}
+
+
 @router.post("/analyze", response_model=DocumentAnalysisResult)
 async def analyze_pdf(
-    document_type: DocumentTypeId = Form(...),
+    document_type: str = Form(...),  # Accept any string, validate later
     extraction: str = Form(...),  # JSON string of ExtractionResult
     file: UploadFile = File(...),
 ) -> DocumentAnalysisResult:
@@ -43,8 +62,16 @@ async def analyze_pdf(
     """
     tmp_path = None
     try:
-        # Parse extraction from JSON (Pydantic v2 method)
         logger.info(f"AI analyze request: document_type={document_type}")
+        logger.info(f"Extraction length: {len(extraction)} chars")
+        logger.info(f"File: {file.filename}, content_type={file.content_type}")
+
+        # Validate document_type
+        valid_types = ["factsheet", "policy-brief", "issue-note", "working-paper", "publication"]
+        if document_type not in valid_types:
+            raise HTTPException(status_code=400, detail=f"Invalid document_type: {document_type}. Must be one of: {valid_types}")
+
+        # Parse extraction from JSON (Pydantic v2 method)
         extraction_data = ExtractionResult.model_validate_json(extraction)
         logger.info(f"Extraction parsed: {extraction_data.metadata.page_count} pages")
 
@@ -55,7 +82,9 @@ async def analyze_pdf(
             tmp_path = tmp.name
         logger.info(f"PDF saved to temp: {tmp_path}")
 
-        result = await analyze_document(tmp_path, extraction_data, document_type)
+        # Cast to DocumentTypeId (already validated above)
+        doc_type: DocumentTypeId = document_type  # type: ignore
+        result = await analyze_document(tmp_path, extraction_data, doc_type)
         logger.info(f"Analysis complete: {result.total_findings} findings")
         return result
 
