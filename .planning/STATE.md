@@ -101,6 +101,8 @@ Last activity: 2026-01-31 - Phase 5 verified and complete
 | Summary bar only when issues exist | No review bar on pass state | 05-03 |
 | DOCUMENT_TYPE_MAP for frontend-backend IDs | Explicit mapping prevents ID mismatch bugs | 05-04 |
 | Pydantic v2 model_validate_json | parse_raw() deprecated in v2, caused 400 errors | 05-04 |
+| Extraction sent as file not Form field | Large JSON exceeds multipart Form field limits | 05-04 |
+| WebP via webptools for AI images | 30% smaller than JPEG, reduces tokens/cost | 05-04 |
 
 ### Technical Debt / TODOs
 
