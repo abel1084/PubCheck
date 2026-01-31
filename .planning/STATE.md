@@ -73,6 +73,10 @@ Last activity: 2026-01-31 - Completed 03-04-PLAN.md
 | Color tolerance +/-5 per channel | Per Claude's discretion from CONTEXT.md | 03-01 |
 | Categories expanded by default if errors | Keeps UI scannable, critical issues visible | 03-04 |
 | Auto-switch to Check Results tab | Immediate feedback when check starts | 03-04 |
+| Minimum-only margin checks | Flag when content too close to edge, not when larger | 03-02 |
+| Flexible font name matching | Handle subset prefixes and name variations | 03-02 |
+| Position heuristics for logo | Quadrant-based detection, full AI in Phase 4 | 03-02 |
+| SDG icon size heuristic | Square images 10-30mm on last page | 03-02 |
 
 ### Technical Debt / TODOs
 
@@ -106,8 +110,9 @@ Resume file: None
 | 2026-01-31 | Completed 02-04 | User verification - Phase 2 approved (15 min) |
 | 2026-01-31 | Phase 2 Complete | All 4 plans executed, user verified |
 | 2026-01-31 | Completed 03-01 | Check foundation: models, tolerance utils, executor (3 min) |
+| 2026-01-31 | Completed 03-02 | 6 check handlers: range, regex, font, position, presence, color (7 min) |
 | 2026-01-31 | Completed 03-04 | Check Results UI: types, hook, components, App integration (8 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-01-31T17:28:00Z*
+*Last updated: 2026-01-31T13:22:00Z*
