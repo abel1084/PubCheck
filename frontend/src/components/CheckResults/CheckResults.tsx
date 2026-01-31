@@ -1,8 +1,11 @@
+import { useMemo } from 'react';
 import type { CheckResult, CategoryResult, CheckIssue } from '../../types/checks';
 import type { DocumentAnalysisResult } from '../../types/ai';
 import { StatusBadge } from './StatusBadge';
 import { CategorySection } from './CategorySection';
+import { ReviewSummaryBar } from './ReviewSummaryBar';
 import { AIProgress } from './AIProgress';
+import { useReviewState, getIssueId } from '../../hooks/useReviewState';
 import './CheckResults.css';
 
 interface CheckResultsProps {
@@ -97,14 +100,55 @@ export function CheckResults({
   ];
 
   // Sort categories by fixed order
-  const sortedCategories = [...allCategories].sort((a: CategoryResult, b: CategoryResult) => {
-    const aIndex = CATEGORY_ORDER.indexOf(a.category_id);
-    const bIndex = CATEGORY_ORDER.indexOf(b.category_id);
-    // Unknown categories go to end
-    const aOrder = aIndex === -1 ? CATEGORY_ORDER.length : aIndex;
-    const bOrder = bIndex === -1 ? CATEGORY_ORDER.length : bIndex;
-    return aOrder - bOrder;
-  });
+  const sortedCategories = useMemo(() => {
+    return [...allCategories].sort((a: CategoryResult, b: CategoryResult) => {
+      const aIndex = CATEGORY_ORDER.indexOf(a.category_id);
+      const bIndex = CATEGORY_ORDER.indexOf(b.category_id);
+      // Unknown categories go to end
+      const aOrder = aIndex === -1 ? CATEGORY_ORDER.length : aIndex;
+      const bOrder = bIndex === -1 ? CATEGORY_ORDER.length : bIndex;
+      return aOrder - bOrder;
+    });
+  }, [allCategories]);
+
+  // Initialize review state with all categories (sorted)
+  const {
+    selectedIssues,
+    notes,
+    severityFilter,
+    categoryFilter,
+    filteredCategories,
+    counts,
+    toggleSelection,
+    selectCategory,
+    deselectCategory,
+    selectAllVisible,
+    deselectAll,
+    setNote,
+    setSeverityFilter,
+    setCategoryFilter,
+  } = useReviewState(sortedCategories);
+
+  // Compute issue IDs for filtered categories (for current display)
+  // When filtering, issues shift position but we need stable IDs based on original index
+  const filteredCategoryIssueIds = useMemo(() => {
+    const result: Record<string, string[]> = {};
+    for (const category of filteredCategories) {
+      // Find original category to get original indices
+      const originalCategory = sortedCategories.find(c => c.category_id === category.category_id);
+      if (!originalCategory) continue;
+
+      // Map filtered issues to their original IDs using original index
+      result[category.category_id] = category.issues.map((issue) => {
+        // Find the original index of this issue by matching rule_id, pages, and message
+        const originalIndex = originalCategory.issues.findIndex(
+          (o) => o.rule_id === issue.rule_id && o.pages.join(',') === issue.pages.join(',') && o.message === issue.message
+        );
+        return getIssueId(issue, category.category_id, originalIndex !== -1 ? originalIndex : 0);
+      });
+    }
+    return result;
+  }, [filteredCategories, sortedCategories]);
 
   // Calculate combined totals
   const totalErrors = (result?.total_errors || 0) + (aiCategory?.error_count || 0);
@@ -131,8 +175,11 @@ export function CheckResults({
     );
   }
 
+  // Add padding class when summary bar is visible
+  const hasResultsWithIssues = !isAllPassed && sortedCategories.length > 0;
+
   return (
-    <div className="check-results">
+    <div className={`check-results ${hasResultsWithIssues ? 'check-results--has-summary-bar' : ''}`}>
       <div className="check-results__header">
         <div className="check-results__title-row">
           <h3 className="check-results__title">Compliance Check Results</h3>
@@ -168,6 +215,20 @@ export function CheckResults({
               {isAnalyzing ? 'Analyzing...' : 'Re-analyze'}
             </button>
           )}
+          <div className="check-results__filters">
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="check-results__category-filter"
+            >
+              <option value="all">All Categories</option>
+              {sortedCategories.map(cat => (
+                <option key={cat.category_id} value={cat.category_id}>
+                  {cat.category_name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -179,10 +240,24 @@ export function CheckResults({
           <span className="check-results__success-icon">{'\u2713'}</span>
           <span className="check-results__success-text">All checks passed</span>
         </div>
+      ) : filteredCategories.length === 0 && sortedCategories.length > 0 ? (
+        <div className="check-results__filter-empty">
+          No issues match current filters
+        </div>
       ) : (
         <div className="check-results__categories">
-          {sortedCategories.map((category) => (
-            <CategorySection key={category.category_id} category={category} />
+          {filteredCategories.map((category) => (
+            <CategorySection
+              key={category.category_id}
+              category={category}
+              issueIds={filteredCategoryIssueIds[category.category_id]}
+              selectedIds={selectedIssues}
+              notes={notes}
+              onToggleSelect={toggleSelection}
+              onSelectCategory={() => selectCategory(category.category_id, filteredCategoryIssueIds[category.category_id] || [])}
+              onDeselectCategory={() => deselectCategory(category.category_id, filteredCategoryIssueIds[category.category_id] || [])}
+              onNoteChange={setNote}
+            />
           ))}
         </div>
       )}
@@ -207,6 +282,18 @@ export function CheckResults({
           </span>
         )}
       </div>
+
+      {/* Review summary bar - fixed at bottom */}
+      {!isAllPassed && (
+        <ReviewSummaryBar
+          counts={counts}
+          severityFilter={severityFilter}
+          onFilterChange={setSeverityFilter}
+          onSelectAllVisible={selectAllVisible}
+          onDeselectAll={deselectAll}
+          canGenerateReport={counts.selected > 0}
+        />
+      )}
     </div>
   );
 }
