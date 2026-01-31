@@ -15,6 +15,11 @@ export interface CheckIssue {
   actual: string | null;
   pages: number[];
   how_to_fix?: string;
+
+  // AI analysis fields
+  ai_verified?: boolean;
+  ai_confidence?: 'high' | 'medium' | 'low';
+  ai_reasoning?: string;
 }
 
 /**
