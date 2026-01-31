@@ -17,11 +17,11 @@ PubCheck delivers automated UNEP PDF design compliance checking through a layere
 **Plans:** 5 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Project scaffolding and PDF extraction service
-- [ ] 01-02-PLAN.md — Rasterized detection, document type detection, upload API
-- [ ] 01-03-PLAN.md — Frontend DropZone and SortableTable components
-- [ ] 01-04-PLAN.md — Frontend integration and data tabs
-- [ ] 01-05-PLAN.md — User verification checkpoint
+- [x] 01-01-PLAN.md — Project scaffolding and PDF extraction service
+- [x] 01-02-PLAN.md — Rasterized detection, document type detection, upload API
+- [x] 01-03-PLAN.md — Frontend DropZone and SortableTable components
+- [x] 01-04-PLAN.md — Frontend integration and data tabs
+- [x] 01-05-PLAN.md — User verification checkpoint
 
 **Requirements:**
 - UPLD-01: User can upload PDF via drag-and-drop or file browser
@@ -181,7 +181,7 @@ Plans:
 
 | Phase | Name | Status | Requirements |
 |-------|------|--------|--------------|
-| 1 | PDF Foundation & Extraction | Planned | 7 |
+| 1 | PDF Foundation & Extraction | Complete | 7 |
 | 2 | Rule Configuration Engine | Pending | 4 |
 | 3 | Design Compliance Checks | Pending | 21 |
 | 4 | AI Verification | Pending | 3 |
