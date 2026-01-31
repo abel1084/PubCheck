@@ -71,6 +71,7 @@ class AIClient:
         image_data: str,
         prompt: str,
         system_prompt: Optional[str] = None,
+        mime_type: str = "image/jpeg",
     ) -> Dict[str, Any]:
         """
         Analyze a page image using Gemini Vision.
@@ -78,9 +79,10 @@ class AIClient:
         Sends the image with the prompt to Gemini and returns parsed JSON response.
 
         Args:
-            image_data: Base64-encoded PNG image data
+            image_data: Base64-encoded image data
             prompt: Analysis prompt (user message)
             system_prompt: Optional system prompt for role/context
+            mime_type: MIME type of the image (default: image/jpeg)
 
         Returns:
             Parsed JSON from response text
@@ -97,9 +99,9 @@ class AIClient:
         # Build content parts
         contents = []
 
-        # Add image (JPEG for reliable compression)
+        # Add image with dynamic mime type
         contents.append(
-            types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg")
+            types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
         )
 
         # Add text prompt

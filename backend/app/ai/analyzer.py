@@ -167,12 +167,12 @@ class DocumentAnalyzer:
             PageAnalysisResult with findings
         """
         # Render page to base64 (0-indexed for renderer)
-        # Use 50 DPI to keep images small for Gemini's 1MB limit
-        image_data = await asyncio.to_thread(
+        # Use 72 DPI for reasonable quality, renderer handles compression
+        image_data, mime_type = await asyncio.to_thread(
             render_page_to_base64,
             self.pdf_path,
             page_num - 1,  # Convert to 0-indexed
-            50,  # Low DPI for API size limits
+            72,  # Standard screen DPI
         )
 
         # Build page-specific context
@@ -187,6 +187,7 @@ class DocumentAnalyzer:
             image_data,
             prompt,
             SYSTEM_PROMPT,
+            mime_type,
         )
 
         # Parse response into findings
