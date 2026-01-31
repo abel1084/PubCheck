@@ -65,6 +65,9 @@ Last activity: 2026-01-31 - Completed 02-03-PLAN.md
 | useReducer for settings state | Predictable state updates with dirty tracking | 02-03 |
 | Native details/summary for collapsible | No extra library needed for simple expand/collapse | 02-03 |
 | Settings as full view, not modal | Better editing experience for rule configuration | 02-03 |
+| 5 doc types to 3 templates | factsheet, brief, publication cover all variations | 02-02 |
+| Atomic file writes | tempfile + os.replace prevents corruption | 02-02 |
+| Separate override storage | User changes in user_config/, templates read-only | 02-02 |
 
 ### Technical Debt / TODOs
 
@@ -76,8 +79,8 @@ Last activity: 2026-01-31 - Completed 02-03-PLAN.md
 
 ## Session Continuity
 
-Last session: 2026-01-31T11:17:58Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-01-31T12:04:00Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
 
 ## Session Log
@@ -93,6 +96,7 @@ Resume file: None
 | 2026-01-31 | Phase 1 Complete | All 5 plans executed, user verified |
 | 2026-01-31 | Completed 02-01 | YAML rule templates and Pydantic models (8 min) |
 | 2026-01-31 | Completed 02-03 | Settings UI with tabs, categories, rule controls (6 min) |
+| 2026-01-31 | Completed 02-02 | Rules API service and REST endpoints (4 min) |
 
 ---
 *State initialized: 2026-01-31*
