@@ -24,15 +24,12 @@ router = APIRouter(prefix="/api/ai", tags=["ai"])
 
 @router.post("/test")
 async def test_endpoint(
-    document_type: str = Form(...),
-    extraction: str = Form(...),
     file: UploadFile = File(...),
 ):
-    """Simple test endpoint."""
-    logger.info(f"TEST - document_type: {document_type}")
-    logger.info(f"TEST - extraction length: {len(extraction)}")
-    logger.info(f"TEST - file: {file.filename}")
-    return {"status": "ok", "doc_type": document_type, "extraction_len": len(extraction), "filename": file.filename}
+    """Simple test endpoint - file only."""
+    content = await file.read()
+    logger.info(f"TEST - file: {file.filename}, size: {len(content)}")
+    return {"status": "ok", "filename": file.filename, "size": len(content)}
 
 
 @router.post("/analyze", response_model=DocumentAnalysisResult)

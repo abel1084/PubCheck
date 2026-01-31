@@ -42,10 +42,12 @@ export function useAIAnalysis(): UseAIAnalysisReturn {
       setProgress(`Analyzing ${pageCount} page${pageCount !== 1 ? 's' : ''}...`);
 
       // Note: Uses relative URL per project learnings
-      // DEBUG: Test endpoint first
+      // DEBUG: Test endpoint with file only
+      const testFormData = new FormData();
+      testFormData.append('file', file);
       const testResponse = await fetch('/api/ai/test', {
         method: 'POST',
-        body: formData,
+        body: testFormData,
       });
       console.log('Test response:', testResponse.status, await testResponse.clone().text());
 
