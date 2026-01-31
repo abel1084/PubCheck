@@ -148,58 +148,58 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| UPLD-01 | TBD | Pending |
-| UPLD-02 | TBD | Pending |
-| UPLD-03 | TBD | Pending |
-| CONF-01 | TBD | Pending |
-| CONF-02 | TBD | Pending |
-| CONF-03 | TBD | Pending |
-| CONF-04 | TBD | Pending |
-| EXTR-01 | TBD | Pending |
-| EXTR-02 | TBD | Pending |
-| EXTR-03 | TBD | Pending |
-| EXTR-04 | TBD | Pending |
-| COVR-01 | TBD | Pending |
-| COVR-02 | TBD | Pending |
-| COVR-03 | TBD | Pending |
-| COVR-04 | TBD | Pending |
-| MRGN-01 | TBD | Pending |
-| MRGN-02 | TBD | Pending |
-| MRGN-03 | TBD | Pending |
-| MRGN-04 | TBD | Pending |
-| TYPO-01 | TBD | Pending |
-| TYPO-02 | TBD | Pending |
-| TYPO-03 | TBD | Pending |
-| TYPO-04 | TBD | Pending |
-| TYPO-05 | TBD | Pending |
-| IMAG-01 | TBD | Pending |
-| IMAG-02 | TBD | Pending |
-| REQD-01 | TBD | Pending |
-| REQD-02 | TBD | Pending |
-| REQD-03 | TBD | Pending |
-| REQD-04 | TBD | Pending |
-| REQD-05 | TBD | Pending |
-| REQD-06 | TBD | Pending |
-| AIVR-01 | TBD | Pending |
-| AIVR-02 | TBD | Pending |
-| AIVR-03 | TBD | Pending |
-| REVW-01 | TBD | Pending |
-| REVW-02 | TBD | Pending |
-| REVW-03 | TBD | Pending |
-| REVW-04 | TBD | Pending |
-| REVW-05 | TBD | Pending |
-| LERN-01 | TBD | Pending |
-| LERN-02 | TBD | Pending |
-| LERN-03 | TBD | Pending |
-| OUTP-01 | TBD | Pending |
-| OUTP-02 | TBD | Pending |
-| OUTP-03 | TBD | Pending |
+| UPLD-01 | Phase 1 | Pending |
+| UPLD-02 | Phase 1 | Pending |
+| UPLD-03 | Phase 1 | Pending |
+| CONF-01 | Phase 2 | Pending |
+| CONF-02 | Phase 2 | Pending |
+| CONF-03 | Phase 2 | Pending |
+| CONF-04 | Phase 2 | Pending |
+| EXTR-01 | Phase 1 | Pending |
+| EXTR-02 | Phase 1 | Pending |
+| EXTR-03 | Phase 1 | Pending |
+| EXTR-04 | Phase 1 | Pending |
+| COVR-01 | Phase 3 | Pending |
+| COVR-02 | Phase 3 | Pending |
+| COVR-03 | Phase 3 | Pending |
+| COVR-04 | Phase 3 | Pending |
+| MRGN-01 | Phase 3 | Pending |
+| MRGN-02 | Phase 3 | Pending |
+| MRGN-03 | Phase 3 | Pending |
+| MRGN-04 | Phase 3 | Pending |
+| TYPO-01 | Phase 3 | Pending |
+| TYPO-02 | Phase 3 | Pending |
+| TYPO-03 | Phase 3 | Pending |
+| TYPO-04 | Phase 3 | Pending |
+| TYPO-05 | Phase 3 | Pending |
+| IMAG-01 | Phase 3 | Pending |
+| IMAG-02 | Phase 3 | Pending |
+| REQD-01 | Phase 3 | Pending |
+| REQD-02 | Phase 3 | Pending |
+| REQD-03 | Phase 3 | Pending |
+| REQD-04 | Phase 3 | Pending |
+| REQD-05 | Phase 3 | Pending |
+| REQD-06 | Phase 3 | Pending |
+| AIVR-01 | Phase 4 | Pending |
+| AIVR-02 | Phase 4 | Pending |
+| AIVR-03 | Phase 4 | Pending |
+| REVW-01 | Phase 5 | Pending |
+| REVW-02 | Phase 5 | Pending |
+| REVW-03 | Phase 5 | Pending |
+| REVW-04 | Phase 5 | Pending |
+| REVW-05 | Phase 5 | Pending |
+| LERN-01 | Phase 6 | Pending |
+| LERN-02 | Phase 6 | Pending |
+| LERN-03 | Phase 6 | Pending |
+| OUTP-01 | Phase 6 | Pending |
+| OUTP-02 | Phase 6 | Pending |
+| OUTP-03 | Phase 6 | Pending |
 
 **Coverage:**
 - v1 requirements: 43 total
-- Mapped to phases: 0
-- Unmapped: 43
+- Mapped to phases: 43
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-31*
-*Last updated: 2026-01-31 after initial definition*
+*Last updated: 2026-01-31 after roadmap creation - traceability complete*
