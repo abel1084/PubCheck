@@ -79,6 +79,15 @@ Plans:
 
 **Goal:** Users can run compliance checks against uploaded PDFs and see categorized findings with severity levels.
 
+**Plans:** 5 plans
+
+Plans:
+- [x] 03-01-PLAN.md — Check models, tolerance utilities, executor foundation
+- [x] 03-02-PLAN.md — Check handlers (position, range, font, regex, presence, color)
+- [x] 03-03-PLAN.md — Check API endpoint and integration
+- [x] 03-04-PLAN.md — Frontend Check Results UI
+- [x] 03-05-PLAN.md — User verification checkpoint
+
 **Requirements:**
 - COVR-01: Validate UNEP logo position (top-right) and size (min 20mm, target 27.5mm)
 - COVR-02: Validate title typography (font, size range 28-34pt)
@@ -118,6 +127,14 @@ Plans:
 ## Phase 4: AI Verification
 
 **Goal:** Users receive AI-augmented verification for visual checks that programmatic rules struggle with.
+
+**Plans:** 4 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — AI infrastructure (client, schemas, prompts, renderer)
+- [ ] 04-02-PLAN.md — Document analyzer and REST API endpoint
+- [ ] 04-03-PLAN.md — Frontend AI integration with progress and confidence display
+- [ ] 04-04-PLAN.md — User verification checkpoint
 
 **Requirements:**
 - AIVR-01: Detect UNEP logo and verify position/size via Claude vision
@@ -191,8 +208,8 @@ Plans:
 |-------|------|--------|--------------|
 | 1 | PDF Foundation & Extraction | Complete | 7 |
 | 2 | Rule Configuration Engine | Complete | 4 |
-| 3 | Design Compliance Checks | Pending | 21 |
-| 4 | AI Verification | Pending | 3 |
+| 3 | Design Compliance Checks | Complete | 21 |
+| 4 | AI Verification | Ready | 3 |
 | 5 | Review Interface | Pending | 5 |
 | 6 | Learning System & Output Generation | Pending | 6 |
 
