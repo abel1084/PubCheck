@@ -157,6 +157,14 @@ Plans:
 
 **Goal:** Users can review all compliance issues in an interactive interface with filtering, notes, and issue selection.
 
+**Plans:** 4 plans
+
+Plans:
+- [x] 05-01-PLAN.md — Review types, useReviewState hook, ReviewSummaryBar component
+- [x] 05-02-PLAN.md — IssueCard checkbox/notes, CategorySection review props
+- [x] 05-03-PLAN.md — CheckResults integration, CSS styling
+- [x] 05-04-PLAN.md — User verification checkpoint
+
 **Requirements:**
 - REVW-01: Display issues list with checkboxes for selection
 - REVW-02: Issue cards show page, category, message, expected vs actual, severity
@@ -210,7 +218,7 @@ Plans:
 | 2 | Rule Configuration Engine | Complete | 4 |
 | 3 | Design Compliance Checks | Complete | 21 |
 | 4 | AI Verification | Complete | 3 |
-| 5 | Review Interface | Ready | 5 |
+| 5 | Review Interface | Complete | 5 |
 | 6 | Learning System & Output Generation | Pending | 6 |
 
 **Total:** 46 requirement mappings (43 unique, some phases share extraction foundation)
