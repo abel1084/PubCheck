@@ -49,6 +49,14 @@ Plans:
 
 **Goal:** Users can configure UNEP design rules via YAML templates and a settings UI before running compliance checks.
 
+**Plans:** 4 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — YAML templates and Pydantic models
+- [ ] 02-02-PLAN.md — Rules service and REST API endpoints
+- [ ] 02-03-PLAN.md — Frontend Settings UI with tabs and rule editing
+- [ ] 02-04-PLAN.md — User verification checkpoint
+
 **Requirements:**
 - CONF-01: Rules stored in YAML template files (3 templates covering 5 document types)
 - CONF-02: Settings UI with tabbed interface to edit template rules
