@@ -1,13 +1,15 @@
 """
-Anthropic client wrapper with retry logic for AI-powered analysis.
-Compatible with Pydantic v1 patterns.
+Google Gemini client wrapper with retry logic for AI-powered analysis.
+Uses Gemini 2.0 Flash for vision capabilities.
 """
+import base64
 import json
 import os
 import time
 from typing import Any, Dict, Optional
 
-import anthropic
+from google import genai
+from google.genai import types
 
 
 class AIClientError(Exception):
@@ -22,15 +24,13 @@ class AIConfigurationError(AIClientError):
 
 class AIClient:
     """
-    Wrapper for Anthropic Claude API with retry logic.
+    Wrapper for Google Gemini API with retry logic.
 
-    Uses temperature=0 for deterministic results.
+    Uses Gemini 2.0 Flash for fast, cost-effective vision analysis.
     Includes exponential backoff retry on transient errors.
-    30-second timeout per request.
     """
 
-    DEFAULT_MODEL = "claude-sonnet-4-20250514"
-    DEFAULT_MAX_TOKENS = 4096
+    DEFAULT_MODEL = "gemini-2.0-flash"
     DEFAULT_TIMEOUT = 30.0  # seconds
     MAX_RETRIES = 3
     RETRY_DELAYS = [1.0, 2.0, 4.0]  # exponential backoff
@@ -42,32 +42,28 @@ class AIClient:
         Does NOT validate API key at init time to allow graceful handling.
         API key is validated on first use.
         """
-        self._api_key: Optional[str] = None
-        self._client: Optional[anthropic.Anthropic] = None
+        self._client: Optional[genai.Client] = None
         self._model = os.getenv("AI_MODEL", self.DEFAULT_MODEL)
 
-    def _ensure_client(self) -> anthropic.Anthropic:
+    def _ensure_client(self) -> genai.Client:
         """
-        Lazy initialization of Anthropic client.
+        Lazy initialization of Gemini client.
 
-        Requires ANTHROPIC_API_KEY from console.anthropic.com.
+        Requires GOOGLE_API_KEY from Google AI Studio.
 
         Raises:
             AIConfigurationError: If API key is not set
         """
         if self._client is None:
-            api_key = os.getenv("ANTHROPIC_API_KEY")
+            api_key = os.getenv("GOOGLE_API_KEY")
 
             if not api_key:
                 raise AIConfigurationError(
-                    "ANTHROPIC_API_KEY not set.\n"
-                    "Get your API key from: https://console.anthropic.com/settings/keys"
+                    "GOOGLE_API_KEY not set.\n"
+                    "Get your API key from: https://aistudio.google.com/apikey"
                 )
 
-            self._client = anthropic.Anthropic(
-                api_key=api_key,
-                timeout=self.DEFAULT_TIMEOUT,
-            )
+            self._client = genai.Client(api_key=api_key)
         return self._client
 
     def analyze_page(
@@ -77,9 +73,9 @@ class AIClient:
         system_prompt: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
-        Analyze a page image using Claude Vision.
+        Analyze a page image using Gemini Vision.
 
-        Sends the image with the prompt to Claude and returns parsed JSON response.
+        Sends the image with the prompt to Gemini and returns parsed JSON response.
 
         Args:
             image_data: Base64-encoded PNG image data
@@ -95,51 +91,44 @@ class AIClient:
         """
         client = self._ensure_client()
 
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": "image/png",
-                            "data": image_data,
-                        },
-                    },
-                    {
-                        "type": "text",
-                        "text": prompt,
-                    },
-                ],
-            }
-        ]
+        # Decode base64 to bytes for Gemini
+        image_bytes = base64.b64decode(image_data)
+
+        # Build content parts
+        contents = []
+
+        # Add image
+        contents.append(
+            types.Part.from_bytes(data=image_bytes, mime_type="image/png")
+        )
+
+        # Add text prompt
+        contents.append(types.Part.from_text(text=prompt))
 
         last_error: Optional[Exception] = None
 
         for attempt in range(self.MAX_RETRIES):
             try:
-                kwargs: Dict[str, Any] = {
-                    "model": self._model,
-                    "max_tokens": self.DEFAULT_MAX_TOKENS,
-                    "temperature": 0,  # Deterministic for verification
-                    "messages": messages,
-                }
+                # Build config
+                config = types.GenerateContentConfig(
+                    temperature=0,  # Deterministic for verification
+                    max_output_tokens=4096,
+                )
 
                 if system_prompt:
-                    kwargs["system"] = system_prompt
+                    config.system_instruction = system_prompt
 
-                response = client.messages.create(**kwargs)
+                response = client.models.generate_content(
+                    model=self._model,
+                    contents=contents,
+                    config=config,
+                )
 
-                # Extract text content from response
-                text_content = ""
-                for block in response.content:
-                    if hasattr(block, "text"):
-                        text_content += block.text
+                # Extract text from response
+                text_content = response.text.strip()
 
                 # Parse JSON from response
                 # Handle potential markdown code blocks
-                text_content = text_content.strip()
                 if text_content.startswith("```json"):
                     text_content = text_content[7:]
                 if text_content.startswith("```"):
@@ -150,38 +139,24 @@ class AIClient:
 
                 return json.loads(text_content)
 
-            except anthropic.RateLimitError as e:
-                last_error = e
-                if attempt < self.MAX_RETRIES - 1:
-                    time.sleep(self.RETRY_DELAYS[attempt])
-                    continue
-                raise AIClientError(
-                    f"Rate limit exceeded after {self.MAX_RETRIES} retries: {e}"
-                ) from e
+            except Exception as e:
+                error_str = str(e).lower()
 
-            except anthropic.APIConnectionError as e:
-                last_error = e
-                if attempt < self.MAX_RETRIES - 1:
-                    time.sleep(self.RETRY_DELAYS[attempt])
-                    continue
-                raise AIClientError(
-                    f"API connection error after {self.MAX_RETRIES} retries: {e}"
-                ) from e
-
-            except anthropic.APIStatusError as e:
-                # 5xx errors are retryable, 4xx are not (except 429 rate limit)
-                if e.status_code >= 500:
+                # Check for retryable errors
+                if "rate" in error_str or "quota" in error_str or "503" in error_str or "500" in error_str:
                     last_error = e
                     if attempt < self.MAX_RETRIES - 1:
                         time.sleep(self.RETRY_DELAYS[attempt])
                         continue
-                raise AIClientError(f"API error: {e}") from e
+                    raise AIClientError(
+                        f"API error after {self.MAX_RETRIES} retries: {e}"
+                    ) from e
 
-            except json.JSONDecodeError as e:
-                # Response wasn't valid JSON - don't retry
-                raise AIClientError(
-                    f"Failed to parse API response as JSON: {e}"
-                ) from e
+                # Non-retryable errors
+                if "invalid" in error_str and "key" in error_str:
+                    raise AIConfigurationError(f"Invalid API key: {e}") from e
+
+                raise AIClientError(f"API error: {e}") from e
 
         # Should not reach here, but just in case
         raise AIClientError(
