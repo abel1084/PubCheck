@@ -291,6 +291,7 @@ export function CheckResults({
           onSelectAllVisible={selectAllVisible}
           onDeselectAll={deselectAll}
           canGenerateReport={counts.selected > 0}
+          isGenerating={false}
         />
       )}
     </div>

@@ -16,6 +16,8 @@ interface ReviewSummaryBarProps {
   onDeselectAll: () => void;
   /** Whether the Generate Report button should be enabled */
   canGenerateReport: boolean;
+  /** Whether report generation is in progress */
+  isGenerating: boolean;
   /** Callback when Generate Report is clicked */
   onGenerateReport?: () => void;
 }
@@ -35,6 +37,7 @@ export function ReviewSummaryBar({
   onSelectAllVisible,
   onDeselectAll,
   canGenerateReport,
+  isGenerating,
   onGenerateReport,
 }: ReviewSummaryBarProps) {
   // Show visible selected vs total selected when filter hides selected items
@@ -111,11 +114,17 @@ export function ReviewSummaryBar({
         <button
           type="button"
           className="review-summary-bar__report-btn"
-          disabled={!canGenerateReport}
+          disabled={!canGenerateReport || isGenerating}
           onClick={onGenerateReport}
-          title={canGenerateReport ? 'Generate PDF report' : 'Select at least one issue'}
+          title={
+            isGenerating
+              ? 'Generating report...'
+              : canGenerateReport
+                ? 'Generate PDF report'
+                : 'Select at least one issue'
+          }
         >
-          Generate Report
+          {isGenerating ? 'Generating...' : 'Generate Report'}
         </button>
       </div>
     </div>
