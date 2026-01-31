@@ -106,6 +106,9 @@ Last activity: 2026-01-31 - Completed 06-04-PLAN.md
 | Pydantic v1 compatible learning models | Match existing codebase patterns | 06-01 |
 | Atomic writes for ignored rules | tempfile + os.replace pattern from config/service.py | 06-01 |
 | Singleton service instance in router | Performance optimization for API calls | 06-01 |
+| 20px vertical offset for stacked annotations | Prevents overlapping sticky notes | 06-02 |
+| Blue summary annotation on page 1 | Distinguishes summary from issue annotations | 06-02 |
+| Clamp coordinates to page bounds | Prevents off-page annotation placement | 06-02 |
 | Blob download for PDF generation | Standard browser pattern for file downloads | 06-04 |
 | Native dialog for ProgressModal | Accessible by default, no library needed | 06-04 |
 | isGenerating placeholder in CheckResults | Full integration in 06-05/06 with pdfFile access | 06-04 |
@@ -157,6 +160,7 @@ Resume file: None
 | 2026-01-31 | Completed 05-04 | User verification - fixed doc type mapping, infinite loop, AI analyze |
 | 2026-01-31 | Phase 5 Complete | All 4 plans executed, user verified |
 | 2026-01-31 | Completed 06-01 | Learning module backend with models, service, and API (3 min) |
+| 2026-01-31 | Completed 06-02 | PDF annotation output: models, annotator, API endpoint (4 min) |
 | 2026-01-31 | Completed 06-04 | Frontend PDF generation: types, hook, ProgressModal, button wiring (3 min) |
 
 ---
