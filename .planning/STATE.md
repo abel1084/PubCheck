@@ -91,6 +91,10 @@ Last activity: 2026-01-31 - Completed 05-02-PLAN.md
 | Gemini 2.0 Flash over Anthropic | OAuth tokens don't work with Anthropic API | 04-04 |
 | Rate limiting: 2 concurrent pages | Prevents 429 errors from Gemini API | 04-04 |
 | Staggered delays between requests | Further reduces rate limit pressure | 04-04 |
+| Errors pre-selected by default | Focus on confirming real problems first | 05-01 |
+| Selection persists across filter changes | User shouldn't lose selections when filtering | 05-01 |
+| getIssueId uses category-rule-pages-index | Stable unique IDs without backend-assigned IDs | 05-01 |
+| visibleSelected in ReviewCounts | Shows "X selected (Y visible)" when filter hides items | 05-01 |
 | Review mode via callback presence | isReviewMode = onToggleSelect !== undefined | 05-02 |
 | Indeterminate checkbox via ref | ref={(el) => el.indeterminate = partial} pattern | 05-02 |
 
@@ -135,6 +139,7 @@ Resume file: None
 | 2026-01-31 | Completed 04-03 | Frontend AI integration: types, hook, components, App (6 min) |
 | 2026-01-31 | Completed 04-04 | User verification - switched to Gemini, fixed rate limits |
 | 2026-01-31 | Phase 4 Complete | All 4 plans executed, user verified |
+| 2026-01-31 | Completed 05-01 | Review types, useReviewState hook, ReviewSummaryBar (4 min) |
 | 2026-01-31 | Completed 05-02 | IssueCard and CategorySection enhanced with review mode (2 min) |
 
 ---
