@@ -1,24 +1,24 @@
 # Project State: PubCheck
 
-**Current Phase:** 6 (Pending)
-**Status:** Phase 5 Complete - Review Interface verified
+**Current Phase:** 6 (In Progress)
+**Status:** Plan 06-01 Complete - Learning module backend
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-31)
 
 **Core value:** Catch 95%+ of design compliance issues automatically, producing professional review outputs
-**Current focus:** Phase 5 - Review Interface (in progress)
+**Current focus:** Phase 6 - Learning System & Output Generation
 
 ## Current Position
 
 ```
-Phase: 6 of 6 - Learning System & Output Generation (PENDING)
-Plan:  0 of ?
-Status: Ready to plan
-Last activity: 2026-01-31 - Phase 5 verified and complete
+Phase: 6 of 6 - Learning System & Output Generation (IN PROGRESS)
+Plan:  1 of 6
+Status: In progress
+Last activity: 2026-01-31 - Completed 06-01-PLAN.md
 
-[========================] 92%
+[========================] 93%
 ```
 
 ## Progress
@@ -30,7 +30,7 @@ Last activity: 2026-01-31 - Phase 5 verified and complete
 | 3 | Design Compliance Checks | Complete | 5/5 |
 | 4 | AI Verification | Complete | 4/4 |
 | 5 | Review Interface | Complete | 4/4 |
-| 6 | Learning System & Output Generation | Pending | 0/? |
+| 6 | Learning System & Output Generation | In Progress | 1/6 |
 
 ## Performance Metrics
 
@@ -103,6 +103,9 @@ Last activity: 2026-01-31 - Phase 5 verified and complete
 | Pydantic v2 model_validate_json | parse_raw() deprecated in v2, caused 400 errors | 05-04 |
 | Extraction sent as file not Form field | Large JSON exceeds multipart Form field limits | 05-04 |
 | WebP via webptools for AI images | 30% smaller than JPEG, reduces tokens/cost | 05-04 |
+| Pydantic v1 compatible learning models | Match existing codebase patterns | 06-01 |
+| Atomic writes for ignored rules | tempfile + os.replace pattern from config/service.py | 06-01 |
+| Singleton service instance in router | Performance optimization for API calls | 06-01 |
 
 ### Technical Debt / TODOs
 
@@ -114,8 +117,8 @@ Last activity: 2026-01-31 - Phase 5 verified and complete
 
 ## Session Continuity
 
-Last session: 2026-01-31T20:30:00Z
-Stopped at: Phase 5 complete, ready for Phase 6
+Last session: 2026-01-31T23:03:00Z
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
 
 ## Session Log
@@ -150,7 +153,8 @@ Resume file: None
 | 2026-01-31 | Completed 05-03 | Review integration in CheckResults, CSS styling (4 min) |
 | 2026-01-31 | Completed 05-04 | User verification - fixed doc type mapping, infinite loop, AI analyze |
 | 2026-01-31 | Phase 5 Complete | All 4 plans executed, user verified |
+| 2026-01-31 | Completed 06-01 | Learning module backend with models, service, and API (3 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-01-31T18:04:00Z*
+*Last updated: 2026-01-31T23:03:00Z*
