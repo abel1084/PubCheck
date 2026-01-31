@@ -13,6 +13,7 @@ from .schemas import AIFinding, PageAnalysisResult, DocumentAnalysisResult
 from .prompts import generate_checklist, build_analysis_prompt, SYSTEM_PROMPT
 from .renderer import render_page_to_base64
 from .analyzer import DocumentAnalyzer, analyze_document
+from .router import router
 
 __all__ = [
     # Client
@@ -31,4 +32,6 @@ __all__ = [
     # Analyzer
     "DocumentAnalyzer",
     "analyze_document",
+    # Router
+    "router",
 ]
