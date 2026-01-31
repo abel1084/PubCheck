@@ -50,27 +50,22 @@ class AIClient:
         """
         Lazy initialization of Anthropic client.
 
-        Uses CLAUDE_CODE_OAUTH_TOKEN (Claude Code subscription) if available,
-        falls back to ANTHROPIC_API_KEY for direct API access.
+        Requires ANTHROPIC_API_KEY from console.anthropic.com.
 
         Raises:
-            AIConfigurationError: If neither token is set
+            AIConfigurationError: If API key is not set
         """
         if self._client is None:
-            # Prefer Claude Code OAuth token (uses existing subscription)
-            self._api_key = os.getenv("CLAUDE_CODE_OAUTH_TOKEN")
-            if not self._api_key:
-                # Fall back to direct API key
-                self._api_key = os.getenv("ANTHROPIC_API_KEY")
+            api_key = os.getenv("ANTHROPIC_API_KEY")
 
-            if not self._api_key:
+            if not api_key:
                 raise AIConfigurationError(
-                    "No API credentials found. Set either:\n"
-                    "  - CLAUDE_CODE_OAUTH_TOKEN (uses your Claude Code subscription)\n"
-                    "  - ANTHROPIC_API_KEY (direct API access)"
+                    "ANTHROPIC_API_KEY not set.\n"
+                    "Get your API key from: https://console.anthropic.com/settings/keys"
                 )
+
             self._client = anthropic.Anthropic(
-                api_key=self._api_key,
+                api_key=api_key,
                 timeout=self.DEFAULT_TIMEOUT,
             )
         return self._client
