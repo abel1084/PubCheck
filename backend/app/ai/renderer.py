@@ -46,7 +46,7 @@ def render_page_to_base64(pdf_path: str, page_num: int, dpi: int = 72) -> str:
         # Try progressively lower quality until under size limit
         for quality in [85, 70, 55, 40]:
             buffer = io.BytesIO()
-            img.save(buffer, format="WEBP", quality=quality, method=6)
+            img.save(buffer, format="WEBP", quality=quality, method=4)
             webp_bytes = buffer.getvalue()
 
             if len(webp_bytes) <= MAX_IMAGE_BYTES:
@@ -59,7 +59,7 @@ def render_page_to_base64(pdf_path: str, page_num: int, dpi: int = 72) -> str:
             resized = img.resize(new_size, Image.Resampling.LANCZOS)
 
             buffer = io.BytesIO()
-            resized.save(buffer, format="WEBP", quality=60, method=6)
+            resized.save(buffer, format="WEBP", quality=60, method=4)
             webp_bytes = buffer.getvalue()
 
             if len(webp_bytes) <= MAX_IMAGE_BYTES:
@@ -71,7 +71,7 @@ def render_page_to_base64(pdf_path: str, page_num: int, dpi: int = 72) -> str:
         new_size = (int(img.width * 0.3), int(img.height * 0.3))
         resized = img.resize(new_size, Image.Resampling.LANCZOS)
         buffer = io.BytesIO()
-        resized.save(buffer, format="WEBP", quality=50, method=6)
+        resized.save(buffer, format="WEBP", quality=50, method=4)
         return base64.standard_b64encode(buffer.getvalue()).decode("utf-8")
 
     finally:
