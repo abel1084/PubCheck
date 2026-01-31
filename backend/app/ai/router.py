@@ -22,22 +22,17 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 
 
-@router.post("/analyze-debug")
-async def analyze_debug(request: Request):
-    """Debug endpoint to see raw request data."""
-    try:
-        form = await request.form()
-        logger.info(f"Form keys: {list(form.keys())}")
-        for key in form.keys():
-            value = form[key]
-            if hasattr(value, 'filename'):
-                logger.info(f"  {key}: file={value.filename}, size={value.size}")
-            else:
-                logger.info(f"  {key}: {str(value)[:100]}...")
-        return {"status": "ok", "keys": list(form.keys())}
-    except Exception as e:
-        logger.error(f"Debug error: {e}")
-        return {"status": "error", "error": str(e)}
+@router.post("/test")
+async def test_endpoint(
+    document_type: str = Form(...),
+    extraction: str = Form(...),
+    file: UploadFile = File(...),
+):
+    """Simple test endpoint."""
+    logger.info(f"TEST - document_type: {document_type}")
+    logger.info(f"TEST - extraction length: {len(extraction)}")
+    logger.info(f"TEST - file: {file.filename}")
+    return {"status": "ok", "doc_type": document_type, "extraction_len": len(extraction), "filename": file.filename}
 
 
 @router.post("/analyze", response_model=DocumentAnalysisResult)
