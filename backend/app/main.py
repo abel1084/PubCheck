@@ -16,6 +16,8 @@ from app.api import upload_router
 from app.ai.router import router as ai_router
 from app.checks.router import router as check_router
 from app.config.router import router as config_router
+from app.learning.router import router as learning_router
+from app.output.router import router as output_router
 
 app = FastAPI(
     title="PubCheck",
@@ -44,6 +46,8 @@ app.include_router(upload_router)
 app.include_router(config_router)
 app.include_router(check_router)
 app.include_router(ai_router)
+app.include_router(learning_router)
+app.include_router(output_router)
 
 
 @app.get("/")
