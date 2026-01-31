@@ -19,6 +19,10 @@ interface DataTabsProps {
   isAnalyzing?: boolean;
   aiProgress?: string;
   onReanalyze?: () => void;
+  // Document type for ignored rules filtering
+  documentType?: string;
+  // PDF file for report generation
+  pdfFile?: File | null;
 }
 
 type TabId = 'text' | 'images' | 'margins' | 'metadata' | 'check-results';
@@ -31,7 +35,9 @@ export function DataTabs({
   aiResult,
   isAnalyzing,
   aiProgress,
-  onReanalyze
+  onReanalyze,
+  documentType,
+  pdfFile
 }: DataTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>('text');
 
@@ -101,6 +107,8 @@ export function DataTabs({
               isAnalyzing={isAnalyzing}
               aiProgress={aiProgress}
               onReanalyze={onReanalyze}
+              documentType={documentType}
+              pdfFile={pdfFile}
             />
           )
         )}

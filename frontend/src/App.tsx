@@ -199,6 +199,8 @@ function App() {
             isAnalyzing={isAnalyzing}
             aiProgress={progress}
             onReanalyze={handleAIAnalyze}
+            documentType={documentType ? DOCUMENT_TYPE_MAP[documentType] : undefined}
+            pdfFile={uploadedFileRef.current}
           />
         </main>
       </div>
