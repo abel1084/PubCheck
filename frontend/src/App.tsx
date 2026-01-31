@@ -4,11 +4,13 @@ import { DataTabs } from './components/DataTabs';
 import { Sidebar } from './components/Sidebar';
 import { Settings } from './components/Settings';
 import { useExtraction } from './hooks/useExtraction';
+import { useComplianceCheck } from './hooks/useComplianceCheck';
 import type { DocumentType } from './types/extraction';
 import './App.css';
 
 function App() {
   const { isUploading, error, result, upload, reset } = useExtraction();
+  const { isChecking, checkResult, checkError, runCheck, clearResult } = useComplianceCheck();
   const [documentType, setDocumentType] = useState<DocumentType | null>(null);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -21,7 +23,17 @@ function App() {
 
   const handleNewDocument = () => {
     reset();
+    clearResult();
     setDocumentType(null);
+  };
+
+  // Handle check button click
+  const handleCheck = () => {
+    if (result && documentType) {
+      // Convert DocumentType to lowercase for API endpoint
+      const docTypeId = documentType.toLowerCase().replace(/\s+/g, '_');
+      runCheck(docTypeId, result.extraction);
+    }
   };
 
   // Show settings view
@@ -80,14 +92,37 @@ function App() {
     <div className="app app--results">
       <header className="app__header app__header--compact">
         <h1>PubCheck</h1>
-        <button
-          type="button"
-          className="app__settings-button"
-          onClick={() => setShowSettings(true)}
-        >
-          Settings
-        </button>
+        <div className="app__header-buttons">
+          <button
+            type="button"
+            className={`app__check-button ${isChecking ? 'app__check-button--loading' : ''}`}
+            onClick={handleCheck}
+            disabled={!result || isChecking}
+            title={!result ? 'Upload a PDF first' : 'Run compliance check'}
+          >
+            {isChecking ? (
+              <>
+                <span className="app__spinner"></span>
+                Checking...
+              </>
+            ) : (
+              'Check'
+            )}
+          </button>
+          <button
+            type="button"
+            className="app__settings-button"
+            onClick={() => setShowSettings(true)}
+          >
+            Settings
+          </button>
+        </div>
       </header>
+      {checkError && (
+        <div className="app__check-error">
+          Check failed: {checkError}
+        </div>
+      )}
       <div className="app__content">
         <Sidebar
           filename={result.filename}
@@ -98,7 +133,12 @@ function App() {
           onNewDocument={handleNewDocument}
         />
         <main className="app__main">
-          <DataTabs extraction={result.extraction} />
+          <DataTabs
+            extraction={result.extraction}
+            checkResult={checkResult}
+            isChecking={isChecking}
+            onRecheck={handleCheck}
+          />
         </main>
       </div>
     </div>
