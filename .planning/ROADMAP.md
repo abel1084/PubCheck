@@ -52,10 +52,10 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — YAML templates and Pydantic models
-- [ ] 02-02-PLAN.md — Rules service and REST API endpoints
-- [ ] 02-03-PLAN.md — Frontend Settings UI with tabs and rule editing
-- [ ] 02-04-PLAN.md — User verification checkpoint
+- [x] 02-01-PLAN.md — YAML templates and Pydantic models
+- [x] 02-02-PLAN.md — Rules service and REST API endpoints
+- [x] 02-03-PLAN.md — Frontend Settings UI with tabs and rule editing
+- [x] 02-04-PLAN.md — User verification checkpoint
 
 **Requirements:**
 - CONF-01: Rules stored in YAML template files (3 templates covering 5 document types)
@@ -190,7 +190,7 @@ Plans:
 | Phase | Name | Status | Requirements |
 |-------|------|--------|--------------|
 | 1 | PDF Foundation & Extraction | Complete | 7 |
-| 2 | Rule Configuration Engine | Pending | 4 |
+| 2 | Rule Configuration Engine | Complete | 4 |
 | 3 | Design Compliance Checks | Pending | 21 |
 | 4 | AI Verification | Pending | 3 |
 | 5 | Review Interface | Pending | 5 |
