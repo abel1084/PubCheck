@@ -1,7 +1,7 @@
 # Project State: PubCheck
 
 **Current Phase:** 1
-**Status:** Not Started
+**Status:** In Progress
 
 ## Project Reference
 
@@ -14,31 +14,32 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 
 ```
 Phase: 1 of 6 - PDF Foundation & Extraction
-Plan:  None yet
-Status: Not Started
+Plan:  1 of 5
+Status: In Progress
+Last activity: 2026-01-31 - Completed 01-01-PLAN.md
 
-[....................] 0%
+[====................] 20%
 ```
 
 ## Progress
 
 | Phase | Name | Status | Plans |
 |-------|------|--------|-------|
-| 1 | PDF Foundation & Extraction | Pending | 0/0 |
-| 2 | Rule Configuration Engine | Pending | 0/0 |
-| 3 | Design Compliance Checks | Pending | 0/0 |
-| 4 | AI Verification | Pending | 0/0 |
-| 5 | Review Interface | Pending | 0/0 |
-| 6 | Learning System & Output Generation | Pending | 0/0 |
+| 1 | PDF Foundation & Extraction | In Progress | 1/5 |
+| 2 | Rule Configuration Engine | Pending | 0/? |
+| 3 | Design Compliance Checks | Pending | 0/? |
+| 4 | AI Verification | Pending | 0/? |
+| 5 | Review Interface | Pending | 0/? |
+| 6 | Learning System & Output Generation | Pending | 0/? |
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans completed | 0 |
+| Plans completed | 1 |
 | Plans failed | 0 |
-| Total iterations | 0 |
-| Avg iterations/plan | - |
+| Total iterations | 1 |
+| Avg iterations/plan | 1.0 |
 
 ## Accumulated Context
 
@@ -46,21 +47,30 @@ Status: Not Started
 
 | Decision | Rationale | Phase |
 |----------|-----------|-------|
-| (none yet) | | |
+| Pydantic v1 for Python 3.14 | v2 requires Rust compilation, failed on system | 01-01 |
+| DPI from rendered size | Embedded metadata values often incorrect | 01-01 |
+| Inside/outside margin derivation | Page 0 = right-hand page assumption | 01-01 |
 
 ### Technical Debt / TODOs
 
-- (none yet)
+- Upgrade to Pydantic v2 when prebuilt wheels available for Python 3.14
 
 ### Blockers
 
 - (none currently)
+
+## Session Continuity
+
+Last session: 2026-01-31T09:54:07Z
+Stopped at: Completed 01-01-PLAN.md
+Resume file: None
 
 ## Session Log
 
 | Date | Action | Notes |
 |------|--------|-------|
 | 2026-01-31 | Project initialized | Roadmap created with 6 phases, 43 requirements mapped |
+| 2026-01-31 | Completed 01-01 | Project scaffolding and PDF extraction service (8 min) |
 
 ---
 *State initialized: 2026-01-31*

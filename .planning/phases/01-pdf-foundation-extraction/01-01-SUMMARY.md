@@ -1,0 +1,156 @@
+---
+phase: 01-pdf-foundation-extraction
+plan: 01
+subsystem: api, extraction
+tags: [fastapi, pymupdf, pydantic, react, typescript, vite]
+
+# Dependency graph
+requires: []
+provides:
+  - FastAPI backend server on localhost:8000
+  - PDF extraction service with text/image/margin extraction
+  - Pydantic models for extraction data structures
+  - React/TypeScript frontend scaffolding on localhost:5173
+  - TypeScript types matching Python models
+affects: [01-02, 01-03, 01-04, 01-05]
+
+# Tech tracking
+tech-stack:
+  added: [pymupdf, fastapi, uvicorn, pydantic, react, vite, react-dropzone, tanstack-react-table]
+  patterns: [layered-service-architecture, pydantic-models, type-mirroring]
+
+key-files:
+  created:
+    - backend/app/main.py
+    - backend/app/services/pdf_extractor.py
+    - backend/app/services/text_processor.py
+    - backend/app/services/image_processor.py
+    - backend/app/services/margin_calculator.py
+    - backend/app/services/document_classifier.py
+    - backend/app/models/extraction.py
+    - frontend/src/types/extraction.ts
+  modified: []
+
+key-decisions:
+  - "Used Pydantic v1 syntax for Python 3.14 compatibility (v2 requires Rust compilation)"
+  - "DPI calculated from rendered bbox size, not embedded metadata (more accurate)"
+  - "Font names normalized by stripping 6-char subset prefixes"
+  - "Inside/outside margins derived from page position (odd/even assumption)"
+
+patterns-established:
+  - "Service layer pattern: extraction orchestrator delegates to specialized processors"
+  - "Pydantic models with Config class for v1 compatibility"
+  - "TypeScript types mirror Python Pydantic models"
+
+# Metrics
+duration: 8min
+completed: 2026-01-31
+---
+
+# Phase 01 Plan 01: Project Scaffolding and PDF Extraction Summary
+
+**FastAPI backend with PyMuPDF extraction service extracting text (font/coordinates), images (DPI), margins, and metadata from PDFs, plus React/TypeScript frontend scaffolding**
+
+## Performance
+
+- **Duration:** 8 min
+- **Started:** 2026-01-31T09:46:28Z
+- **Completed:** 2026-01-31T09:54:07Z
+- **Tasks:** 2
+- **Files modified:** 20
+
+## Accomplishments
+
+- Created FastAPI backend with CORS configured for React dev server
+- Implemented PDFExtractor class orchestrating PyMuPDF operations
+- Built text processor with font normalization (strips subset prefixes) and flag decoding
+- Built image processor calculating DPI from rendered size (not embedded metadata)
+- Built margin calculator finding content bounding boxes and deriving inside/outside margins
+- Created Pydantic models matching extraction data structures
+- Created TypeScript types mirroring Python models
+- Added upload endpoint with rasterized PDF detection
+- Added document type classifier for UNEP categories
+
+## Task Commits
+
+Each task was committed atomically:
+
+1. **Task 1: Create project scaffolding** - `3e5d2aa` (feat)
+2. **Task 2: Implement PDF extraction service with Pydantic models** - `aeb21bd` (feat)
+
+## Files Created/Modified
+
+### Backend
+- `backend/app/main.py` - FastAPI app with health endpoints and upload route
+- `backend/app/models/extraction.py` - Pydantic models: TextBlock, ImageInfo, PageMargins, DocumentMetadata, FontSummary, ExtractionResult
+- `backend/app/services/pdf_extractor.py` - PDFExtractor class orchestrating extraction
+- `backend/app/services/text_processor.py` - Font normalization, flag decoding, text block extraction
+- `backend/app/services/image_processor.py` - Image extraction with DPI calculation
+- `backend/app/services/margin_calculator.py` - Content-based margin calculation
+- `backend/app/services/document_classifier.py` - UNEP document type classification
+- `backend/requirements.txt` - Python dependencies
+
+### Frontend
+- `frontend/package.json` - React/TypeScript dependencies
+- `frontend/vite.config.ts` - Vite with backend proxy
+- `frontend/tsconfig.json` - Strict TypeScript config
+- `frontend/index.html` - HTML entry point
+- `frontend/src/main.tsx` - React root mount
+- `frontend/src/App.tsx` - Placeholder component
+- `frontend/src/types/extraction.ts` - TypeScript types matching backend models
+
+## Decisions Made
+
+1. **Pydantic v1 for Python 3.14 compatibility** - Pydantic v2 requires Rust compilation which failed on the system. Used v1 syntax (Optional[], List[], Config class) for compatibility.
+
+2. **DPI calculation from rendered size** - Per RESEARCH.md guidance, DPI is calculated as `(image_pixels / display_points) * 72` rather than trusting embedded metadata values.
+
+3. **Font flag + name checking** - Bold/italic detection checks both font flags (bit 16, bit 2) AND font name keywords to handle PDFs with incorrect flags.
+
+4. **Inside/outside margin derivation** - Assumes standard book binding where page 0 (first page) is a right-hand page. Odd pages have inside=left, even pages have inside=right.
+
+## Deviations from Plan
+
+### Auto-added Functionality
+
+**1. [Rule 2 - Missing Critical] Added document classifier**
+- **Found during:** Task 2 completion (auto-generated by parallel process)
+- **Issue:** Document type detection mentioned in CONTEXT.md but not explicitly in Task 2
+- **Fix:** Included document_classifier.py implementing UNEP document type detection
+- **Files modified:** backend/app/services/document_classifier.py, backend/app/main.py
+- **Committed in:** aeb21bd (Task 2 commit)
+
+**2. [Rule 3 - Blocking] Pydantic v1 compatibility**
+- **Found during:** Task 2 dependency installation
+- **Issue:** Pydantic v2 requires Rust compilation, failed on Python 3.14 / Windows
+- **Fix:** Used Pydantic v1 syntax with typing imports (Optional, List, Tuple) and Config class
+- **Files modified:** backend/app/models/extraction.py, backend/requirements.txt
+- **Committed in:** aeb21bd (Task 2 commit)
+
+---
+
+**Total deviations:** 2 auto-fixed (1 missing critical, 1 blocking)
+**Impact on plan:** Both necessary for functionality. Document classifier adds value for Phase 1 context. Pydantic v1 required for system compatibility.
+
+## Quick Rules Applied
+
+No Quick Rules applied during this plan.
+
+## Issues Encountered
+
+- **Pydantic v2 compilation failure** - Python 3.14 on Windows lacks prebuilt wheels for pydantic-core (requires Rust). Resolved by using Pydantic v1 which is pure Python.
+
+## User Setup Required
+
+None - no external service configuration required.
+
+## Next Phase Readiness
+
+- Backend server starts and health endpoints respond
+- PDF extraction service complete and importable
+- TypeScript types ready for frontend consumption
+- Ready for Plan 02: Upload UI with dropzone and rasterized detection
+
+---
+*Phase: 01-pdf-foundation-extraction*
+*Completed: 2026-01-31*
