@@ -66,10 +66,31 @@ def create_executor() -> CheckExecutor:
     """
     Create executor with all handlers registered.
 
+    Registers all 6 check type handlers:
+    - position: Logo placement checks (COVR-01, COVR-04)
+    - range: Margin and DPI checks (MRGN-*, IMAG-01)
+    - font: Typography checks (TYPO-*)
+    - regex: Required element pattern checks (REQD-01 to REQD-05)
+    - presence: Element presence and count checks (REQD-06, color space)
+    - color: Color matching checks
+
     Returns:
         CheckExecutor instance ready for use
     """
+    from .handlers import (
+        check_position,
+        check_range,
+        check_font,
+        check_regex,
+        check_presence,
+        check_color,
+    )
+
     executor = CheckExecutor()
-    # Handlers will be registered in Plan 02
-    # Placeholder registrations - will be replaced
+    executor.register("position", check_position)
+    executor.register("range", check_range)
+    executor.register("font", check_font)
+    executor.register("regex", check_regex)
+    executor.register("presence", check_presence)
+    executor.register("color", check_color)
     return executor
