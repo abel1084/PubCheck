@@ -2,8 +2,12 @@
 PubCheck - UNEP PDF Design Compliance Checker
 FastAPI application entry point
 """
+from pathlib import Path
 from dotenv import load_dotenv
-load_dotenv()  # Load .env file before other imports
+
+# Load .env from project root (one level up from backend/)
+env_path = Path(__file__).parent.parent.parent / ".env"
+load_dotenv(env_path)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
