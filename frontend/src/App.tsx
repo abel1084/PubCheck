@@ -43,8 +43,9 @@ function App() {
   // Handle check button click
   const handleCheck = () => {
     if (result && documentType) {
-      // Convert DocumentType to lowercase for API endpoint
-      const docTypeId = documentType.toLowerCase().replace(/\s+/g, '_');
+      // Convert DocumentType to lowercase with hyphens for API endpoint
+      // Backend expects: factsheet, policy-brief, issue-note, working-paper, publication
+      const docTypeId = documentType.toLowerCase().replace(/\s+/g, '-');
       runCheck(docTypeId, result.extraction);
     }
   };
@@ -52,7 +53,7 @@ function App() {
   // Handle AI analyze button click
   const handleAIAnalyze = () => {
     if (result && documentType && uploadedFileRef.current) {
-      const docTypeId = documentType.toLowerCase().replace(/\s+/g, '_');
+      const docTypeId = documentType.toLowerCase().replace(/\s+/g, '-');
       analyze(uploadedFileRef.current, result.extraction, docTypeId);
     }
   };
