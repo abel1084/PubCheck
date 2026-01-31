@@ -1,6 +1,6 @@
 """
 PDF page to base64 image renderer using PyMuPDF.
-Uses JPEG compression to stay under Gemini's 1MB limit.
+Uses WebP compression to stay under Gemini's 1MB limit.
 """
 import base64
 import io
@@ -15,9 +15,9 @@ MAX_IMAGE_BYTES = 900 * 1024  # 900KB to be safe
 
 def render_page_to_base64(pdf_path: str, page_num: int, dpi: int = 72) -> str:
     """
-    Render a PDF page to base64-encoded JPEG.
+    Render a PDF page to base64-encoded WebP.
 
-    Uses JPEG compression and quality adjustment to stay under API size limits.
+    Uses WebP compression for smallest file size while maintaining quality.
     Falls back to lower quality/resolution if needed.
 
     Args:
@@ -26,7 +26,7 @@ def render_page_to_base64(pdf_path: str, page_num: int, dpi: int = 72) -> str:
         dpi: Resolution for rendering (default 72 for screen)
 
     Returns:
-        Base64-encoded JPEG image data
+        Base64-encoded WebP image data
     """
     doc = None
     try:
@@ -40,17 +40,17 @@ def render_page_to_base64(pdf_path: str, page_num: int, dpi: int = 72) -> str:
         # Render page to pixmap (no alpha for smaller size)
         pix = page.get_pixmap(matrix=matrix, alpha=False)
 
-        # Convert to PIL Image for JPEG compression
+        # Convert to PIL Image for WebP compression
         img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
 
         # Try progressively lower quality until under size limit
         for quality in [85, 70, 55, 40]:
             buffer = io.BytesIO()
-            img.save(buffer, format="JPEG", quality=quality, optimize=True)
-            jpeg_bytes = buffer.getvalue()
+            img.save(buffer, format="WEBP", quality=quality, method=6)
+            webp_bytes = buffer.getvalue()
 
-            if len(jpeg_bytes) <= MAX_IMAGE_BYTES:
-                return base64.standard_b64encode(jpeg_bytes).decode("utf-8")
+            if len(webp_bytes) <= MAX_IMAGE_BYTES:
+                return base64.standard_b64encode(webp_bytes).decode("utf-8")
 
         # If still too large, resize the image
         scale = 0.7
@@ -59,11 +59,11 @@ def render_page_to_base64(pdf_path: str, page_num: int, dpi: int = 72) -> str:
             resized = img.resize(new_size, Image.Resampling.LANCZOS)
 
             buffer = io.BytesIO()
-            resized.save(buffer, format="JPEG", quality=60, optimize=True)
-            jpeg_bytes = buffer.getvalue()
+            resized.save(buffer, format="WEBP", quality=60, method=6)
+            webp_bytes = buffer.getvalue()
 
-            if len(jpeg_bytes) <= MAX_IMAGE_BYTES:
-                return base64.standard_b64encode(jpeg_bytes).decode("utf-8")
+            if len(webp_bytes) <= MAX_IMAGE_BYTES:
+                return base64.standard_b64encode(webp_bytes).decode("utf-8")
 
             scale -= 0.1
 
@@ -71,7 +71,7 @@ def render_page_to_base64(pdf_path: str, page_num: int, dpi: int = 72) -> str:
         new_size = (int(img.width * 0.3), int(img.height * 0.3))
         resized = img.resize(new_size, Image.Resampling.LANCZOS)
         buffer = io.BytesIO()
-        resized.save(buffer, format="JPEG", quality=50, optimize=True)
+        resized.save(buffer, format="WEBP", quality=50, method=6)
         return base64.standard_b64encode(buffer.getvalue()).decode("utf-8")
 
     finally:
