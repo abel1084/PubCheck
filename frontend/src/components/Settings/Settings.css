@@ -325,3 +325,67 @@
   cursor: not-allowed;
   opacity: 0.5;
 }
+
+/* Ignored Rules Tab */
+.ignored-rules-tab {
+  padding: 1rem;
+}
+
+.ignored-rules-tab__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ignored-rules-tab__table th,
+.ignored-rules-tab__table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.ignored-rules-tab__table th {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.85rem;
+}
+
+.ignored-rules-tab__rule-id {
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+.ignored-rules-tab__reason {
+  color: #666;
+  font-style: italic;
+}
+
+.ignored-rules-tab__delete-btn {
+  padding: 0.25rem 0.5rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.ignored-rules-tab__delete-btn:hover {
+  background: #c82333;
+}
+
+.ignored-rules-tab__empty {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+}
+
+.ignored-rules-tab__hint {
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+.ignored-rules-tab__loading {
+  padding: 2rem;
+  text-align: center;
+  color: #888;
+}
