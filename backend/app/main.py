@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import upload_router
+from app.config.router import router as config_router
 
 app = FastAPI(
     title="PubCheck",
@@ -24,6 +25,7 @@ app.add_middleware(
 
 # Include API routers
 app.include_router(upload_router)
+app.include_router(config_router)
 
 
 @app.get("/")
