@@ -1,0 +1,420 @@
+version: "1.0"
+document_type: "publication"
+categories:
+  cover:
+    name: "Cover"
+    rules:
+      unep_logo_front:
+        name: "UNEP logo on front cover"
+        description: "Logo must be in top-right corner on front cover"
+        enabled: true
+        severity: "error"
+        check_type: "position"
+        expected:
+          position: "top-right"
+          min_size_mm: 20
+          target_size_mm: 27.5
+          height_mm: 30
+
+      unep_logo_back:
+        name: "UNEP logo on back cover"
+        description: "Logo must be in bottom-left corner on back cover"
+        enabled: true
+        severity: "error"
+        check_type: "position"
+        expected:
+          position: "bottom-left"
+          min_size_mm: 20
+
+      title_size:
+        name: "Main title size"
+        description: "Main title should be 28-34pt"
+        enabled: true
+        severity: "error"
+        check_type: "range"
+        expected:
+          min: 28
+          max: 34
+          unit: "pt"
+
+      subtitle_size:
+        name: "Subtitle size"
+        description: "Subtitle should be 12-14pt"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 12
+          max: 14
+          unit: "pt"
+
+      cover_image_dpi:
+        name: "Cover image resolution"
+        description: "Cover image should be at least 300 DPI"
+        enabled: true
+        severity: "error"
+        check_type: "range"
+        expected:
+          min: 300
+          max: 9999
+          unit: "dpi"
+
+      partner_logo_placement:
+        name: "Partner logo placement"
+        description: "Partner logos should be on inner pages or bottom-left of cover"
+        enabled: true
+        severity: "warning"
+        check_type: "presence"
+        expected:
+          allowed_positions:
+            - "inner_pages"
+            - "bottom-left"
+          spacing_mm: 10
+
+      partner_logo_size:
+        name: "Partner logo size"
+        description: "Partner logos must be smaller than UNEP logo"
+        enabled: true
+        severity: "warning"
+        check_type: "presence"
+        expected:
+          smaller_than_unep: true
+
+      bottom_bar:
+        name: "Bottom bar"
+        description: "Cover should have 30mm bottom bar for series title"
+        enabled: false
+        severity: "warning"
+        check_type: "range"
+        expected:
+          height: 30
+          unit: "mm"
+
+  margins:
+    name: "Margins"
+    rules:
+      top_margin:
+        name: "Top margin"
+        description: "Top margin should be 20-25mm"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 20
+          max: 25
+          unit: "mm"
+
+      bottom_margin:
+        name: "Bottom margin"
+        description: "Bottom margin should be 20mm minimum"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 20
+          max: 30
+          unit: "mm"
+
+      inside_margin:
+        name: "Inside margin (binding)"
+        description: "Inside margin should be 20-30mm"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 20
+          max: 30
+          unit: "mm"
+
+      outside_margin:
+        name: "Outside margin"
+        description: "Outside margin should be 20-25mm"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 20
+          max: 25
+          unit: "mm"
+
+  typography:
+    name: "Typography"
+    rules:
+      body_text_font:
+        name: "Body text font"
+        description: "Body text should use Roboto Flex"
+        enabled: true
+        severity: "warning"
+        check_type: "font"
+        expected:
+          family: "Roboto Flex"
+          alternatives:
+            - "Roboto"
+          weights:
+            - "Regular"
+            - "Light"
+
+      body_text_size:
+        name: "Body text size"
+        description: "Body text should be 9-12pt"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 9
+          max: 12
+          unit: "pt"
+
+      chapter_intro_size:
+        name: "Chapter introduction size"
+        description: "Chapter introductions should be 11-12pt"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 11
+          max: 12
+          unit: "pt"
+
+      h1_heading:
+        name: "H1 (chapter title) style"
+        description: "Chapter titles should be large, UNEP Blue"
+        enabled: true
+        severity: "warning"
+        check_type: "font"
+        expected:
+          weight: "Bold"
+          color: "#00AEEF"
+
+      h2_heading:
+        name: "H2 (section heading) style"
+        description: "Section headings should be UNEP Blue, bold"
+        enabled: true
+        severity: "warning"
+        check_type: "font"
+        expected:
+          weight: "Bold"
+          color: "#00AEEF"
+
+      h3_heading:
+        name: "H3 (subsection heading) style"
+        description: "Subsection headings should be UNEP Blue, underlined"
+        enabled: true
+        severity: "warning"
+        check_type: "font"
+        expected:
+          color: "#00AEEF"
+          underline: true
+
+      h4_heading:
+        name: "H4 (sub-subsection) style"
+        description: "Sub-subsection headings should be bold, black"
+        enabled: true
+        severity: "warning"
+        check_type: "font"
+        expected:
+          weight: "Bold"
+          color: "#000000"
+
+      chart_font:
+        name: "Chart font"
+        description: "Charts should use Roboto Condensed at 8pt"
+        enabled: true
+        severity: "warning"
+        check_type: "font"
+        expected:
+          family: "Roboto Condensed"
+          size: 8
+          unit: "pt"
+
+      figure_table_title:
+        name: "Figure/table title size"
+        description: "Figure and table titles should be 9pt bold"
+        enabled: true
+        severity: "warning"
+        check_type: "font"
+        expected:
+          size: 9
+          unit: "pt"
+          weight: "Bold"
+
+      caption_size:
+        name: "Caption size"
+        description: "Captions should be 7pt Roboto"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 7
+          max: 7
+          unit: "pt"
+
+  images:
+    name: "Images"
+    rules:
+      min_dpi:
+        name: "Minimum image DPI"
+        description: "Images should be at least 300 DPI for print quality"
+        enabled: true
+        severity: "error"
+        check_type: "range"
+        expected:
+          min: 300
+          max: 9999
+          unit: "dpi"
+
+      max_figure_width:
+        name: "Maximum figure width"
+        description: "Figures should not exceed 160mm width"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 0
+          max: 160
+          unit: "mm"
+
+      color_space:
+        name: "Color space"
+        description: "Images should use RGB or CMYK color space"
+        enabled: true
+        severity: "warning"
+        check_type: "presence"
+        expected:
+          allowed_values:
+            - "RGB"
+            - "CMYK"
+            - "DeviceRGB"
+            - "DeviceCMYK"
+
+      chart_stroke_weight:
+        name: "Chart stroke weight"
+        description: "Chart lines should be 0.35pt"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 0.30
+          max: 0.40
+          unit: "pt"
+
+  required_elements:
+    name: "Required Elements"
+    rules:
+      isbn:
+        name: "ISBN"
+        description: "Publication must include an ISBN"
+        enabled: true
+        severity: "error"
+        check_type: "regex"
+        expected:
+          pattern: "(?i)ISBN[:\\s-]*(?:978|979)[\\d\\s-]{10,17}"
+
+      doi:
+        name: "DOI"
+        description: "Publication must include a DOI"
+        enabled: true
+        severity: "error"
+        check_type: "regex"
+        expected:
+          pattern: "(?i)(doi|DOI)[:\\s]+10\\.\\d{4,}/[^\\s]+"
+
+      job_number:
+        name: "Job number"
+        description: "Publication must include UNEP job number"
+        enabled: true
+        severity: "error"
+        check_type: "regex"
+        expected:
+          pattern: "(?i)job\\s*(number|no\\.?|#)?[:\\s]*[A-Z0-9-]+"
+
+      copyright_notice:
+        name: "Copyright notice"
+        description: "Publication must include copyright notice"
+        enabled: true
+        severity: "error"
+        check_type: "regex"
+        expected:
+          pattern: "\\u00a9.*\\d{4}.*United Nations Environment Programme"
+
+      territorial_disclaimer:
+        name: "Territorial disclaimer"
+        description: "Publication must include UN territorial disclaimer"
+        enabled: true
+        severity: "error"
+        check_type: "regex"
+        expected:
+          pattern: "(?i)designations employed.*do not imply.*opinion.*United Nations"
+
+      commercial_disclaimer:
+        name: "Commercial products disclaimer"
+        description: "Publication must include commercial products disclaimer"
+        enabled: true
+        severity: "error"
+        check_type: "regex"
+        expected:
+          pattern: "(?i)mention of.*commercial products.*does not imply endorsement"
+
+      views_disclaimer:
+        name: "Views expressed disclaimer"
+        description: "Publication must include views expressed disclaimer"
+        enabled: true
+        severity: "error"
+        check_type: "regex"
+        expected:
+          pattern: "(?i)views expressed.*do not necessarily reflect.*United Nations"
+
+      suggested_citation:
+        name: "Suggested citation"
+        description: "Publication should include suggested citation format"
+        enabled: true
+        severity: "warning"
+        check_type: "regex"
+        expected:
+          pattern: "(?i)(suggested citation|cite this|citation)[:\\s].*United Nations Environment Programme"
+
+      sdg_icons:
+        name: "SDG icons"
+        description: "Publication should display 1-3 SDG icons"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 1
+          max: 3
+          unit: "icons"
+
+      table_of_contents:
+        name: "Table of contents"
+        description: "Publication must have a tagged table of contents"
+        enabled: true
+        severity: "error"
+        check_type: "presence"
+        expected:
+          required: true
+          tagged: true
+          linked: true
+
+      page_numbers:
+        name: "Page numbers"
+        description: "Publication must have proper page numbering"
+        enabled: true
+        severity: "error"
+        check_type: "presence"
+        expected:
+          required: true
+          front_matter: "roman"
+          main_content: "arabic"
+
+      back_cover_elements:
+        name: "Back cover elements"
+        description: "Back cover must include required elements"
+        enabled: true
+        severity: "error"
+        check_type: "presence"
+        expected:
+          required_elements:
+            - "unep_logo"
+            - "website_url"
+            - "contact_email"
+            - "funding_acknowledgment"

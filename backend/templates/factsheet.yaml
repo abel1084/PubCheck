@@ -1,0 +1,174 @@
+version: "1.0"
+document_type: "factsheet"
+categories:
+  cover:
+    name: "Cover"
+    rules:
+      unep_logo_position:
+        name: "UNEP logo position"
+        description: "Logo must be in top-right corner"
+        enabled: true
+        severity: "error"
+        check_type: "position"
+        expected:
+          position: "top-right"
+          min_size_mm: 20
+          target_size_mm: 27.5
+
+      title_size:
+        name: "Main heading size"
+        description: "Main heading should be 28-34pt"
+        enabled: true
+        severity: "error"
+        check_type: "range"
+        expected:
+          min: 28
+          max: 34
+          unit: "pt"
+
+      subtitle_size:
+        name: "Subheading size"
+        description: "Subheading should be 18-24pt"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 18
+          max: 24
+          unit: "pt"
+
+  margins:
+    name: "Margins"
+    rules:
+      left_right_margin:
+        name: "Left/right margins"
+        description: "Left and right margins should be 20-25mm"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 20
+          max: 25
+          unit: "mm"
+
+      top_bottom_margin:
+        name: "Top/bottom margins"
+        description: "Top and bottom margins should be 15-20mm"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 15
+          max: 20
+          unit: "mm"
+
+  typography:
+    name: "Typography"
+    rules:
+      body_text_font:
+        name: "Body text font"
+        description: "Body text should use Roboto Flex"
+        enabled: true
+        severity: "warning"
+        check_type: "font"
+        expected:
+          family: "Roboto Flex"
+          alternatives:
+            - "Roboto"
+          weights:
+            - "Regular"
+            - "Light"
+
+      body_text_size:
+        name: "Body text size"
+        description: "Body text should be 11-12pt"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 11
+          max: 12
+          unit: "pt"
+
+      caption_size:
+        name: "Caption text size"
+        description: "Captions should be 9-10pt"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 9
+          max: 10
+          unit: "pt"
+
+      chart_axis_font:
+        name: "Chart axis font"
+        description: "Chart axis labels should use Roboto Condensed at 8pt"
+        enabled: true
+        severity: "warning"
+        check_type: "font"
+        expected:
+          family: "Roboto Condensed"
+          size: 8
+          unit: "pt"
+
+      heading_color:
+        name: "Heading color"
+        description: "Main headings should use UNEP Cyan"
+        enabled: true
+        severity: "warning"
+        check_type: "color"
+        expected:
+          hex: "#00AEEF"
+          tolerance: 10
+
+  images:
+    name: "Images"
+    rules:
+      min_dpi:
+        name: "Minimum image DPI"
+        description: "Images should be at least 300 DPI for print quality"
+        enabled: true
+        severity: "error"
+        check_type: "range"
+        expected:
+          min: 300
+          max: 9999
+          unit: "dpi"
+
+      color_space:
+        name: "Color space"
+        description: "Images should use RGB or CMYK color space"
+        enabled: true
+        severity: "warning"
+        check_type: "presence"
+        expected:
+          allowed_values:
+            - "RGB"
+            - "CMYK"
+            - "DeviceRGB"
+            - "DeviceCMYK"
+
+  required_elements:
+    name: "Required Elements"
+    rules:
+      page_numbers:
+        name: "Page numbers"
+        description: "Document should have page numbers"
+        enabled: true
+        severity: "warning"
+        check_type: "presence"
+        expected:
+          required: true
+
+      partner_logo_spacing:
+        name: "Partner logo spacing"
+        description: "Partner logos should have 10mm spacing"
+        enabled: false
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 10
+          max: 10
+          unit: "mm"
+          tolerance: 2

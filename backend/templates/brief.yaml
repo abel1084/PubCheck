@@ -1,0 +1,302 @@
+version: "1.0"
+document_type: "brief"
+categories:
+  cover:
+    name: "Cover"
+    rules:
+      unep_logo_position:
+        name: "UNEP logo position"
+        description: "Logo must be in top-right corner on front cover"
+        enabled: true
+        severity: "error"
+        check_type: "position"
+        expected:
+          position: "top-right"
+          min_size_mm: 20
+          target_size_mm: 27.5
+
+      unep_logo_back:
+        name: "UNEP logo on back cover"
+        description: "Logo must be in bottom-left corner on back cover"
+        enabled: true
+        severity: "error"
+        check_type: "position"
+        expected:
+          position: "bottom-left"
+          min_size_mm: 20
+
+      document_type_label:
+        name: "Document type label"
+        description: "Cover must show POLICY BRIEF or WORKING PAPER label"
+        enabled: true
+        severity: "error"
+        check_type: "regex"
+        expected:
+          pattern: "(?i)(POLICY\\s*BRIEF|WORKING\\s*PAPER|ISSUE\\s*NOTE)"
+
+      title_size:
+        name: "Main title size"
+        description: "Main title should be 24-32pt"
+        enabled: true
+        severity: "error"
+        check_type: "range"
+        expected:
+          min: 24
+          max: 32
+          unit: "pt"
+
+      title_color:
+        name: "Title color"
+        description: "Main title should use UNEP Cyan"
+        enabled: true
+        severity: "warning"
+        check_type: "color"
+        expected:
+          hex: "#00ADD8"
+          tolerance: 15
+
+      cover_image_dpi:
+        name: "Cover image resolution"
+        description: "Cover image should be at least 300 DPI"
+        enabled: true
+        severity: "error"
+        check_type: "range"
+        expected:
+          min: 300
+          max: 9999
+          unit: "dpi"
+
+      partner_logo_placement:
+        name: "Partner logo placement"
+        description: "Partner logos should be on inner pages unless joint copyright"
+        enabled: true
+        severity: "warning"
+        check_type: "presence"
+        expected:
+          inner_pages_only: true
+          exception: "joint_copyright"
+
+  margins:
+    name: "Margins"
+    rules:
+      top_margin:
+        name: "Top margin"
+        description: "Top margin should be 25mm"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 23
+          max: 27
+          unit: "mm"
+
+      bottom_margin:
+        name: "Bottom margin"
+        description: "Bottom margin should be 20mm"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 18
+          max: 22
+          unit: "mm"
+
+      inside_margin:
+        name: "Inside margin (binding)"
+        description: "Inside margin should be 20mm"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 18
+          max: 22
+          unit: "mm"
+
+      outside_margin:
+        name: "Outside margin"
+        description: "Outside margin should be 20mm"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 18
+          max: 22
+          unit: "mm"
+
+  typography:
+    name: "Typography"
+    rules:
+      body_text_font:
+        name: "Body text font"
+        description: "Body text should use a sans-serif font (Arial, Helvetica, or equivalent)"
+        enabled: true
+        severity: "warning"
+        check_type: "font"
+        expected:
+          family: "Arial"
+          alternatives:
+            - "Helvetica"
+            - "Roboto"
+            - "Roboto Flex"
+          weights:
+            - "Regular"
+            - "Light"
+
+      body_text_size_one_column:
+        name: "Body text size (one-column)"
+        description: "Body text in one-column layout should be 11-12pt"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 11
+          max: 12
+          unit: "pt"
+          layout: "one-column"
+
+      body_text_size_two_column:
+        name: "Body text size (two-column)"
+        description: "Body text in two-column layout should be 9-10pt"
+        enabled: true
+        severity: "warning"
+        check_type: "range"
+        expected:
+          min: 9
+          max: 10
+          unit: "pt"
+          layout: "two-column"
+
+      h1_heading:
+        name: "H1 heading style"
+        description: "H1 headings should be 24-32pt, bold, UNEP Cyan"
+        enabled: true
+        severity: "warning"
+        check_type: "font"
+        expected:
+          size_min: 24
+          size_max: 32
+          unit: "pt"
+          weight: "Bold"
+          color: "#00ADD8"
+
+      h2_heading:
+        name: "H2 heading style"
+        description: "H2 headings should be 18-22pt, bold, UNEP Cyan"
+        enabled: true
+        severity: "warning"
+        check_type: "font"
+        expected:
+          size_min: 18
+          size_max: 22
+          unit: "pt"
+          weight: "Bold"
+          color: "#00ADD8"
+
+      h3_heading:
+        name: "H3 heading style"
+        description: "H3 headings should be 14-16pt, bold, UNEP Cyan"
+        enabled: true
+        severity: "warning"
+        check_type: "font"
+        expected:
+          size_min: 14
+          size_max: 16
+          unit: "pt"
+          weight: "Bold"
+          color: "#00ADD8"
+
+      h4_heading:
+        name: "H4 heading style"
+        description: "H4 headings should be 12pt, bold, black"
+        enabled: true
+        severity: "warning"
+        check_type: "font"
+        expected:
+          size: 12
+          unit: "pt"
+          weight: "Bold"
+          color: "#000000"
+
+  images:
+    name: "Images"
+    rules:
+      min_dpi:
+        name: "Minimum image DPI"
+        description: "Images should be at least 300 DPI for print, 150 DPI for web"
+        enabled: true
+        severity: "error"
+        check_type: "range"
+        expected:
+          min: 300
+          max: 9999
+          unit: "dpi"
+
+      figure_caption_format:
+        name: "Figure caption format"
+        description: "Figure captions should follow 'Figure N: Description' format"
+        enabled: true
+        severity: "warning"
+        check_type: "regex"
+        expected:
+          pattern: "^Figure\\s+\\d+:"
+
+      table_caption_format:
+        name: "Table caption format"
+        description: "Table captions should follow 'Table N: Description' format"
+        enabled: true
+        severity: "warning"
+        check_type: "regex"
+        expected:
+          pattern: "^Table\\s+\\d+:"
+
+  required_elements:
+    name: "Required Elements"
+    rules:
+      copyright_notice:
+        name: "Copyright notice"
+        description: "Document must include copyright notice"
+        enabled: true
+        severity: "error"
+        check_type: "regex"
+        expected:
+          pattern: "(?i)\\u00a9.*United Nations Environment Programme"
+
+      disclaimers:
+        name: "Standard disclaimers"
+        description: "Document should include required disclaimers"
+        enabled: true
+        severity: "warning"
+        check_type: "presence"
+        expected:
+          required: true
+          types:
+            - "territorial"
+            - "commercial"
+            - "views"
+
+      suggested_citation:
+        name: "Suggested citation"
+        description: "Document should include suggested citation format"
+        enabled: true
+        severity: "warning"
+        check_type: "regex"
+        expected:
+          pattern: "(?i)United Nations Environment Programme.*\\(\\d{4}\\)"
+
+      page_numbers:
+        name: "Page numbers"
+        description: "Document should have page numbers"
+        enabled: true
+        severity: "warning"
+        check_type: "presence"
+        expected:
+          required: true
+
+      doi:
+        name: "DOI"
+        description: "Document should include a DOI when assigned"
+        enabled: false
+        severity: "warning"
+        check_type: "regex"
+        expected:
+          pattern: "(?i)(doi|DOI)[:\\s]+10\\.\\d+"
