@@ -44,7 +44,13 @@ def extract_images(doc: pymupdf.Document, page: pymupdf.Page, page_num: int) -> 
 
         img_width = img_data.get("width", 0)
         img_height = img_data.get("height", 0)
-        colorspace = img_data.get("colorspace", "unknown") or "unknown"
+        # Colorspace can be int (component count) or string - normalize to string
+        cs = img_data.get("colorspace", "unknown")
+        if isinstance(cs, int):
+            # Map component count to colorspace name
+            colorspace = {1: "Gray", 3: "RGB", 4: "CMYK"}.get(cs, f"Unknown({cs})")
+        else:
+            colorspace = cs or "unknown"
 
         # Get image bounding boxes on page for DPI calculation
         # An image can appear multiple times on a page at different sizes
