@@ -19,6 +19,12 @@ body {
   padding: 20px 40px;
 }
 
+.app__header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .app__header h1 {
   margin: 0 0 8px 0;
   font-size: 28px;
@@ -29,13 +35,37 @@ body {
   opacity: 0.9;
 }
 
+.app__settings-button {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.app__settings-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
 .app__header--compact {
   padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .app__header--compact h1 {
   font-size: 20px;
   margin: 0;
+}
+
+.app__header--compact .app__settings-button {
+  padding: 6px 12px;
+  font-size: 13px;
 }
 
 /* Upload view */
@@ -66,4 +96,15 @@ body {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
+}
+
+/* Settings view */
+.app--settings {
+  background: #f5f5f5;
+}
+
+.app__settings-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
 }

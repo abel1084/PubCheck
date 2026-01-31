@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { DropZone } from './components/DropZone';
 import { DataTabs } from './components/DataTabs';
 import { Sidebar } from './components/Sidebar';
+import { Settings } from './components/Settings';
 import { useExtraction } from './hooks/useExtraction';
 import type { DocumentType } from './types/extraction';
 import './App.css';
@@ -9,6 +10,7 @@ import './App.css';
 function App() {
   const { isUploading, error, result, upload, reset } = useExtraction();
   const [documentType, setDocumentType] = useState<DocumentType | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Sync document type from result when it changes
   useEffect(() => {
@@ -22,13 +24,45 @@ function App() {
     setDocumentType(null);
   };
 
+  // Show settings view
+  if (showSettings) {
+    return (
+      <div className="app app--settings">
+        <header className="app__header app__header--compact">
+          <h1>PubCheck</h1>
+          <button
+            type="button"
+            className="app__settings-button"
+            onClick={() => setShowSettings(false)}
+          >
+            Back
+          </button>
+        </header>
+        <main className="app__settings-content">
+          <Settings onClose={() => setShowSettings(false)} />
+        </main>
+      </div>
+    );
+  }
+
   // Show upload view if no result
   if (!result) {
     return (
       <div className="app app--upload">
         <header className="app__header">
-          <h1>PubCheck</h1>
-          <p>UNEP PDF Design Compliance Checker</p>
+          <div className="app__header-content">
+            <div>
+              <h1>PubCheck</h1>
+              <p>UNEP PDF Design Compliance Checker</p>
+            </div>
+            <button
+              type="button"
+              className="app__settings-button"
+              onClick={() => setShowSettings(true)}
+            >
+              Settings
+            </button>
+          </div>
         </header>
         <main className="app__upload-area">
           <DropZone
@@ -46,6 +80,13 @@ function App() {
     <div className="app app--results">
       <header className="app__header app__header--compact">
         <h1>PubCheck</h1>
+        <button
+          type="button"
+          className="app__settings-button"
+          onClick={() => setShowSettings(true)}
+        >
+          Settings
+        </button>
       </header>
       <div className="app__content">
         <Sidebar
