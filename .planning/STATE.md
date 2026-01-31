@@ -1,7 +1,7 @@
 # Project State: PubCheck
 
 **Current Phase:** 6 (In Progress)
-**Status:** Plan 06-01 Complete - Learning module backend
+**Status:** Plan 06-04 Complete - Frontend PDF generation integration
 
 ## Project Reference
 
@@ -14,11 +14,11 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 
 ```
 Phase: 6 of 6 - Learning System & Output Generation (IN PROGRESS)
-Plan:  1 of 6
+Plan:  4 of 6
 Status: In progress
-Last activity: 2026-01-31 - Completed 06-01-PLAN.md
+Last activity: 2026-01-31 - Completed 06-04-PLAN.md
 
-[========================] 93%
+[==========================] 97%
 ```
 
 ## Progress
@@ -30,15 +30,15 @@ Last activity: 2026-01-31 - Completed 06-01-PLAN.md
 | 3 | Design Compliance Checks | Complete | 5/5 |
 | 4 | AI Verification | Complete | 4/4 |
 | 5 | Review Interface | Complete | 4/4 |
-| 6 | Learning System & Output Generation | In Progress | 1/6 |
+| 6 | Learning System & Output Generation | In Progress | 4/6 |
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans completed | 22 |
+| Plans completed | 26 |
 | Plans failed | 0 |
-| Total iterations | 22 |
+| Total iterations | 26 |
 | Avg iterations/plan | 1.0 |
 
 ## Accumulated Context
@@ -106,6 +106,9 @@ Last activity: 2026-01-31 - Completed 06-01-PLAN.md
 | Pydantic v1 compatible learning models | Match existing codebase patterns | 06-01 |
 | Atomic writes for ignored rules | tempfile + os.replace pattern from config/service.py | 06-01 |
 | Singleton service instance in router | Performance optimization for API calls | 06-01 |
+| Blob download for PDF generation | Standard browser pattern for file downloads | 06-04 |
+| Native dialog for ProgressModal | Accessible by default, no library needed | 06-04 |
+| isGenerating placeholder in CheckResults | Full integration in 06-05/06 with pdfFile access | 06-04 |
 
 ### Technical Debt / TODOs
 
@@ -117,8 +120,8 @@ Last activity: 2026-01-31 - Completed 06-01-PLAN.md
 
 ## Session Continuity
 
-Last session: 2026-01-31T23:03:00Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-01-31T20:04:00Z
+Stopped at: Completed 06-04-PLAN.md
 Resume file: None
 
 ## Session Log
@@ -154,7 +157,8 @@ Resume file: None
 | 2026-01-31 | Completed 05-04 | User verification - fixed doc type mapping, infinite loop, AI analyze |
 | 2026-01-31 | Phase 5 Complete | All 4 plans executed, user verified |
 | 2026-01-31 | Completed 06-01 | Learning module backend with models, service, and API (3 min) |
+| 2026-01-31 | Completed 06-04 | Frontend PDF generation: types, hook, ProgressModal, button wiring (3 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-01-31T23:03:00Z*
+*Last updated: 2026-01-31T20:04:00Z*
