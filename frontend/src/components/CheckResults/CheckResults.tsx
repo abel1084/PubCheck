@@ -1,11 +1,15 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
+import { toast } from 'sonner';
 import type { CheckResult, CategoryResult, CheckIssue } from '../../types/checks';
 import type { DocumentAnalysisResult } from '../../types/ai';
 import { StatusBadge } from './StatusBadge';
 import { CategorySection } from './CategorySection';
 import { ReviewSummaryBar } from './ReviewSummaryBar';
 import { AIProgress } from './AIProgress';
+import { ProgressModal } from '../GenerateReport/ProgressModal';
 import { useReviewState, getIssueId } from '../../hooks/useReviewState';
+import { useIgnoredRules } from '../../hooks/useIgnoredRules';
+import { useGenerateReport } from '../../hooks/useGenerateReport';
 import './CheckResults.css';
 
 interface CheckResultsProps {
@@ -16,6 +20,9 @@ interface CheckResultsProps {
   isAnalyzing?: boolean;
   aiProgress?: string;
   onReanalyze?: () => void;
+  // Props for ignore rules and PDF generation
+  pdfFile?: File | null;
+  documentType?: string | null;
 }
 
 // Fixed category order per CONTEXT.md
@@ -79,8 +86,13 @@ export function CheckResults({
   aiResult,
   isAnalyzing,
   aiProgress,
-  onReanalyze
+  onReanalyze,
+  pdfFile,
+  documentType
 }: CheckResultsProps) {
+  // Hooks for ignore rules and PDF generation
+  const { ignoredRuleIds, ignoreRule, unignoreRule } = useIgnoredRules(documentType || null);
+  const { isGenerating, generateReport } = useGenerateReport();
   // Convert AI findings to issues
   const aiIssues = aiResult ? convertAIFindingsToIssues(aiResult) : [];
 
@@ -94,13 +106,22 @@ export function CheckResults({
   } : null;
 
   // Sort and combine categories - memoize to prevent infinite loops
+  // Also filter out ignored rules
   const sortedCategories = useMemo(() => {
     const allCategories: CategoryResult[] = [
       ...(result?.categories || []),
       ...(aiCategory ? [aiCategory] : []),
     ];
 
-    return [...allCategories].sort((a: CategoryResult, b: CategoryResult) => {
+    // Filter out ignored rules from each category
+    const filteredByIgnored = allCategories.map(category => ({
+      ...category,
+      issues: category.issues.filter(issue => !ignoredRuleIds.has(issue.rule_id)),
+      error_count: category.issues.filter(issue => !ignoredRuleIds.has(issue.rule_id) && issue.severity === 'error').length,
+      warning_count: category.issues.filter(issue => !ignoredRuleIds.has(issue.rule_id) && issue.severity === 'warning').length,
+    })).filter(category => category.issues.length > 0);
+
+    return [...filteredByIgnored].sort((a: CategoryResult, b: CategoryResult) => {
       const aIndex = CATEGORY_ORDER.indexOf(a.category_id);
       const bIndex = CATEGORY_ORDER.indexOf(b.category_id);
       // Unknown categories go to end
@@ -108,7 +129,7 @@ export function CheckResults({
       const bOrder = bIndex === -1 ? CATEGORY_ORDER.length : bIndex;
       return aOrder - bOrder;
     });
-  }, [result?.categories, aiCategory]);
+  }, [result?.categories, aiCategory, ignoredRuleIds]);
 
   // Initialize review state with all categories (sorted)
   const {
@@ -149,9 +170,32 @@ export function CheckResults({
     return result;
   }, [filteredCategories, sortedCategories]);
 
-  // Calculate combined totals
-  const totalErrors = (result?.total_errors || 0) + (aiCategory?.error_count || 0);
-  const totalWarnings = (result?.total_warnings || 0) + (aiCategory?.warning_count || 0);
+  // Calculate combined totals (after filtering ignored rules)
+  const totalErrors = sortedCategories.reduce((sum, cat) => sum + cat.error_count, 0);
+  const totalWarnings = sortedCategories.reduce((sum, cat) => sum + cat.warning_count, 0);
+
+  // Handle ignore rule with toast and undo
+  const handleIgnoreRule = useCallback((ruleId: string) => {
+    if (!documentType) return;
+
+    ignoreRule(ruleId, documentType);
+    toast.success('Rule ignored for this document type', {
+      duration: 5000,
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          unignoreRule(ruleId, documentType);
+          toast.success('Rule restored');
+        },
+      },
+    });
+  }, [documentType, ignoreRule, unignoreRule]);
+
+  // Handle generate report
+  const handleGenerateReport = useCallback(() => {
+    if (!pdfFile) return;
+    generateReport(pdfFile, sortedCategories, selectedIssues, notes, getIssueId);
+  }, [pdfFile, sortedCategories, selectedIssues, notes, generateReport]);
 
   // Determine overall status
   const getStatus = (): 'pass' | 'fail' | 'warning' => {
@@ -256,6 +300,7 @@ export function CheckResults({
               onSelectCategory={() => selectCategory(category.category_id, filteredCategoryIssueIds[category.category_id] || [])}
               onDeselectCategory={() => deselectCategory(category.category_id, filteredCategoryIssueIds[category.category_id] || [])}
               onNoteChange={setNote}
+              onIgnoreRule={handleIgnoreRule}
             />
           ))}
         </div>
@@ -290,10 +335,14 @@ export function CheckResults({
           onFilterChange={setSeverityFilter}
           onSelectAllVisible={selectAllVisible}
           onDeselectAll={deselectAll}
-          canGenerateReport={counts.selected > 0}
-          isGenerating={false}
+          canGenerateReport={counts.selected > 0 && !!pdfFile}
+          isGenerating={isGenerating}
+          onGenerateReport={handleGenerateReport}
         />
       )}
+
+      {/* Progress modal for PDF generation */}
+      <ProgressModal isOpen={isGenerating} message="Generating annotated PDF..." />
     </div>
   );
 }

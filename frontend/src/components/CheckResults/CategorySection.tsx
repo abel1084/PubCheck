@@ -11,6 +11,7 @@ interface CategorySectionProps {
   onSelectCategory?: () => void;  // Select all in this category
   onDeselectCategory?: () => void;  // Deselect all in this category
   onNoteChange?: (issueId: string, note: string) => void;
+  onIgnoreRule?: (ruleId: string) => void;  // Ignore rule callback
 }
 
 /**
@@ -26,7 +27,8 @@ export function CategorySection({
   onToggleSelect,
   onSelectCategory,
   onDeselectCategory,
-  onNoteChange
+  onNoteChange,
+  onIgnoreRule
 }: CategorySectionProps) {
   // Determine if in review mode based on presence of review callbacks
   const isReviewMode = onToggleSelect !== undefined;
@@ -94,6 +96,7 @@ export function CategorySection({
                   note={issueId ? notes?.[issueId] : undefined}
                   onToggleSelect={issueId && onToggleSelect ? () => onToggleSelect(issueId) : undefined}
                   onNoteChange={issueId && onNoteChange ? (note) => onNoteChange(issueId, note) : undefined}
+                  onIgnoreRule={onIgnoreRule}
                 />
               );
             })}
