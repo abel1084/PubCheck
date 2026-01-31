@@ -97,9 +97,9 @@ class AIClient:
         # Build content parts
         contents = []
 
-        # Add image (WebP for smallest size)
+        # Add image (JPEG for reliable compression)
         contents.append(
-            types.Part.from_bytes(data=image_bytes, mime_type="image/webp")
+            types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg")
         )
 
         # Add text prompt
