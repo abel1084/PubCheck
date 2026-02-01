@@ -1,6 +1,9 @@
+import { Alert, Button, Spin, Typography, Space, Result } from 'antd';
+import { SyncOutlined } from '@ant-design/icons';
 import type { AIReviewSections } from '../../types/review';
 import { ReviewSection } from './ReviewSection';
-import './ReviewResults.css';
+
+const { Title, Text } = Typography;
 
 interface ReviewResultsProps {
   sections: AIReviewSections;
@@ -10,10 +13,6 @@ interface ReviewResultsProps {
   onRetry?: () => void;
 }
 
-/**
- * Main review results container.
- * Displays AI review organized by priority sections.
- */
 export function ReviewResults({
   sections,
   isStreaming,
@@ -21,106 +20,94 @@ export function ReviewResults({
   error,
   onRetry,
 }: ReviewResultsProps) {
-  // Show error state
+  // Error state
   if (error) {
     return (
-      <div className="review-results review-results--error">
-        <div className="review-results__error">
-          <h3>Review Failed</h3>
-          <p>{error}</p>
-          {onRetry && (
-            <button
-              type="button"
-              className="review-results__retry-button"
-              onClick={onRetry}
-            >
+      <Alert
+        message="Review Failed"
+        description={error}
+        type="error"
+        showIcon
+        action={
+          onRetry && (
+            <Button size="small" onClick={onRetry}>
               Try Again
-            </button>
-          )}
-        </div>
-      </div>
+            </Button>
+          )
+        }
+        style={{ margin: 16 }}
+      />
     );
   }
 
-  // Show empty state before review starts
+  // Empty state before review
   const hasContent = Object.values(sections).some(s => s.length > 0);
   if (!hasContent && !isStreaming) {
     return (
-      <div className="review-results review-results--empty">
-        <p className="review-results__empty-text">
-          Click "Review" to analyze the document for design compliance.
-        </p>
-      </div>
+      <Result
+        status="info"
+        title="No Review Yet"
+        subTitle="Click 'Review' to analyze the document for design compliance."
+        style={{ padding: 40 }}
+      />
     );
   }
 
-  // Show loading state when streaming but no content yet
+  // Loading state
   if (isStreaming && !hasContent) {
     return (
-      <div className="review-results review-results--loading">
-        <div className="review-results__loading-spinner"></div>
-        <p className="review-results__loading-text">
+      <div style={{ textAlign: 'center', padding: 60 }}>
+        <Spin size="large" />
+        <Text style={{ display: 'block', marginTop: 16 }}>
           Analyzing document...
-        </p>
+        </Text>
       </div>
     );
   }
 
   return (
-    <div className="review-results">
-      <div className="review-results__header">
-        <h2 className="review-results__title">Design Review</h2>
-        {isComplete && (
-          <span className="review-results__status review-results__status--complete">
-            Review Complete
-          </span>
-        )}
-        {isStreaming && (
-          <span className="review-results__status review-results__status--streaming">
-            Reviewing...
-          </span>
-        )}
+    <div style={{ padding: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <Title level={4} style={{ margin: 0 }}>Design Review</Title>
+        <Space>
+          {isComplete && <Text type="success">Review Complete</Text>}
+          {isStreaming && <Text type="secondary"><SyncOutlined spin /> Reviewing...</Text>}
+        </Space>
       </div>
 
-      <div className="review-results__sections">
-        <ReviewSection
-          title="Overview"
-          content={sections.overview}
-          variant="overview"
-          isStreaming={isStreaming && !sections.needsAttention}
-        />
+      <ReviewSection
+        title="Overview"
+        content={sections.overview}
+        variant="overview"
+        isStreaming={isStreaming && !sections.needsAttention}
+      />
 
-        <ReviewSection
-          title="Needs Attention"
-          content={sections.needsAttention}
-          variant="attention"
-          isStreaming={isStreaming && !!sections.overview && !sections.lookingGood}
-        />
+      <ReviewSection
+        title="Needs Attention"
+        content={sections.needsAttention}
+        variant="attention"
+        isStreaming={isStreaming && !!sections.overview && !sections.lookingGood}
+      />
 
-        <ReviewSection
-          title="Looking Good"
-          content={sections.lookingGood}
-          variant="good"
-          isStreaming={isStreaming && !!sections.needsAttention && !sections.suggestions}
-        />
+      <ReviewSection
+        title="Looking Good"
+        content={sections.lookingGood}
+        variant="good"
+        isStreaming={isStreaming && !!sections.needsAttention && !sections.suggestions}
+      />
 
-        <ReviewSection
-          title="Suggestions"
-          content={sections.suggestions}
-          variant="suggestions"
-          isStreaming={isStreaming && !!sections.lookingGood}
-        />
-      </div>
+      <ReviewSection
+        title="Suggestions"
+        content={sections.suggestions}
+        variant="suggestions"
+        isStreaming={isStreaming && !!sections.lookingGood}
+      />
 
       {onRetry && isComplete && (
-        <div className="review-results__footer">
-          <button
-            type="button"
-            className="review-results__review-button"
-            onClick={onRetry}
-          >
+        <div style={{ marginTop: 16, textAlign: 'center' }}>
+          <Button onClick={onRetry} icon={<SyncOutlined />}>
             Re-review
-          </button>
+          </Button>
         </div>
       )}
     </div>

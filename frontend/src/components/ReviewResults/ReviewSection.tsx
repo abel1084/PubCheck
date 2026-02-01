@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Card, Spin, Tag } from 'antd';
+import { CaretRightOutlined } from '@ant-design/icons';
 import ReactMarkdown from 'react-markdown';
 
 interface ReviewSectionProps {
@@ -8,66 +10,60 @@ interface ReviewSectionProps {
   isStreaming?: boolean;
 }
 
-/**
- * Individual review section card.
- * Renders markdown content with variant-specific styling.
- * Collapsible with toggle button in title bar.
- */
-export function ReviewSection({
-  title,
-  content,
-  variant,
-  isStreaming = false,
-}: ReviewSectionProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+const variantConfig = {
+  overview: { color: '#1890ff', tagColor: 'processing' as const },
+  attention: { color: '#ff4d4f', tagColor: 'error' as const },
+  good: { color: '#52c41a', tagColor: 'success' as const },
+  suggestions: { color: '#faad14', tagColor: 'warning' as const },
+};
 
-  // Don't render empty sections (unless streaming and might fill)
+export function ReviewSection({ title, content, variant, isStreaming }: ReviewSectionProps) {
+  const [collapsed, setCollapsed] = useState(false);
+  const config = variantConfig[variant];
+
   if (!content && !isStreaming) {
     return null;
   }
 
-  const toggleCollapse = () => {
-    setIsCollapsed((prev) => !prev);
-  };
-
   return (
-    <section className={`review-section review-section--${variant}`}>
-      <header className="review-section__header">
-        <h3 className="review-section__title">{title}</h3>
-        <button
-          type="button"
-          className={`review-section__toggle ${isCollapsed ? 'review-section__toggle--collapsed' : ''}`}
-          onClick={toggleCollapse}
-          aria-expanded={!isCollapsed}
-          aria-label={isCollapsed ? 'Expand section' : 'Collapse section'}
+    <Card
+      size="small"
+      style={{ marginBottom: 12, borderLeft: `3px solid ${config.color}` }}
+      title={
+        <div
+          style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+          onClick={() => setCollapsed(!collapsed)}
         >
-          <svg
-            className="review-section__toggle-icon"
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="currentColor"
-          >
-            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z" />
-          </svg>
-        </button>
-      </header>
-      {!isCollapsed && (
-        <div className="review-section__content">
-          {content ? (
-            <ReactMarkdown>{content}</ReactMarkdown>
-          ) : (
-            <span className="review-section__placeholder">
-              {isStreaming ? 'Analyzing...' : 'No content'}
-            </span>
+          <CaretRightOutlined
+            style={{
+              marginRight: 8,
+              transform: collapsed ? 'rotate(0deg)' : 'rotate(90deg)',
+              transition: 'transform 0.2s',
+            }}
+          />
+          <span>{title}</span>
+          {isStreaming && (
+            <Tag color={config.tagColor} style={{ marginLeft: 8 }}>
+              Streaming...
+            </Tag>
           )}
         </div>
+      }
+    >
+      {!collapsed && (
+        <>
+          {isStreaming && !content && (
+            <div style={{ textAlign: 'center', padding: 16 }}>
+              <Spin size="small" />
+            </div>
+          )}
+          {content && (
+            <div className="markdown-content">
+              <ReactMarkdown>{content}</ReactMarkdown>
+            </div>
+          )}
+        </>
       )}
-      {!isCollapsed && isStreaming && content && (
-        <div className="review-section__streaming-indicator">
-          <span className="review-section__cursor"></span>
-        </div>
-      )}
-    </section>
+    </Card>
   );
 }
