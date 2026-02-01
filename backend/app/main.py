@@ -12,7 +12,8 @@ load_dotenv(env_path)
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.auth.middleware import verify_password
+from app.auth.middleware import verify_session
+from app.auth.router import router as auth_router
 
 from app.api import upload_router
 from app.ai.router import router as ai_router
@@ -26,7 +27,6 @@ app = FastAPI(
     title="PubCheck",
     description="UNEP PDF Design Compliance Checker",
     version="1.0.0",
-    dependencies=[Depends(verify_password)],
 )
 
 # CORS middleware for frontend development server
@@ -45,14 +45,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API routers
-app.include_router(upload_router)
-app.include_router(config_router)
-app.include_router(settings_router)
-# check_router removed - AI handles all compliance decisions (Phase 7)
-app.include_router(ai_router)
-app.include_router(learning_router)
-app.include_router(output_router)
+# Auth router - no authentication required
+app.include_router(auth_router)
+
+# Protected API routers - require valid session
+app.include_router(upload_router, dependencies=[Depends(verify_session)])
+app.include_router(config_router, dependencies=[Depends(verify_session)])
+app.include_router(settings_router, dependencies=[Depends(verify_session)])
+app.include_router(ai_router, dependencies=[Depends(verify_session)])
+app.include_router(learning_router, dependencies=[Depends(verify_session)])
+app.include_router(output_router, dependencies=[Depends(verify_session)])
 
 
 @app.get("/")

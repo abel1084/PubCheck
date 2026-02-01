@@ -1,52 +1,66 @@
 """
-HTTP Basic Authentication middleware for PubCheck.
+Session-based authentication for PubCheck.
 
-Provides a simple shared-password authentication using browser-native
-HTTP Basic Auth dialog. Password is configured via PUBCHECK_PASSWORD
-environment variable.
+Provides a simple shared-password authentication with session cookies.
+Password is configured via PUBCHECK_PASSWORD environment variable.
 """
 import os
 import secrets
+from typing import Optional
 
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-
-# HTTPBasic with auto_error=True triggers browser's native auth dialog
-security = HTTPBasic(auto_error=True)
+from fastapi import Cookie, HTTPException, status
 
 
-def verify_password(
-    credentials: HTTPBasicCredentials = Depends(security),
-) -> bool:
+# Session token storage (in-memory for simplicity)
+# In production, use Redis or database
+_valid_sessions: set[str] = set()
+
+
+def create_session() -> str:
+    """Create a new session token."""
+    token = secrets.token_urlsafe(32)
+    _valid_sessions.add(token)
+    return token
+
+
+def invalidate_session(token: str) -> None:
+    """Invalidate a session token."""
+    _valid_sessions.discard(token)
+
+
+def verify_session(pubcheck_session: Optional[str] = Cookie(None)) -> bool:
     """
-    Verify HTTP Basic Auth credentials.
-
-    Username can be anything - only password is checked.
-    Password is compared using constant-time comparison to prevent timing attacks.
+    Verify session cookie is valid.
 
     Args:
-        credentials: HTTP Basic credentials from request
+        pubcheck_session: Session token from cookie
 
     Returns:
-        True if password is valid
+        True if session is valid
 
     Raises:
-        HTTPException: 401 if password is invalid
+        HTTPException: 401 if session is invalid
     """
-    # Get password from environment, default to "pubcheck" for development
-    correct_password = os.environ.get("PUBCHECK_PASSWORD", "pubcheck")
-
-    # Use constant-time comparison to prevent timing attacks
-    password_correct = secrets.compare_digest(
-        credentials.password.encode("utf-8"),
-        correct_password.encode("utf-8"),
-    )
-
-    if not password_correct:
+    if not pubcheck_session or pubcheck_session not in _valid_sessions:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid password",
-            headers={"WWW-Authenticate": "Basic"},
+            detail="Not authenticated",
         )
-
     return True
+
+
+def check_password(password: str) -> bool:
+    """
+    Check if password matches the configured password.
+
+    Args:
+        password: Password to check
+
+    Returns:
+        True if password matches
+    """
+    correct_password = os.environ.get("PUBCHECK_PASSWORD", "pubcheck")
+    return secrets.compare_digest(
+        password.encode("utf-8"),
+        correct_password.encode("utf-8"),
+    )

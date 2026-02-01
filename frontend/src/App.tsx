@@ -1,19 +1,27 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Layout, Button, Select, Tabs, Typography, Space, type TabsProps } from 'antd';
-import { SettingOutlined, SyncOutlined } from '@ant-design/icons';
+import { Layout, Button, Select, Tabs, Typography, Space, Spin, type TabsProps } from 'antd';
+import { SettingOutlined, SyncOutlined, PlusOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Login } from './components/Login';
 import { DropZone } from './components/DropZone';
 import { DataTabs } from './components/DataTabs';
-import { Sidebar } from './components/Sidebar';
 import { ReviewResults } from './components/ReviewResults/ReviewResults';
-import { CommentList } from './components/CommentList/CommentList';
+import { CommentList, type EditedIssueData } from './components/CommentList/CommentList';
 import { Settings } from './components/Settings/Settings';
 import { useExtraction } from './hooks/useExtraction';
 import { useAIReview } from './hooks/useAIReview';
 import { useAntdApp } from './hooks/useAntdApp';
 import type { DocumentType, Confidence } from './types/extraction';
 
-const { Header, Content, Sider } = Layout;
+const { Header, Content } = Layout;
 const { Title, Text } = Typography;
+
+const DOCUMENT_TYPES: DocumentType[] = [
+  'Factsheet',
+  'Policy Brief',
+  'Working Paper',
+  'Technical Report',
+  'Publication',
+];
 
 type ReviewTab = 'review' | 'comments';
 type OutputFormat = 'print' | 'digital' | 'both';
@@ -45,6 +53,7 @@ function App() {
     reset: resetReview
   } = useAIReview();
 
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [documentType, setDocumentType] = useState<DocumentType | null>(null);
   const [outputFormat, setOutputFormat] = useState<OutputFormat>('digital');
   const [activeTab, setActiveTab] = useState<ReviewTab>('review');
@@ -52,6 +61,19 @@ function App() {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const uploadedFileRef = useRef<File | null>(null);
+
+  // Check auth on mount
+  useEffect(() => {
+    fetch('/api/auth/check', { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => setIsAuthenticated(data.authenticated))
+      .catch(() => setIsAuthenticated(false));
+  }, []);
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    setIsAuthenticated(false);
+  };
 
   const handleToggleIssue = useCallback((id: string) => {
     setSelectedIssueIds(prev => {
@@ -68,21 +90,29 @@ function App() {
     }
   }, [issues]);
 
-  const handleGeneratePdf = useCallback(async () => {
+  const handleGeneratePdf = useCallback(async (editedData: Map<string, EditedIssueData>) => {
     if (!uploadedFileRef.current || selectedIssueIds.size === 0) return;
 
     setIsGeneratingPdf(true);
     try {
       const selectedIssues = issues.filter(i => selectedIssueIds.has(i.id));
-      const annotations = selectedIssues.flatMap(issue =>
-        issue.pages.map(page => ({
+      const annotations = selectedIssues.flatMap(issue => {
+        const edited = editedData.get(issue.id);
+        const title = edited?.title ?? issue.title;
+        const description = edited?.description ?? issue.description;
+        const allPages = edited?.allPages ?? true;
+
+        // If allPages is false, only use the first page
+        const pagesToAnnotate = allPages ? issue.pages : [issue.pages[0]];
+
+        return pagesToAnnotate.map(page => ({
           page,
           x: null,
           y: null,
-          message: `${issue.title}\n\n${issue.description}`,
+          message: `${title}\n\n${description}`,
           severity: issue.category === 'needs_attention' ? 'error' : 'warning',
-        }))
-      );
+        }));
+      });
 
       const formData = new FormData();
       formData.append('pdf', uploadedFileRef.current);
@@ -145,24 +175,46 @@ function App() {
     }
   };
 
+  // Loading auth state
+  if (isAuthenticated === null) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  // Login screen
+  if (!isAuthenticated) {
+    return <Login onLogin={() => setIsAuthenticated(true)} />;
+  }
+
   // Upload view
   if (!result) {
     return (
-      <Layout style={{ minHeight: '100vh', maxWidth: 1920, margin: '0 auto' }}>
+      <Layout style={{ minHeight: '100vh', maxWidth: 1920, margin: '0 auto', background: '#fff' }}>
         {showSettings && <Settings onClose={() => setShowSettings(false)} />}
-        <Header style={{ background: '#fff', padding: '0 24px', borderBottom: '1px solid #f0f0f0' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%' }}>
-            <div>
-              <Title level={4} style={{ margin: 0 }}>PubCheck</Title>
-              <Text type="secondary">UNEP PDF Design Compliance Checker</Text>
-            </div>
-            <Button icon={<SettingOutlined />} onClick={() => setShowSettings(true)}>
+        <Content style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+          <div style={{ textAlign: 'center', marginBottom: 24 }}>
+            <Title level={2} style={{ margin: 0 }}>PubCheck</Title>
+          </div>
+          <DropZone onFileAccepted={handleUpload} isProcessing={isUploading} error={error} />
+          <Space style={{ marginTop: 16 }}>
+            <Button
+              type="link"
+              icon={<SettingOutlined />}
+              onClick={() => setShowSettings(true)}
+            >
               Settings
             </Button>
-          </div>
-        </Header>
-        <Content style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
-          <DropZone onFileAccepted={handleUpload} isProcessing={isUploading} error={error} />
+            <Button
+              type="link"
+              icon={<LogoutOutlined />}
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </Space>
         </Content>
       </Layout>
     );
@@ -214,60 +266,80 @@ function App() {
     },
   ];
 
+  // Truncate filename for header display
+  const truncatedFilename = result.filename.length > 30
+    ? result.filename.substring(0, 27) + '...'
+    : result.filename;
+
   return (
-    <Layout style={{ minHeight: '100vh', maxWidth: 1920, margin: '0 auto' }}>
+    <Layout style={{ minHeight: '100vh', maxWidth: 1920, margin: '0 auto', background: '#fff' }}>
       {showSettings && <Settings onClose={() => setShowSettings(false)} />}
-      <Header style={{ background: '#fff', padding: '0 24px', borderBottom: '1px solid #f0f0f0' }}>
+      <Header style={{ background: '#fff', padding: '0 24px', borderBottom: '1px solid #e8e8e8' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%' }}>
           <Title level={4} style={{ margin: 0 }}>PubCheck</Title>
+          <Text type="secondary">
+            {truncatedFilename} — {result.extraction.metadata.page_count} pages
+          </Text>
           <Space>
-            <Button icon={<SettingOutlined />} onClick={() => setShowSettings(true)}>
-              Settings
-            </Button>
-            <Select
-              value={outputFormat}
-              onChange={setOutputFormat}
-              disabled={isStreaming}
-              style={{ width: 150 }}
-              options={[
-                { value: 'digital', label: 'Digital (72 DPI)' },
-                { value: 'print', label: 'Print (300 DPI)' },
-                { value: 'both', label: 'Both (150 DPI)' },
-              ]}
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={handleNewDocument}
+              style={{ background: '#52c41a', borderColor: '#52c41a' }}
             />
             <Button
               type="primary"
-              icon={isStreaming ? <SyncOutlined spin /> : undefined}
-              onClick={handleReview}
-              disabled={!result || isStreaming}
-              loading={isStreaming}
-            >
-              {isStreaming ? 'Reviewing...' : 'Review'}
-            </Button>
+              icon={<SettingOutlined />}
+              onClick={() => setShowSettings(true)}
+              style={{ background: '#1677ff', borderColor: '#1677ff' }}
+            />
+            <Button
+              icon={<LogoutOutlined />}
+              onClick={handleLogout}
+            />
           </Space>
         </div>
       </Header>
 
-      <Layout>
-        <Sider width={280} style={{ background: '#fafafa', borderRight: '1px solid #f0f0f0' }}>
-          <Sidebar
-            filename={result.filename}
-            documentType={documentType || result.documentType}
-            confidence={result.confidence}
-            metadata={result.extraction.metadata}
-            onDocumentTypeChange={setDocumentType}
-            onNewDocument={handleNewDocument}
-          />
-        </Sider>
-        <Content style={{ padding: 16, overflow: 'auto' }}>
-          <Tabs
-            activeKey={activeTab}
-            onChange={(key) => setActiveTab(key as ReviewTab)}
-            items={tabItems}
-          />
-          <DataTabs extraction={result.extraction} defaultCollapsed={true} />
-        </Content>
-      </Layout>
+      <Content style={{ padding: 16, overflow: 'auto', background: '#fff' }}>
+        <Tabs
+          activeKey={activeTab}
+          onChange={(key) => setActiveTab(key as ReviewTab)}
+          items={tabItems}
+          tabBarExtraContent={
+            <Space>
+              <Select
+                value={documentType || result.documentType}
+                onChange={setDocumentType}
+                disabled={isStreaming}
+                style={{ width: 140 }}
+                options={DOCUMENT_TYPES.map(type => ({ value: type, label: type }))}
+              />
+              <Select
+                value={outputFormat}
+                onChange={setOutputFormat}
+                disabled={isStreaming}
+                style={{ width: 140 }}
+                options={[
+                  { value: 'digital', label: 'Digital (72 DPI)' },
+                  { value: 'print', label: 'Print (300 DPI)' },
+                  { value: 'both', label: 'Both (150 DPI)' },
+                ]}
+              />
+              <Button
+                type="primary"
+                icon={isStreaming ? <SyncOutlined spin /> : undefined}
+                onClick={handleReview}
+                disabled={!result || isStreaming}
+                loading={isStreaming}
+              >
+                {isStreaming ? 'Reviewing...' : 'Review'}
+              </Button>
+            </Space>
+          }
+        />
+        <DataTabs extraction={result.extraction} defaultCollapsed={true} />
+      </Content>
     </Layout>
   );
 }
