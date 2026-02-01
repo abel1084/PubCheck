@@ -148,6 +148,8 @@ Last activity: 2026-02-01 - Completed 08-04-PLAN.md
 | Settings page restored | Allow users to update config and add new rules | 07-08 |
 | Inline styles for simple layouts | antd component styling + inline styles, no CSS file needed | 08-04 |
 | Semantic Tag colors | Use antd preset colors (success/warning/error) for confidence | 08-04 |
+| beforeUpload for file validation | Workaround for known accept+drag issue in antd Upload | 08-02 |
+| return false in beforeUpload | Prevents antd auto-upload, lets app handle manually | 08-02 |
 
 ### Roadmap Evolution
 
@@ -223,7 +225,8 @@ Resume file: None
 | 2026-02-01 | ALL PHASES COMPLETE | PubCheck v1.0 with AI-first architecture ready |
 | 2026-02-01 | Phase 8 added | Ant Design Frontend Refactor added to roadmap |
 | 2026-02-01 | Completed 08-04 | Sidebar antd refactor (3 min) |
+| 2026-02-01 | Completed 08-02 | DropZone antd migration - Upload.Dragger + Alert + Spin (3 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-02-01T15:48:00Z*
+*Last updated: 2026-02-01T15:50:00Z*
