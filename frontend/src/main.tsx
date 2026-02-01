@@ -1,14 +1,19 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { ConfigProvider, App as AntdApp } from 'antd';
+import App from './App';
 
-const rootElement = document.getElementById('root')
+const rootElement = document.getElementById('root');
 if (!rootElement) {
-  throw new Error('Root element not found')
+  throw new Error('Root element not found');
 }
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <ConfigProvider>
+      <AntdApp>
+        <App />
+      </AntdApp>
+    </ConfigProvider>
   </StrictMode>,
-)
+);
