@@ -101,3 +101,79 @@ export type ReviewAction =
 
   /** Reset all review state to initial values */
   | { type: 'RESET' };
+
+// ============================================================================
+// AI-First Architecture Types (Phase 7)
+// ============================================================================
+
+/**
+ * Parsed review sections from AI response.
+ * AI produces prose review organized by these sections.
+ */
+export interface AIReviewSections {
+  overview: string;
+  needsAttention: string;
+  lookingGood: string;
+  suggestions: string;
+}
+
+/**
+ * State of AI review process.
+ * Tracks streaming progress and accumulated content.
+ */
+export interface AIReviewState {
+  /** Accumulated raw markdown content */
+  content: string;
+  /** Parsed sections (updated as content streams) */
+  sections: AIReviewSections;
+  /** Currently streaming */
+  isStreaming: boolean;
+  /** Stream completed successfully */
+  isComplete: boolean;
+  /** Error message if failed */
+  error: string | null;
+}
+
+/** Initial empty AI review state */
+export const INITIAL_AI_REVIEW_STATE: AIReviewState = {
+  content: '',
+  sections: {
+    overview: '',
+    needsAttention: '',
+    lookingGood: '',
+    suggestions: '',
+  },
+  isStreaming: false,
+  isComplete: false,
+  error: null,
+};
+
+/**
+ * Parse markdown content into sections.
+ * Handles partial content during streaming.
+ */
+export function parseReviewSections(content: string): AIReviewSections {
+  const sections: AIReviewSections = {
+    overview: '',
+    needsAttention: '',
+    lookingGood: '',
+    suggestions: '',
+  };
+
+  // Section patterns - case insensitive, flexible header matching
+  const patterns = [
+    { key: 'overview' as const, pattern: /###?\s*Overview\n([\s\S]*?)(?=###|$)/i },
+    { key: 'needsAttention' as const, pattern: /###?\s*Needs\s*Attention\n([\s\S]*?)(?=###|$)/i },
+    { key: 'lookingGood' as const, pattern: /###?\s*Looking\s*Good\n([\s\S]*?)(?=###|$)/i },
+    { key: 'suggestions' as const, pattern: /###?\s*Suggestions\n([\s\S]*?)(?=###|$)/i },
+  ];
+
+  for (const { key, pattern } of patterns) {
+    const match = content.match(pattern);
+    if (match && match[1]) {
+      sections[key] = match[1].trim();
+    }
+  }
+
+  return sections;
+}
