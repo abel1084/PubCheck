@@ -95,12 +95,51 @@
   overflow: hidden;
 }
 
+/* Section header with title and toggle */
+.review-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border, #e0e0e0);
+}
+
 .review-section__title {
   margin: 0;
   padding: 0.75rem 1rem;
   font-size: 1rem;
   font-weight: 600;
-  border-bottom: 1px solid var(--color-border, #e0e0e0);
+  flex: 1;
+}
+
+/* Collapse toggle button */
+.review-section__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-right: 0.5rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.review-section__toggle:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.review-section__toggle-icon {
+  transition: transform 0.2s ease;
+}
+
+.review-section__toggle--collapsed .review-section__toggle-icon {
+  transform: rotate(-90deg);
 }
 
 .review-section--overview .review-section__title {
