@@ -1,6 +1,8 @@
-import { useCallback, useState } from 'react';
-import { useDropzone, FileRejection } from 'react-dropzone';
-import './DropZone.css';
+import { Upload, message, Alert, Spin } from 'antd';
+import { InboxOutlined } from '@ant-design/icons';
+import type { UploadProps } from 'antd';
+
+const { Dragger } = Upload;
 
 interface DropZoneProps {
   onFileAccepted: (file: File) => void;
@@ -9,78 +11,57 @@ interface DropZoneProps {
 }
 
 export function DropZone({ onFileAccepted, isProcessing, error }: DropZoneProps) {
-  const [rejectionMessage, setRejectionMessage] = useState<string | null>(null);
-
-  const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
-    setRejectionMessage(null);
-
-    if (rejectedFiles.length > 0) {
-      const rejection = rejectedFiles[0];
-      const rejectionError = rejection?.errors?.[0];
-      if (!rejectionError) {
-        setRejectionMessage('File was rejected');
-      } else if (rejectionError.code === 'file-invalid-type') {
-        setRejectionMessage('Only PDF files are accepted');
-      } else if (rejectionError.code === 'too-many-files') {
-        setRejectionMessage('Please upload one file at a time');
-      } else {
-        setRejectionMessage(rejectionError.message);
-      }
-      return;
-    }
-
-    const file = acceptedFiles[0];
-    if (file) {
-      onFileAccepted(file);
-    }
-  }, [onFileAccepted]);
-
-  const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
-    onDrop,
-    accept: { 'application/pdf': ['.pdf'] },
-    maxFiles: 1,
-    disabled: isProcessing,
+  const uploadProps: UploadProps = {
+    name: 'file',
+    accept: '.pdf,application/pdf',
     multiple: false,
-  });
-
-  const displayError = error || rejectionMessage;
-
-  const classNames = [
-    'drop-zone',
-    isDragActive ? 'drop-zone--active' : '',
-    isDragAccept ? 'drop-zone--accept' : '',
-    isDragReject ? 'drop-zone--reject' : '',
-    isProcessing ? 'drop-zone--processing' : '',
-    displayError ? 'drop-zone--error' : '',
-  ].filter(Boolean).join(' ');
+    disabled: isProcessing,
+    showUploadList: false,
+    beforeUpload: (file) => {
+      // Validate file type (workaround for accept + drag issue per RESEARCH.md)
+      if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+        message.error('Only PDF files are accepted');
+        return Upload.LIST_IGNORE;
+      }
+      onFileAccepted(file);
+      return false; // Prevent auto-upload, handle manually
+    },
+  };
 
   return (
-    <div {...getRootProps()} className={classNames}>
-      <input {...getInputProps()} />
-
-      {isProcessing ? (
-        <div className="drop-zone__content">
-          <div className="drop-zone__spinner" />
-          <p className="drop-zone__text">Processing...</p>
-        </div>
-      ) : displayError ? (
-        <div className="drop-zone__content drop-zone__content--error">
-          <p className="drop-zone__error">{displayError}</p>
-          <p className="drop-zone__secondary">Drop another PDF or click to browse</p>
-        </div>
-      ) : isDragActive ? (
-        <div className="drop-zone__content">
-          <p className="drop-zone__text">Drop PDF here...</p>
-        </div>
-      ) : (
-        <div className="drop-zone__content">
-          <div className="drop-zone__icon">
-            <span className="drop-zone__icon-text">PDF</span>
-          </div>
-          <p className="drop-zone__text">Drop PDF here</p>
-          <p className="drop-zone__secondary">or click to browse</p>
-        </div>
+    <div style={{ padding: '40px', maxWidth: '600px', margin: '0 auto' }}>
+      {error && (
+        <Alert
+          message="Upload Error"
+          description={error}
+          type="error"
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
       )}
+
+      <Dragger {...uploadProps}>
+        {isProcessing ? (
+          <div style={{ padding: '40px 0' }}>
+            <Spin size="large" />
+            <p style={{ marginTop: 16, color: 'rgba(0, 0, 0, 0.45)' }}>
+              Processing...
+            </p>
+          </div>
+        ) : (
+          <>
+            <p className="ant-upload-drag-icon">
+              <InboxOutlined />
+            </p>
+            <p className="ant-upload-text">
+              Drop PDF here or click to browse
+            </p>
+            <p className="ant-upload-hint">
+              Only PDF files are accepted
+            </p>
+          </>
+        )}
+      </Dragger>
     </div>
   );
 }
