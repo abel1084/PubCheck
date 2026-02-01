@@ -9,20 +9,24 @@ from dotenv import load_dotenv
 env_path = Path(__file__).parent.parent.parent / ".env"
 load_dotenv(env_path)
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.auth.middleware import verify_password
 
 from app.api import upload_router
 from app.ai.router import router as ai_router
 # check_router removed - AI handles all compliance decisions (Phase 7)
 from app.config.router import router as config_router
+from app.routers.settings import router as settings_router
 from app.learning.router import router as learning_router
 from app.output.router import router as output_router
 
 app = FastAPI(
     title="PubCheck",
     description="UNEP PDF Design Compliance Checker",
-    version="1.0.0"
+    version="1.0.0",
+    dependencies=[Depends(verify_password)],
 )
 
 # CORS middleware for frontend development server
@@ -44,6 +48,7 @@ app.add_middleware(
 # Include API routers
 app.include_router(upload_router)
 app.include_router(config_router)
+app.include_router(settings_router)
 # check_router removed - AI handles all compliance decisions (Phase 7)
 app.include_router(ai_router)
 app.include_router(learning_router)
