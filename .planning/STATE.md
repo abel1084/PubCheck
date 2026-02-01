@@ -1,27 +1,27 @@
 # Project State: PubCheck
 
-**Current Phase:** 7 (In Progress)
-**Status:** Executing Phase 7 - AI-First Architecture Overhaul (Plan 7 complete)
+**Current Phase:** 7.1 (In Progress)
+**Status:** Executing Phase 7.1 - AI Review Fixes (Plan 1 complete)
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-31)
 
 **Core value:** Catch 95%+ of design compliance issues automatically, producing professional review outputs
-**Current focus:** AI-First Architecture - Phase 7 nearing completion
+**Current focus:** AI Review Fixes - improving logo detection and extraction
 
 ## Current Position
 
 ```
-Phase: 7 of 7 - AI-First Architecture Overhaul (IN PROGRESS)
-Plan:  7 of 8
+Phase: 7.1 of 7.1 - AI Review Fixes (IN PROGRESS)
+Plan:  1 of 4
 Status: In progress
-Last activity: 2026-02-01 - Completed 07-07-PLAN.md
+Last activity: 2026-02-01 - Completed 07.1-01-PLAN.md
 
-[##########                  ] 35%
+[##########                  ] 36%
 ```
 
-**Current Plan:** 07-07 complete, ready for 07-08 (User Verification)
+**Current Plan:** 07.1-01 complete, ready for 07.1-02
 
 ## Progress
 
@@ -34,12 +34,13 @@ Last activity: 2026-02-01 - Completed 07-07-PLAN.md
 | 5 | Review Interface | Complete | 4/4 |
 | 6 | Learning System & Output Generation | Complete | 6/6 |
 | 7 | AI-First Architecture Overhaul | In Progress | 7/8 |
+| 7.1 | AI Review Fixes | In Progress | 1/4 |
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans completed | 35 |
+| Plans completed | 36 |
 | Plans failed | 0 |
 | Total iterations | 27 |
 | Avg iterations/plan | 1.0 |
@@ -134,6 +135,8 @@ Last activity: 2026-02-01 - Completed 07-07-PLAN.md
 | Single Review button | Unifies Check + Analyze AI into single action per new architecture | 07-07 |
 | Settings removed from header | Rule configuration no longer needed with AI-first approach | 07-07 |
 | DataTabs collapsed by default | Extraction data secondary to review results | 07-07 |
+| mm dimensions from rendered bbox | Gives actual print size, not pixel dimensions | 07.1-01 |
+| Logo uncertainty for implausible measurements | AI hedges when logo <5mm or >50mm | 07.1-01 |
 
 ### Roadmap Evolution
 
@@ -149,8 +152,8 @@ Last activity: 2026-02-01 - Completed 07-07-PLAN.md
 
 ## Session Continuity
 
-Last session: 2026-02-01T08:47:56Z
-Stopped at: Completed 07-06-PLAN.md
+Last session: 2026-02-01T09:38:28Z
+Stopped at: Completed 07.1-01-PLAN.md
 Resume file: None
 
 ## Session Log
@@ -198,7 +201,8 @@ Resume file: None
 | 2026-02-01 | Completed 07-03 | useAIReview hook with SSE streaming and section parsing (3 min) |
 | 2026-02-01 | Completed 07-05 | ReviewResults component with markdown rendering (3 min) |
 | 2026-02-01 | Completed 07-07 | App integration with AI review, DataTabs simplified (6 min) |
+| 2026-02-01 | Completed 07.1-01 | Logo detection fix: mm dimensions and uncertainty hedging (1 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-02-01T08:55:00Z*
+*Last updated: 2026-02-01T09:38:28Z*
