@@ -37,17 +37,17 @@ First, provide your prose review using the section headers above (Overview, Need
 Then, at the very end of your response, provide a JSON block with structured issues for the comment system:
 
 ```json
-{
+{{
   "issues": [
-    {
+    {{
       "id": "issue-1",
       "category": "needs_attention",
       "title": "Brief issue title",
       "description": "Full description with measurements",
       "pages": [1, 2]
-    }
+    }}
   ]
-}
+}}
 ```
 
 Rules for the JSON block:
