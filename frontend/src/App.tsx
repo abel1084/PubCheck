@@ -6,7 +6,7 @@ import { ReviewResults } from './components/ReviewResults/ReviewResults';
 import { ToastProvider } from './components/Toast/ToastProvider';
 import { useExtraction } from './hooks/useExtraction';
 import { useAIReview } from './hooks/useAIReview';
-import type { DocumentType } from './types/extraction';
+import type { DocumentType, Confidence } from './types/extraction';
 import './App.css';
 
 // Map frontend DocumentType to backend document_type IDs
@@ -16,6 +16,13 @@ const DOCUMENT_TYPE_MAP: Record<DocumentType, string> = {
   'Working Paper': 'working-paper',
   'Technical Report': 'issue-note',
   'Publication': 'publication',
+};
+
+// Map confidence strings to numeric values for AI review
+const CONFIDENCE_MAP: Record<Confidence, number> = {
+  'high': 0.95,
+  'medium': 0.75,
+  'low': 0.5,
 };
 
 function App() {
@@ -56,11 +63,12 @@ function App() {
   const handleReview = () => {
     if (result && documentType && uploadedFileRef.current) {
       const docTypeId = DOCUMENT_TYPE_MAP[documentType];
+      const confidenceNum = CONFIDENCE_MAP[result.confidence];
       startReview(
         uploadedFileRef.current,
         result.extraction,
         docTypeId,
-        result.confidence
+        confidenceNum
       );
     }
   };

@@ -20,7 +20,7 @@ export function useAIReview() {
     file: File,
     extraction: ExtractionResult,
     documentType: string,
-    confidence: string,
+    confidence: number,
   ) => {
     // Cancel any existing request
     if (abortControllerRef.current) {
@@ -38,10 +38,8 @@ export function useAIReview() {
     const formData = new FormData();
     formData.append('file', file);
 
-    // Send extraction as file (not Form field) to avoid size limits
-    const extractionBlob = new Blob([JSON.stringify(extraction)], { type: 'application/json' });
-    const extractionFile = new File([extractionBlob], 'extraction.json', { type: 'application/json' });
-    formData.append('extraction_file', extractionFile);
+    // Send extraction as JSON string (backend expects Form field, not file)
+    formData.append('extraction', JSON.stringify(extraction));
 
     formData.append('document_type', documentType);
     formData.append('confidence', confidence.toString());
