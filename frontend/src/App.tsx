@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { toast } from 'sonner';
 import { DropZone } from './components/DropZone';
 import { DataTabs } from './components/DataTabs';
 import { Sidebar } from './components/Sidebar';
@@ -48,6 +49,7 @@ function App() {
   const [outputFormat, setOutputFormat] = useState<OutputFormat>('digital');
   const [activeTab, setActiveTab] = useState<ReviewTab>('review');
   const [selectedIssueIds, setSelectedIssueIds] = useState<Set<string>>(new Set());
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const uploadedFileRef = useRef<File | null>(null);
 
   // Toggle issue selection
@@ -69,6 +71,84 @@ function App() {
       setSelectedIssueIds(new Set(issues.map(i => i.id)));
     }
   }, [issues]);
+
+  // Generate annotated PDF from selected issues
+  const handleGeneratePdf = useCallback(async () => {
+    if (!uploadedFileRef.current || selectedIssueIds.size === 0) {
+      return;
+    }
+
+    setIsGeneratingPdf(true);
+
+    try {
+      // Convert selected ReviewIssues to IssueAnnotation format
+      const selectedIssues = issues.filter(i => selectedIssueIds.has(i.id));
+
+      // Build annotations array - one annotation per page per issue
+      const annotations: Array<{
+        page: number;
+        x: number | null;
+        y: number | null;
+        message: string;
+        severity: 'error' | 'warning';
+        reviewer_note?: string;
+      }> = [];
+
+      for (const issue of selectedIssues) {
+        // Map category to severity
+        const severity = issue.category === 'needs_attention' ? 'error' : 'warning';
+
+        // Create annotation for each page
+        for (const page of issue.pages) {
+          annotations.push({
+            page,
+            x: null,  // No coordinates from AI review
+            y: null,
+            message: `${issue.title}\n\n${issue.description}`,
+            severity,
+          });
+        }
+      }
+
+      // Create form data
+      const formData = new FormData();
+      formData.append('pdf', uploadedFileRef.current);
+      formData.append('issues', JSON.stringify({ issues: annotations }));
+
+      // Call annotation endpoint (relative URL per LEARNINGS.md)
+      const response = await fetch('/api/output/annotate', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to generate annotated PDF');
+      }
+
+      // Download the result
+      const blob = await response.blob();
+      const contentDisposition = response.headers.get('Content-Disposition');
+      const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
+      const filename = filenameMatch?.[1] || 'annotated.pdf';
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success('Annotated PDF downloaded');
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      toast.error(`Failed to generate PDF: ${message}`);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  }, [issues, selectedIssueIds]);
 
   // Sync document type from result when it changes
   useEffect(() => {
@@ -218,6 +298,8 @@ function App() {
               issues={issues}
               selectedIds={selectedIssueIds}
               onToggleSelect={handleToggleIssue}
+              onGeneratePdf={handleGeneratePdf}
+              isGenerating={isGeneratingPdf}
             />
           )}
 

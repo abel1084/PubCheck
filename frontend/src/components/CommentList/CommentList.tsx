@@ -9,6 +9,10 @@ interface CommentListProps {
   selectedIds: Set<string>;
   /** Toggle selection callback */
   onToggleSelect: (id: string) => void;
+  /** Generate PDF callback */
+  onGeneratePdf?: () => void;
+  /** Whether PDF generation is in progress */
+  isGenerating?: boolean;
 }
 
 /**
@@ -19,6 +23,8 @@ export function CommentList({
   issues,
   selectedIds,
   onToggleSelect,
+  onGeneratePdf,
+  isGenerating = false,
 }: CommentListProps) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
@@ -164,6 +170,28 @@ export function CommentList({
 
       {renderSection('Needs Attention', needsAttention, 'attention')}
       {renderSection('Suggestions', suggestions, 'suggestions')}
+
+      {/* Footer with Generate PDF button */}
+      {onGeneratePdf && (
+        <div className="comment-list__footer">
+          <button
+            type="button"
+            className={`comment-list__generate-btn ${isGenerating ? 'comment-list__generate-btn--loading' : ''}`}
+            onClick={onGeneratePdf}
+            disabled={totalSelected === 0 || isGenerating}
+            title={totalSelected === 0 ? 'Select at least one issue' : 'Generate annotated PDF'}
+          >
+            {isGenerating ? (
+              <>
+                <span className="comment-list__spinner"></span>
+                Generating...
+              </>
+            ) : (
+              `Generate PDF (${totalSelected} comments)`
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
