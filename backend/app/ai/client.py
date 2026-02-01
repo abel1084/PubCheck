@@ -1,12 +1,12 @@
 """
-Anthropic Claude client wrapper with native PDF support and streaming.
-Uses Claude for AI-powered document review with full PDF understanding.
+Google Gemini client wrapper with native PDF support and streaming.
+Uses Gemini 2.5 Flash with thinking mode for AI-powered document review.
 """
-import base64
 import os
 from typing import AsyncGenerator, Optional
 
-from anthropic import AsyncAnthropic
+from google import genai
+from google.genai import types
 
 
 class AIClientError(Exception):
@@ -21,32 +21,33 @@ class AIConfigurationError(AIClientError):
 
 class AIClient:
     """
-    Wrapper for Anthropic Claude API with native PDF and streaming support.
+    Wrapper for Google Gemini API with native PDF and streaming support.
 
-    Uses Claude's native PDF document type for full text + visual understanding.
+    Uses Gemini 2.5 Flash with thinking mode for enhanced reasoning.
     Supports async streaming for real-time response delivery.
     """
 
-    DEFAULT_MODEL = "claude-sonnet-4-5"
-    DEFAULT_MAX_TOKENS = 8192
+    DEFAULT_MODEL = "gemini-2.5-flash-preview-05-20"
+    DEFAULT_MAX_TOKENS = 16384  # Gemini supports larger outputs
 
     def __init__(self):
         """Initialize the AI client. API key validated on first use."""
-        self._client: Optional[AsyncAnthropic] = None
-        self._model = os.getenv("AI_MODEL", self.DEFAULT_MODEL)
+        self._client: Optional[genai.Client] = None
+        self._model_name = os.getenv("AI_MODEL", self.DEFAULT_MODEL)
 
-    def _ensure_client(self) -> AsyncAnthropic:
-        """Lazy initialization of Anthropic client."""
+    def _ensure_client(self) -> genai.Client:
+        """Lazy initialization of Gemini client."""
         if self._client is None:
-            api_key = os.getenv("ANTHROPIC_API_KEY")
+            api_key = os.getenv("GOOGLE_API_KEY")
 
             if not api_key:
                 raise AIConfigurationError(
-                    "ANTHROPIC_API_KEY not set.\n"
-                    "Get your API key from: https://console.anthropic.com/settings/keys"
+                    "GOOGLE_API_KEY not set.\n"
+                    "Get your API key from: https://aistudio.google.com/apikey"
                 )
 
-            self._client = AsyncAnthropic(api_key=api_key)
+            self._client = genai.Client(api_key=api_key)
+
         return self._client
 
     async def review_document_stream(
@@ -57,13 +58,13 @@ class AIClient:
         max_tokens: Optional[int] = None,
     ) -> AsyncGenerator[str, None]:
         """
-        Stream document review using Claude's native PDF support.
+        Stream document review using Gemini's native PDF support.
 
         Args:
             pdf_bytes: Raw PDF file bytes
             user_prompt: User message with extraction JSON and document type
             system_prompt: System prompt with rules context
-            max_tokens: Max response tokens (default: 8192)
+            max_tokens: Max response tokens (default: 16384)
 
         Yields:
             Text chunks as they're generated
@@ -73,35 +74,39 @@ class AIClient:
             AIConfigurationError: If API key is missing
         """
         client = self._ensure_client()
-        pdf_base64 = base64.standard_b64encode(pdf_bytes).decode("utf-8")
 
         try:
-            async with client.messages.stream(
-                model=self._model,
-                max_tokens=max_tokens or self.DEFAULT_MAX_TOKENS,
-                system=system_prompt,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "document",
-                                "source": {
-                                    "type": "base64",
-                                    "media_type": "application/pdf",
-                                    "data": pdf_base64,
-                                }
-                            },
-                            {
-                                "type": "text",
-                                "text": user_prompt,
-                            }
-                        ],
-                    }
-                ],
-            ) as stream:
-                async for text in stream.text_stream:
-                    yield text
+            # Build content with PDF document inline
+            contents = [
+                types.Part.from_bytes(data=pdf_bytes, mime_type="application/pdf"),
+                types.Part.from_text(text=user_prompt),
+            ]
+
+            # Configure generation with thinking enabled
+            config = types.GenerateContentConfig(
+                system_instruction=system_prompt,
+                max_output_tokens=max_tokens or self.DEFAULT_MAX_TOKENS,
+                temperature=1.0,  # Required for thinking mode
+                thinking_config=types.ThinkingConfig(
+                    thinking_budget=8192,
+                ),
+            )
+
+            # Stream response
+            async for chunk in client.aio.models.generate_content_stream(
+                model=self._model_name,
+                contents=contents,
+                config=config,
+            ):
+                # Extract text from response parts, skip thinking parts
+                if chunk.candidates:
+                    for candidate in chunk.candidates:
+                        if candidate.content and candidate.content.parts:
+                            for part in candidate.content.parts:
+                                if hasattr(part, 'text') and part.text:
+                                    # Skip thinking content (has thought=True attribute)
+                                    if not getattr(part, 'thought', False):
+                                        yield part.text
 
         except Exception as e:
             error_str = str(e).lower()
@@ -109,8 +114,11 @@ class AIClient:
             if "invalid" in error_str and "key" in error_str:
                 raise AIConfigurationError(f"Invalid API key: {e}") from e
 
-            if "rate" in error_str or "quota" in error_str:
+            if "rate" in error_str or "quota" in error_str or "429" in error_str:
                 raise AIClientError(f"Rate limit exceeded: {e}") from e
+
+            if "too large" in error_str or "size" in error_str:
+                raise AIClientError(f"Document too large: {e}") from e
 
             raise AIClientError(f"API error: {e}") from e
 

@@ -205,8 +205,18 @@ export function parseReviewIssues(content: string): ReviewIssue[] {
 }
 
 /**
+ * Strip JSON code blocks from content.
+ * Removes ```json ... ``` blocks to prevent showing raw data in UI.
+ */
+function stripJsonBlocks(content: string): string {
+  // Remove JSON code blocks (```json ... ```)
+  return content.replace(/```(?:json)?\s*\n\{[\s\S]*?\}\s*\n```/g, '').trim();
+}
+
+/**
  * Parse markdown content into sections.
  * Handles partial content during streaming.
+ * Strips JSON blocks from section content to prevent showing raw data.
  */
 export function parseReviewSections(content: string): AIReviewSections {
   const sections: AIReviewSections = {
@@ -227,7 +237,8 @@ export function parseReviewSections(content: string): AIReviewSections {
   for (const { key, pattern } of patterns) {
     const match = content.match(pattern);
     if (match && match[1]) {
-      sections[key] = match[1].trim();
+      // Strip JSON blocks from each section's content
+      sections[key] = stripJsonBlocks(match[1]);
     }
   }
 
