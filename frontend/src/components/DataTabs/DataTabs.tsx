@@ -1,68 +1,64 @@
 import { useState } from 'react';
+import { Collapse, Tabs, type TabsProps } from 'antd';
 import type { ExtractionResult } from '../../types/extraction';
 import { TextTab } from './TextTab';
 import { ImagesTab } from './ImagesTab';
 import { MarginsTab } from './MarginsTab';
 import { MetadataTab } from './MetadataTab';
-import './DataTabs.css';
 
 interface DataTabsProps {
   extraction: ExtractionResult;
   defaultCollapsed?: boolean;
 }
 
-type TabId = 'text' | 'images' | 'margins' | 'metadata';
-
 export function DataTabs({ extraction, defaultCollapsed = false }: DataTabsProps) {
-  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
-  const [activeTab, setActiveTab] = useState<TabId>('text');
+  const [activeKey, setActiveKey] = useState(defaultCollapsed ? [] : ['data']);
 
-  const tabs: { id: TabId; label: string; count: number }[] = [
-    { id: 'text', label: 'Text', count: extraction.fonts.length },
-    { id: 'images', label: 'Images', count: extraction.images.length },
-    { id: 'margins', label: 'Margins', count: extraction.margins.length },
-    { id: 'metadata', label: 'Metadata', count: 1 },
+  const tabItems: TabsProps['items'] = [
+    {
+      key: 'text',
+      label: `Text (${extraction.fonts.length})`,
+      children: <TextTab fonts={extraction.fonts} textBlocks={extraction.text_blocks} />,
+    },
+    {
+      key: 'images',
+      label: `Images (${extraction.images.length})`,
+      children: <ImagesTab images={extraction.images} />,
+      disabled: extraction.images.length === 0,
+    },
+    {
+      key: 'margins',
+      label: `Margins (${extraction.margins.length})`,
+      children: <MarginsTab margins={extraction.margins} />,
+      disabled: extraction.margins.length === 0,
+    },
+    {
+      key: 'metadata',
+      label: 'Metadata',
+      children: <MetadataTab metadata={extraction.metadata} />,
+    },
+  ];
+
+  const collapseItems = [
+    {
+      key: 'data',
+      label: 'Extracted Data',
+      children: (
+        <Tabs
+          items={tabItems}
+          defaultActiveKey="text"
+          size="small"
+        />
+      ),
+    },
   ];
 
   return (
-    <div className="data-tabs">
-      <button
-        type="button"
-        className="data-tabs__toggle"
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        aria-expanded={!isCollapsed}
-      >
-        <span className="data-tabs__toggle-icon">
-          {isCollapsed ? '\u25B6' : '\u25BC'}
-        </span>
-        Extracted Data
-      </button>
-
-      {!isCollapsed && (
-        <>
-          <div className="data-tabs__header">
-            {tabs.map(tab => {
-              const isEmpty = tab.id !== 'metadata' && tab.count === 0;
-              return (
-                <button
-                  key={tab.id}
-                  className={`data-tabs__tab ${activeTab === tab.id ? 'data-tabs__tab--active' : ''} ${isEmpty ? 'data-tabs__tab--disabled' : ''}`}
-                  onClick={() => !isEmpty && setActiveTab(tab.id)}
-                  disabled={isEmpty}
-                >
-                  {tab.label} ({tab.count})
-                </button>
-              );
-            })}
-          </div>
-          <div className="data-tabs__content">
-            {activeTab === 'text' && <TextTab fonts={extraction.fonts} textBlocks={extraction.text_blocks} />}
-            {activeTab === 'images' && <ImagesTab images={extraction.images} />}
-            {activeTab === 'margins' && <MarginsTab margins={extraction.margins} />}
-            {activeTab === 'metadata' && <MetadataTab metadata={extraction.metadata} />}
-          </div>
-        </>
-      )}
-    </div>
+    <Collapse
+      activeKey={activeKey}
+      onChange={(keys) => setActiveKey(keys as string[])}
+      items={collapseItems}
+      style={{ marginTop: 16 }}
+    />
   );
 }
