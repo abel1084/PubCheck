@@ -96,6 +96,8 @@ def build_user_prompt(
     extraction_json: str,
     document_type: str,
     confidence: float,
+    output_format: str = "digital",
+    dpi_min: int = 72,
 ) -> str:
     """
     Build user prompt with extraction data and document type.
@@ -104,6 +106,8 @@ def build_user_prompt(
         extraction_json: JSON string of ExtractionResult
         document_type: Detected document type
         confidence: Detection confidence (0-1)
+        output_format: Output format (digital, print, both)
+        dpi_min: Minimum DPI requirement for the output format
 
     Returns:
         User prompt for document review
@@ -112,9 +116,26 @@ def build_user_prompt(
     if confidence < 0.8:
         confidence_note = f"\n(Please verify this is actually a {document_type} - detection confidence is only {confidence:.0%})"
 
+    # Format label for user-friendly display
+    format_labels = {
+        "digital": "Digital only",
+        "print": "Print",
+        "both": "Print + Digital",
+    }
+    format_label = format_labels.get(output_format, output_format)
+
     return f'''Please review this {document_type} for design compliance.
 
 Document type confidence: {confidence:.0%}{confidence_note}
+
+## Output Format
+Target output: {format_label}
+**DPI requirement: {dpi_min} DPI minimum** for all significant images
+
+When checking image resolution:
+- Flag images below {dpi_min} DPI as needing attention
+- Images at or above {dpi_min} DPI are acceptable
+- Small decorative elements (under ~5mm) don't need DPI checks
 
 ## Extracted Measurements
 The following JSON contains measurements extracted from the PDF. Use this data to verify specific values (font sizes, margins, DPI, etc.) but also visually inspect the document for issues the extraction might miss.

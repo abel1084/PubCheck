@@ -58,6 +58,7 @@ async def review_document(
     extraction: ExtractionResult,
     document_type: str,
     confidence: float,
+    output_format: str = "digital",
 ) -> AsyncGenerator[str, None]:
     """
     Stream AI document review.
@@ -77,6 +78,13 @@ async def review_document(
         AIClientError: On API errors
         FileNotFoundError: If rules context missing
     """
+    # DPI requirements by output format
+    DPI_REQUIREMENTS = {
+        "digital": {"min": 72, "label": "Digital"},
+        "print": {"min": 300, "label": "Print"},
+        "both": {"min": 150, "label": "Print + Digital"},
+    }
+    dpi_info = DPI_REQUIREMENTS.get(output_format, DPI_REQUIREMENTS["digital"])
     # Load rules context
     rules_context = load_rules_context(document_type)
     logger.info(f"Loaded rules context for {document_type}: {len(rules_context)} chars")
@@ -84,9 +92,11 @@ async def review_document(
     # Build prompts
     system_prompt = build_system_prompt(rules_context)
     extraction_json = json.dumps(extraction.dict(), indent=2, default=str)
-    user_prompt = build_user_prompt(extraction_json, document_type, confidence)
+    user_prompt = build_user_prompt(
+        extraction_json, document_type, confidence, output_format, dpi_info["min"]
+    )
 
-    logger.info(f"Starting review: {extraction.metadata.page_count} pages, type={document_type}")
+    logger.info(f"Starting review: {extraction.metadata.page_count} pages, type={document_type}, format={output_format} ({dpi_info['min']} DPI)")
 
     # Stream from AI client
     client = get_ai_client()

@@ -28,6 +28,7 @@ async def generate_review_events(
     extraction: ExtractionResult,
     document_type: str,
     confidence: float,
+    output_format: str,
 ) -> AsyncGenerator[dict, None]:
     """
     Generate SSE events from AI review stream.
@@ -41,6 +42,7 @@ async def generate_review_events(
             extraction=extraction,
             document_type=document_type,
             confidence=confidence,
+            output_format=output_format,
         ):
             yield {
                 "event": "text",
@@ -82,6 +84,7 @@ async def review_pdf(
     extraction: str = Form(...),
     document_type: str = Form(...),
     confidence: float = Form(...),
+    output_format: str = Form("digital"),
 ):
     """
     Stream AI document review via Server-Sent Events.
@@ -93,6 +96,7 @@ async def review_pdf(
         extraction: JSON string of ExtractionResult
         document_type: Type of document (factsheet, publication, etc.)
         confidence: Document type detection confidence (0-1)
+        output_format: Output format for DPI rules (digital, print, both)
 
     Returns:
         EventSourceResponse streaming text chunks
@@ -104,7 +108,7 @@ async def review_pdf(
     """
     tmp_path = None
     try:
-        logger.info(f"Review request: document_type={document_type}, confidence={confidence}")
+        logger.info(f"Review request: document_type={document_type}, confidence={confidence}, output_format={output_format}")
         logger.info(f"File: {file.filename}, content_type={file.content_type}")
 
         # Validate document_type
@@ -130,6 +134,14 @@ async def review_pdf(
         pdf_bytes = await file.read()
         logger.info(f"PDF size: {len(pdf_bytes)} bytes")
 
+        # Validate output_format
+        valid_formats = ["digital", "print", "both"]
+        if output_format not in valid_formats:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid output_format: {output_format}. Must be one of: {valid_formats}"
+            )
+
         # Return streaming response
         return EventSourceResponse(
             generate_review_events(
@@ -137,6 +149,7 @@ async def review_pdf(
                 extraction=extraction_data,
                 document_type=document_type,
                 confidence=confidence,
+                output_format=output_format,
             ),
             media_type="text/event-stream",
         )

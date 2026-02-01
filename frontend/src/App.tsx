@@ -9,6 +9,9 @@ import { useAIReview } from './hooks/useAIReview';
 import type { DocumentType, Confidence } from './types/extraction';
 import './App.css';
 
+// Output format types for DPI requirements
+type OutputFormat = 'print' | 'digital' | 'both';
+
 // Map frontend DocumentType to backend document_type IDs
 const DOCUMENT_TYPE_MAP: Record<DocumentType, string> = {
   'Factsheet': 'factsheet',
@@ -37,6 +40,7 @@ function App() {
   } = useAIReview();
 
   const [documentType, setDocumentType] = useState<DocumentType | null>(null);
+  const [outputFormat, setOutputFormat] = useState<OutputFormat>('digital');
   const uploadedFileRef = useRef<File | null>(null);
 
   // Sync document type from result when it changes
@@ -56,6 +60,7 @@ function App() {
     reset();
     resetReview();
     setDocumentType(null);
+    setOutputFormat('digital');
     uploadedFileRef.current = null;
   };
 
@@ -68,7 +73,8 @@ function App() {
         uploadedFileRef.current,
         result.extraction,
         docTypeId,
-        confidenceNum
+        confidenceNum,
+        outputFormat
       );
     }
   };
@@ -104,6 +110,19 @@ function App() {
       <header className="app__header app__header--compact">
         <h1>PubCheck</h1>
         <div className="app__header-buttons">
+          <label className="app__output-format">
+            <span className="app__output-format-label">Output:</span>
+            <select
+              value={outputFormat}
+              onChange={(e) => setOutputFormat(e.target.value as OutputFormat)}
+              disabled={isStreaming}
+              className="app__output-format-select"
+            >
+              <option value="digital">Digital (72 DPI)</option>
+              <option value="print">Print (300 DPI)</option>
+              <option value="both">Both (150 DPI)</option>
+            </select>
+          </label>
           <button
             type="button"
             className={`app__review-button ${isStreaming ? 'app__review-button--loading' : ''}`}
