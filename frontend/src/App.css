@@ -75,8 +75,8 @@ body {
   align-items: center;
 }
 
-/* Check button */
-.app__check-button {
+/* Review button */
+.app__review-button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -91,56 +91,24 @@ body {
   transition: all 0.2s ease;
 }
 
-.app__check-button:hover:not(:disabled) {
+.app__review-button:hover:not(:disabled) {
   background: #218838;
   border-color: #1e7e34;
 }
 
-.app__check-button:disabled {
+.app__review-button:disabled {
   background: #6c757d;
   border-color: #6c757d;
   cursor: not-allowed;
   opacity: 0.7;
 }
 
-.app__check-button--loading {
+.app__review-button--loading {
   background: #17a2b8;
   border-color: #17a2b8;
 }
 
-/* AI Analyze button - green outline style */
-.app__ai-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 16px;
-  background: transparent;
-  border: 1px solid #28a745;
-  border-radius: 4px;
-  color: white;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.app__ai-button:hover:not(:disabled) {
-  background: rgba(40, 167, 69, 0.2);
-}
-
-.app__ai-button:disabled {
-  border-color: #6c757d;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.app__ai-button--loading {
-  background: rgba(40, 167, 69, 0.2);
-  border-color: #28a745;
-}
-
-/* Spinner for check button */
+/* Spinner for review button */
 .app__spinner {
   display: inline-block;
   width: 14px;
