@@ -1,27 +1,27 @@
 # Project State: PubCheck
 
 **Current Phase:** 8 (In Progress)
-**Status:** Phase 8 - Ant Design Frontend Refactor in progress. Plan 05 complete.
+**Status:** Phase 8 - Ant Design Frontend Refactor in progress. Plan 03 complete.
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-31)
 
 **Core value:** Catch 95%+ of design compliance issues automatically, producing professional review outputs
-**Current focus:** Phase 8 - Settings modal refactored to antd
+**Current focus:** Phase 8 - Tables and tabs refactored to antd
 
 ## Current Position
 
 ```
 Phase: 8 of 8 - Ant Design Frontend Refactor (IN PROGRESS)
-Plan:  05 of 8
+Plan:  03 of 8
 Status: In progress
-Last activity: 2026-02-01 - Completed 08-05-PLAN.md
+Last activity: 2026-02-01 - Completed 08-03-PLAN.md
 
-[===============             ] 62%
+[==========                  ] 37%
 ```
 
-**Current Plan:** 08-05 complete - Settings modal antd refactor
+**Current Plan:** 08-03 complete - Tables and tabs antd refactor
 
 ## Progress
 
@@ -35,7 +35,7 @@ Last activity: 2026-02-01 - Completed 08-05-PLAN.md
 | 6 | Learning System & Output Generation | Complete | 6/6 |
 | 7 | AI-First Architecture Overhaul | Complete | 8/8 |
 | 7.1 | AI Review Fixes | Complete | 4/4 |
-| 8 | Ant Design Frontend Refactor | In Progress | 5/8 |
+| 8 | Ant Design Frontend Refactor | In Progress | 3/8 |
 
 ## Performance Metrics
 
@@ -152,6 +152,9 @@ Last activity: 2026-02-01 - Completed 08-05-PLAN.md
 | Semantic Tag colors | Use antd preset colors (success/warning/error) for confidence | 08-04 |
 | beforeUpload for file validation | Workaround for known accept+drag issue in antd Upload | 08-02 |
 | return false in beforeUpload | Prevents antd auto-upload, lets app handle manually | 08-02 |
+| antd Table auto-sorter | Add sorter function based on dataIndex type (number/string) | 08-03 |
+| Collapse+Tabs combo | Collapse for section expand/collapse, Tabs for content | 08-03 |
+| Descriptions for metadata | Better UX than table for key-value display | 08-03 |
 
 ### Roadmap Evolution
 
@@ -168,8 +171,8 @@ Last activity: 2026-02-01 - Completed 08-05-PLAN.md
 
 ## Session Continuity
 
-Last session: 2026-02-01T15:55:00Z
-Stopped at: Completed 08-05-PLAN.md
+Last session: 2026-02-01T15:50:00Z
+Stopped at: Completed 08-03-PLAN.md
 Resume file: None
 
 ## Session Log
@@ -229,7 +232,8 @@ Resume file: None
 | 2026-02-01 | Completed 08-04 | Sidebar antd refactor (3 min) |
 | 2026-02-01 | Completed 08-02 | DropZone antd migration - Upload.Dragger + Alert + Spin (3 min) |
 | 2026-02-01 | Completed 08-05 | Settings modal antd refactor - Modal, Tabs, Collapse, Form (5 min) |
+| 2026-02-01 | Completed 08-03 | Tables and tabs antd refactor - Table, Tabs, Collapse, Descriptions (3 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-02-01T15:55:00Z*
+*Last updated: 2026-02-01T15:50:00Z*
