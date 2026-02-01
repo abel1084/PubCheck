@@ -30,6 +30,35 @@ Mention 2-3 positive observations.
 Minor improvements that would enhance the document but aren't requirements.
 Optional enhancements or stylistic suggestions.
 
+## Output Format
+
+First, provide your prose review using the section headers above (Overview, Needs Attention, Looking Good, Suggestions).
+
+Then, at the very end of your response, provide a JSON block with structured issues for the comment system:
+
+```json
+{
+  "issues": [
+    {
+      "id": "issue-1",
+      "category": "needs_attention",
+      "title": "Brief issue title",
+      "description": "Full description with measurements",
+      "pages": [1, 2]
+    }
+  ]
+}
+```
+
+Rules for the JSON block:
+- Include ALL issues from both "Needs Attention" and "Suggestions" sections
+- Use category "needs_attention" for items from Needs Attention section
+- Use category "suggestion" for items from Suggestions section
+- Use sequential IDs: "issue-1", "issue-2", etc.
+- Include page numbers where the issue appears (use [1] if document-wide)
+- The JSON block MUST come AFTER all prose content
+- Do NOT include items from "Looking Good" in the JSON (those are positive observations)
+
 ## Common Pitfalls to Avoid in Your Analysis
 - Full-bleed images are intentional design, not margin violations
 - Decorative elements (thin lines, bullets, icons under ~5mm) don't need DPI checks
