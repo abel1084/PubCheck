@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { toast } from 'sonner';
+import { App } from 'antd';
 import type { CheckIssue, CategoryResult } from '../types/checks';
 import type { IssueAnnotation } from '../types/output';
 
@@ -20,6 +20,7 @@ interface UseGenerateReportReturn {
  * Handles building annotations from selected issues and downloading the result.
  */
 export function useGenerateReport(): UseGenerateReportReturn {
+  const { message } = App.useApp();
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -91,15 +92,15 @@ export function useGenerateReport(): UseGenerateReportReturn {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      toast.success('Annotated PDF downloaded');
+      message.success('Annotated PDF downloaded');
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'Unknown error';
-      setError(message);
-      toast.error(`Failed to generate report: ${message}`);
+      const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+      setError(errorMessage);
+      message.error(`Failed to generate report: ${errorMessage}`);
     } finally {
       setIsGenerating(false);
     }
-  }, []);
+  }, [message]);
 
   return { isGenerating, error, generateReport };
 }
