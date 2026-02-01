@@ -92,12 +92,13 @@ class AIClient:
                 ),
             )
 
-            # Stream response
-            async for chunk in client.aio.models.generate_content_stream(
+            # Stream response - await the coroutine to get async iterator
+            stream = await client.aio.models.generate_content_stream(
                 model=self._model_name,
                 contents=contents,
                 config=config,
-            ):
+            )
+            async for chunk in stream:
                 # Extract text from response parts, skip thinking parts
                 if chunk.candidates:
                     for candidate in chunk.candidates:
