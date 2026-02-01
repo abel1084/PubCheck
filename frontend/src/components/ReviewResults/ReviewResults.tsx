@@ -66,7 +66,7 @@ export function ReviewResults({
   }
 
   return (
-    <div style={{ padding: 16, maxWidth: 1400, margin: '0 auto' }}>
+    <div style={{ padding: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <Title level={4} style={{ margin: 0 }}>Design Review</Title>
         <Space>
@@ -75,8 +75,8 @@ export function ReviewResults({
         </Space>
       </div>
 
-      <Row gutter={[16, 16]}>
-        <Col xs={24} lg={12}>
+      <Row gutter={16}>
+        <Col xs={24} sm={12} xl={6}>
           <ReviewSection
             title="Overview"
             content={sections.overview}
@@ -84,7 +84,7 @@ export function ReviewResults({
             isStreaming={isStreaming && !sections.needsAttention}
           />
         </Col>
-        <Col xs={24} lg={12}>
+        <Col xs={24} sm={12} xl={6}>
           <ReviewSection
             title="Looking Good"
             content={sections.lookingGood}
@@ -92,7 +92,7 @@ export function ReviewResults({
             isStreaming={isStreaming && !!sections.needsAttention && !sections.suggestions}
           />
         </Col>
-        <Col xs={24} lg={12}>
+        <Col xs={24} sm={12} xl={6}>
           <ReviewSection
             title="Needs Attention"
             content={sections.needsAttention}
@@ -100,7 +100,7 @@ export function ReviewResults({
             isStreaming={isStreaming && !!sections.overview && !sections.lookingGood}
           />
         </Col>
-        <Col xs={24} lg={12}>
+        <Col xs={24} sm={12} xl={6}>
           <ReviewSection
             title="Suggestions"
             content={sections.suggestions}
