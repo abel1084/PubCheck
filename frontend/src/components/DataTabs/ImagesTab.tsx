@@ -1,41 +1,53 @@
-import { createColumnHelper, ColumnDef } from '@tanstack/react-table';
-import { SortableTable } from '../SortableTable';
+import { SortableTable, type ColumnsType } from '../SortableTable';
 import type { ImageInfo } from '../../types/extraction';
 
 interface ImagesTabProps {
   images: ImageInfo[];
 }
 
-const columnHelper = createColumnHelper<ImageInfo>();
-
-const columns: ColumnDef<ImageInfo, any>[] = [
-  columnHelper.accessor('page', { header: 'Page' }),
-  columnHelper.accessor(row => `${row.width} x ${row.height}`, {
-    id: 'dimensions',
-    header: 'Dimensions'
-  }),
-  columnHelper.accessor('dpi_x', {
-    header: 'DPI (X)',
-    cell: info => info.getValue().toFixed(0),
-  }),
-  columnHelper.accessor('dpi_y', {
-    header: 'DPI (Y)',
-    cell: info => info.getValue().toFixed(0),
-  }),
-  columnHelper.accessor('colorspace', { header: 'Color Space' }),
-  columnHelper.accessor('has_mask', {
-    header: 'Has Mask',
-    cell: info => info.getValue() ? 'Yes' : 'No',
-  }),
-];
+type ImageWithKey = ImageInfo & { key: string };
 
 export function ImagesTab({ images }: ImagesTabProps) {
+  const columns: ColumnsType<ImageWithKey> = [
+    { title: 'Page', dataIndex: 'page', key: 'page' },
+    {
+      title: 'Dimensions',
+      key: 'dimensions',
+      render: (_, record) => `${record.width} x ${record.height}`,
+    },
+    {
+      title: 'DPI (X)',
+      dataIndex: 'dpi_x',
+      key: 'dpi_x',
+      render: (v: number) => v.toFixed(0),
+    },
+    {
+      title: 'DPI (Y)',
+      dataIndex: 'dpi_y',
+      key: 'dpi_y',
+      render: (v: number) => v.toFixed(0),
+    },
+    { title: 'Color Space', dataIndex: 'colorspace', key: 'colorspace' },
+    {
+      title: 'Has Mask',
+      dataIndex: 'has_mask',
+      key: 'has_mask',
+      render: (v: boolean) => (v ? 'Yes' : 'No'),
+    },
+  ];
+
+  // Add key to each image for rowKey
+  const dataWithKeys: ImageWithKey[] = images.map((img, i) => ({
+    ...img,
+    key: `${img.page}-${i}`,
+  }));
+
   return (
     <div className="images-tab">
       <SortableTable
-        data={images}
+        data={dataWithKeys}
         columns={columns}
-        defaultSort={[{ id: 'dpi_x', desc: false }]}
+        rowKey="key"
         emptyMessage="No images found"
       />
     </div>

@@ -1,5 +1,8 @@
 import { useState } from 'react';
+import { Descriptions, Button, Typography } from 'antd';
 import type { DocumentMetadata } from '../../types/extraction';
+
+const { Text } = Typography;
 
 interface MetadataTabProps {
   metadata: DocumentMetadata;
@@ -8,36 +11,35 @@ interface MetadataTabProps {
 export function MetadataTab({ metadata }: MetadataTabProps) {
   const [showAll, setShowAll] = useState(false);
 
-  const keyFields = [
-    { label: 'Title', value: metadata.title },
-    { label: 'Author', value: metadata.author },
-    { label: 'ISBN', value: metadata.isbn },
-    { label: 'DOI', value: metadata.doi },
-    { label: 'Job Number', value: metadata.job_number },
-    { label: 'Creation Date', value: metadata.creation_date },
-    { label: 'Producer', value: metadata.producer },
+  const items = [
+    { key: 'title', label: 'Title', children: metadata.title || <Text type="secondary">Not found</Text> },
+    { key: 'author', label: 'Author', children: metadata.author || <Text type="secondary">Not found</Text> },
+    { key: 'isbn', label: 'ISBN', children: metadata.isbn || <Text type="secondary">Not found</Text> },
+    { key: 'doi', label: 'DOI', children: metadata.doi || <Text type="secondary">Not found</Text> },
+    { key: 'job_number', label: 'Job Number', children: metadata.job_number || <Text type="secondary">Not found</Text> },
+    { key: 'creation_date', label: 'Creation Date', children: metadata.creation_date || <Text type="secondary">Not found</Text> },
+    { key: 'producer', label: 'Producer', children: metadata.producer || <Text type="secondary">Not found</Text> },
   ];
 
   return (
     <div className="metadata-tab">
-      <table className="metadata-table">
-        <tbody>
-          {keyFields.map(field => (
-            <tr key={field.label}>
-              <th>{field.label}</th>
-              <td>{field.value || <span className="metadata-empty">Not found</span>}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <button
-        className="metadata-toggle"
+      <Descriptions column={1} size="small" items={items} />
+      <Button
+        type="link"
         onClick={() => setShowAll(!showAll)}
+        style={{ marginTop: 8, padding: 0 }}
       >
         {showAll ? 'Hide details' : 'Show all metadata'}
-      </button>
+      </Button>
       {showAll && (
-        <pre className="metadata-raw">
+        <pre style={{
+          marginTop: 8,
+          padding: 12,
+          background: '#f5f5f5',
+          borderRadius: 4,
+          fontSize: 12,
+          overflow: 'auto'
+        }}>
           {JSON.stringify(metadata, null, 2)}
         </pre>
       )}

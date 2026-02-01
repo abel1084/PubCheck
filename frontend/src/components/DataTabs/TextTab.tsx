@@ -1,5 +1,4 @@
-import { createColumnHelper, ColumnDef } from '@tanstack/react-table';
-import { SortableTable } from '../SortableTable';
+import { SortableTable, type ColumnsType } from '../SortableTable';
 import type { FontSummary, TextBlock } from '../../types/extraction';
 
 interface TextTabProps {
@@ -7,25 +6,25 @@ interface TextTabProps {
   textBlocks: TextBlock[];
 }
 
-const columnHelper = createColumnHelper<FontSummary>();
-
-const columns: ColumnDef<FontSummary, any>[] = [
-  columnHelper.accessor('name', { header: 'Font Name' }),
-  columnHelper.accessor('count', { header: 'Occurrences' }),
-  columnHelper.accessor('pages', {
-    header: 'Pages',
-    cell: info => info.getValue().join(', '),
-  }),
-];
-
 export function TextTab({ fonts, textBlocks }: TextTabProps) {
+  const columns: ColumnsType<FontSummary> = [
+    { title: 'Font Name', dataIndex: 'name', key: 'name' },
+    { title: 'Occurrences', dataIndex: 'count', key: 'count' },
+    {
+      title: 'Pages',
+      dataIndex: 'pages',
+      key: 'pages',
+      render: (pages: number[]) => pages.join(', '),
+    },
+  ];
+
   return (
     <div className="text-tab">
       <h3>Font Summary</h3>
       <SortableTable
         data={fonts}
         columns={columns}
-        defaultSort={[{ id: 'count', desc: true }]}
+        rowKey="name"
         emptyMessage="No fonts found"
       />
       <p className="text-tab__count">{textBlocks.length} text blocks extracted</p>
