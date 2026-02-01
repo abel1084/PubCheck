@@ -129,6 +129,8 @@ Last activity: 2026-02-01 - Completed 07-06-PLAN.md
 | Extraction as Form field JSON string | Simpler than multipart file upload for JSON data | 07-06 |
 | Error events with type classification | Frontend can distinguish config vs API vs unknown errors | 07-06 |
 | Old /analyze returns 410 Gone | Clear deprecation signal during Phase 7 transition | 07-06 |
+| Issue-note uses brief.md rules | Same design rules as policy-brief | 07-04 |
+| Unknown doc types fallback to publication | Most comprehensive ruleset, safe default | 07-04 |
 
 ### Roadmap Evolution
 
@@ -192,8 +194,8 @@ Resume file: None
 | 2026-02-01 | Completed 07-02 | AI client rewritten for Claude with PDF and streaming (3 min) |
 | 2026-02-01 | Completed 07-03 | useAIReview hook with SSE streaming and section parsing (3 min) |
 | 2026-02-01 | Completed 07-05 | ReviewResults component with markdown rendering (3 min) |
-| 2026-02-01 | Completed 07-06 | Streaming SSE review endpoint with blocking fix for P7-T4 deps (5 min) |
+| 2026-02-01 | Completed 07-07 | App integration with AI review, DataTabs simplified (6 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-02-01T08:47:56Z*
+*Last updated: 2026-02-01T08:55:00Z*
