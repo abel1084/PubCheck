@@ -1,8 +1,6 @@
-import { useState } from 'react';
-import { Card, Spin, Tag, Typography } from 'antd';
+import { useState, type ReactNode } from 'react';
+import { Card, Spin, Tag } from 'antd';
 import { CaretRightOutlined, CheckCircleOutlined, ExclamationCircleOutlined, BulbOutlined, InfoCircleOutlined } from '@ant-design/icons';
-
-const { Paragraph } = Typography;
 
 interface ReviewSectionProps {
   title: string;
@@ -33,6 +31,50 @@ const variantConfig = {
     icon: <BulbOutlined style={{ color: '#faad14' }} />,
   },
 };
+
+function renderMarkdownInline(text: string): ReactNode[] {
+  const parts: ReactNode[] = [];
+  let remaining = text;
+  let key = 0;
+
+  while (remaining.length > 0) {
+    // Match **bold** or *italic*
+    const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
+    const italicMatch = remaining.match(/(?<!\*)\*([^*]+?)\*(?!\*)/);
+
+    // Find the earliest match
+    let match: RegExpMatchArray | null = null;
+    let type: 'bold' | 'italic' | null = null;
+
+    if (boldMatch && (!italicMatch || boldMatch.index! <= italicMatch.index!)) {
+      match = boldMatch;
+      type = 'bold';
+    } else if (italicMatch) {
+      match = italicMatch;
+      type = 'italic';
+    }
+
+    if (match && match.index !== undefined) {
+      // Add text before match
+      if (match.index > 0) {
+        parts.push(remaining.slice(0, match.index));
+      }
+      // Add formatted text
+      if (type === 'bold') {
+        parts.push(<strong key={key++}>{match[1]}</strong>);
+      } else {
+        parts.push(<em key={key++}>{match[1]}</em>);
+      }
+      remaining = remaining.slice(match.index + match[0].length);
+    } else {
+      // No more matches
+      parts.push(remaining);
+      break;
+    }
+  }
+
+  return parts;
+}
 
 function parseContentToItems(content: string): string[] {
   // Split by markdown list items (-, *, or numbered)
@@ -131,9 +173,9 @@ export function ReviewSection({ title, content, variant, isStreaming }: ReviewSe
                   }}
                 >
                   <span style={{ flexShrink: 0, marginTop: 2 }}>{config.icon}</span>
-                  <Paragraph style={{ margin: 0, flex: 1 }}>
-                    {item}
-                  </Paragraph>
+                  <span style={{ flex: 1, lineHeight: 1.6 }}>
+                    {renderMarkdownInline(item)}
+                  </span>
                 </div>
               ))}
             </div>
