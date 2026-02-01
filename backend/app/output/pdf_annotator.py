@@ -2,7 +2,7 @@
 PDF annotation service using PyMuPDF.
 Adds sticky note annotations to PDF pages at issue locations.
 """
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 import pymupdf
 
@@ -10,13 +10,15 @@ import pymupdf
 class PDFAnnotator:
     """Adds sticky note annotations to PDF pages."""
 
-    STACK_OFFSET = 20.0  # Vertical offset for overlapping notes
-    DEFAULT_MARGIN = (20.0, 20.0)  # Default position when no coordinates
+    STACK_OFFSET = 50.0  # Vertical offset between notes (larger for visibility)
+    SUMMARY_Y = 20.0  # Y position for summary note
+    FIRST_ISSUE_Y = 80.0  # Y position for first issue note (below summary)
+    MARGIN_X = 20.0  # X margin for notes without coordinates
 
     def __init__(self, file_bytes: bytes):
         """Initialize with PDF file bytes."""
         self._doc = pymupdf.open(stream=file_bytes, filetype="pdf")
-        self._used_positions: Dict[int, List[float]] = {}
+        self._page_note_counts: Dict[int, int] = {}  # Track notes per page for distribution
 
     def add_issue_annotation(
         self,
@@ -36,6 +38,7 @@ class PDFAnnotator:
             reviewer_note: Optional reviewer note to append
         """
         page = self._doc[page_num - 1]  # Convert to 0-indexed
+        page_height = page.rect.height
 
         # Build annotation text
         text = message
@@ -50,10 +53,21 @@ class PDFAnnotator:
             x = max(10, min(x, rect.width - 30))
             y = max(10, min(y, rect.height - 30))
         else:
-            x, y = self.DEFAULT_MARGIN
+            # No coordinates - distribute down the left margin
+            note_index = self._page_note_counts.get(page_num, 0)
+            self._page_note_counts[page_num] = note_index + 1
 
-        # Offset if position already used
-        y = self._get_available_y(page_num, y)
+            x = self.MARGIN_X
+            # Start below summary on page 1, at top margin on other pages
+            start_y = self.FIRST_ISSUE_Y if page_num == 1 else 30.0
+            y = start_y + (note_index * self.STACK_OFFSET)
+
+            # Wrap to right side if we exceed 80% of page height
+            if y > page_height * 0.8:
+                # Move to right margin and reset y
+                x = page.rect.width - 40
+                overflow_index = note_index - int((page_height * 0.8 - start_y) / self.STACK_OFFSET)
+                y = start_y + (overflow_index * self.STACK_OFFSET)
 
         # Create annotation
         annot = page.add_text_annot((x, y), text, icon="Note")
@@ -73,34 +87,9 @@ class PDFAnnotator:
         """
         page = self._doc[0]
         summary_text = f"Review Summary\n{error_count} Errors, {warning_count} Warnings"
-        annot = page.add_text_annot((20.0, 20.0), summary_text, icon="Note")
+        annot = page.add_text_annot((self.MARGIN_X, self.SUMMARY_Y), summary_text, icon="Note")
         annot.set_colors(stroke=(0, 0, 1))  # Blue for summary
         annot.update()
-        # Reserve this position
-        self._used_positions.setdefault(1, []).append(20.0)
-
-    def _get_available_y(self, page_num: int, desired_y: float) -> float:
-        """Find available Y position, offsetting if needed.
-
-        Args:
-            page_num: 1-indexed page number
-            desired_y: Desired Y position
-
-        Returns:
-            Available Y position (offset if needed)
-        """
-        if page_num not in self._used_positions:
-            self._used_positions[page_num] = []
-
-        used = self._used_positions[page_num]
-        y = desired_y
-
-        # Offset down if position is too close to an existing annotation
-        while any(abs(y - used_y) < self.STACK_OFFSET for used_y in used):
-            y += self.STACK_OFFSET
-
-        used.append(y)
-        return y
 
     def save(self) -> bytes:
         """Return annotated PDF as bytes."""
