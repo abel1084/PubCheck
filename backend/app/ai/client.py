@@ -1,15 +1,12 @@
 """
-Google Gemini client wrapper with retry logic for AI-powered analysis.
-Uses Gemini 2.0 Flash for vision capabilities.
+Anthropic Claude client wrapper with native PDF support and streaming.
+Uses Claude for AI-powered document review with full PDF understanding.
 """
 import base64
-import json
 import os
-import time
-from typing import Any, Dict, Optional
+from typing import AsyncGenerator, Optional
 
-from google import genai
-from google.genai import types
+from anthropic import AsyncAnthropic
 
 
 class AIClientError(Exception):
@@ -24,146 +21,98 @@ class AIConfigurationError(AIClientError):
 
 class AIClient:
     """
-    Wrapper for Google Gemini API with retry logic.
+    Wrapper for Anthropic Claude API with native PDF and streaming support.
 
-    Uses Gemini 2.0 Flash for fast, cost-effective vision analysis.
-    Includes exponential backoff retry on transient errors.
+    Uses Claude's native PDF document type for full text + visual understanding.
+    Supports async streaming for real-time response delivery.
     """
 
-    DEFAULT_MODEL = "gemini-2.0-flash"
-    DEFAULT_TIMEOUT = 60.0  # seconds
-    MAX_RETRIES = 5
-    RETRY_DELAYS = [2.0, 5.0, 10.0, 20.0, 30.0]  # longer backoff for rate limits
+    DEFAULT_MODEL = "claude-sonnet-4-5"
+    DEFAULT_MAX_TOKENS = 8192
 
     def __init__(self):
-        """
-        Initialize the AI client.
-
-        Does NOT validate API key at init time to allow graceful handling.
-        API key is validated on first use.
-        """
-        self._client: Optional[genai.Client] = None
+        """Initialize the AI client. API key validated on first use."""
+        self._client: Optional[AsyncAnthropic] = None
         self._model = os.getenv("AI_MODEL", self.DEFAULT_MODEL)
 
-    def _ensure_client(self) -> genai.Client:
-        """
-        Lazy initialization of Gemini client.
-
-        Requires GOOGLE_API_KEY from Google AI Studio.
-
-        Raises:
-            AIConfigurationError: If API key is not set
-        """
+    def _ensure_client(self) -> AsyncAnthropic:
+        """Lazy initialization of Anthropic client."""
         if self._client is None:
-            api_key = os.getenv("GOOGLE_API_KEY")
+            api_key = os.getenv("ANTHROPIC_API_KEY")
 
             if not api_key:
                 raise AIConfigurationError(
-                    "GOOGLE_API_KEY not set.\n"
-                    "Get your API key from: https://aistudio.google.com/apikey"
+                    "ANTHROPIC_API_KEY not set.\n"
+                    "Get your API key from: https://console.anthropic.com/settings/keys"
                 )
 
-            self._client = genai.Client(api_key=api_key)
+            self._client = AsyncAnthropic(api_key=api_key)
         return self._client
 
-    def analyze_page(
+    async def review_document_stream(
         self,
-        image_data: str,
-        prompt: str,
-        system_prompt: Optional[str] = None,
-        mime_type: str = "image/jpeg",
-    ) -> Dict[str, Any]:
+        pdf_bytes: bytes,
+        user_prompt: str,
+        system_prompt: str,
+        max_tokens: Optional[int] = None,
+    ) -> AsyncGenerator[str, None]:
         """
-        Analyze a page image using Gemini Vision.
-
-        Sends the image with the prompt to Gemini and returns parsed JSON response.
+        Stream document review using Claude's native PDF support.
 
         Args:
-            image_data: Base64-encoded image data
-            prompt: Analysis prompt (user message)
-            system_prompt: Optional system prompt for role/context
-            mime_type: MIME type of the image (default: image/jpeg)
+            pdf_bytes: Raw PDF file bytes
+            user_prompt: User message with extraction JSON and document type
+            system_prompt: System prompt with rules context
+            max_tokens: Max response tokens (default: 8192)
 
-        Returns:
-            Parsed JSON from response text
+        Yields:
+            Text chunks as they're generated
 
         Raises:
-            AIClientError: On API errors after retries exhausted
+            AIClientError: On API errors
             AIConfigurationError: If API key is missing
         """
         client = self._ensure_client()
+        pdf_base64 = base64.standard_b64encode(pdf_bytes).decode("utf-8")
 
-        # Decode base64 to bytes for Gemini
-        image_bytes = base64.b64decode(image_data)
+        try:
+            async with client.messages.stream(
+                model=self._model,
+                max_tokens=max_tokens or self.DEFAULT_MAX_TOKENS,
+                system=system_prompt,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "document",
+                                "source": {
+                                    "type": "base64",
+                                    "media_type": "application/pdf",
+                                    "data": pdf_base64,
+                                }
+                            },
+                            {
+                                "type": "text",
+                                "text": user_prompt,
+                            }
+                        ],
+                    }
+                ],
+            ) as stream:
+                async for text in stream.text_stream:
+                    yield text
 
-        # Build content parts
-        contents = []
+        except Exception as e:
+            error_str = str(e).lower()
 
-        # Add image with dynamic mime type
-        contents.append(
-            types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
-        )
+            if "invalid" in error_str and "key" in error_str:
+                raise AIConfigurationError(f"Invalid API key: {e}") from e
 
-        # Add text prompt
-        contents.append(types.Part.from_text(text=prompt))
+            if "rate" in error_str or "quota" in error_str:
+                raise AIClientError(f"Rate limit exceeded: {e}") from e
 
-        last_error: Optional[Exception] = None
-
-        for attempt in range(self.MAX_RETRIES):
-            try:
-                # Build config
-                config = types.GenerateContentConfig(
-                    temperature=0,  # Deterministic for verification
-                    max_output_tokens=4096,
-                )
-
-                if system_prompt:
-                    config.system_instruction = system_prompt
-
-                response = client.models.generate_content(
-                    model=self._model,
-                    contents=contents,
-                    config=config,
-                )
-
-                # Extract text from response
-                text_content = response.text.strip()
-
-                # Parse JSON from response
-                # Handle potential markdown code blocks
-                if text_content.startswith("```json"):
-                    text_content = text_content[7:]
-                if text_content.startswith("```"):
-                    text_content = text_content[3:]
-                if text_content.endswith("```"):
-                    text_content = text_content[:-3]
-                text_content = text_content.strip()
-
-                return json.loads(text_content)
-
-            except Exception as e:
-                error_str = str(e).lower()
-
-                # Check for retryable errors
-                if "rate" in error_str or "quota" in error_str or "503" in error_str or "500" in error_str:
-                    last_error = e
-                    if attempt < self.MAX_RETRIES - 1:
-                        time.sleep(self.RETRY_DELAYS[attempt])
-                        continue
-                    raise AIClientError(
-                        f"API error after {self.MAX_RETRIES} retries: {e}"
-                    ) from e
-
-                # Non-retryable errors
-                if "invalid" in error_str and "key" in error_str:
-                    raise AIConfigurationError(f"Invalid API key: {e}") from e
-
-                raise AIClientError(f"API error: {e}") from e
-
-        # Should not reach here, but just in case
-        raise AIClientError(
-            f"Failed after {self.MAX_RETRIES} retries: {last_error}"
-        )
+            raise AIClientError(f"API error: {e}") from e
 
 
 # Singleton instance
@@ -171,12 +120,7 @@ _client: Optional[AIClient] = None
 
 
 def get_ai_client() -> AIClient:
-    """
-    Get or create AI client singleton.
-
-    Returns:
-        AIClient instance (shared across the application)
-    """
+    """Get or create AI client singleton."""
     global _client
     if _client is None:
         _client = AIClient()
