@@ -1,27 +1,27 @@
 # Project State: PubCheck
 
 **Current Phase:** 7.1 (In Progress)
-**Status:** Executing Phase 7.1 - AI Review Fixes (Plan 2 complete)
+**Status:** Executing Phase 7.1 - AI Review Fixes (Plan 4 complete)
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-31)
 
 **Core value:** Catch 95%+ of design compliance issues automatically, producing professional review outputs
-**Current focus:** AI Review Fixes - output format DPI dropdown
+**Current focus:** AI Review Fixes - Comment List tab for PDF annotation
 
 ## Current Position
 
 ```
 Phase: 7.1 of 7.1 - AI Review Fixes (IN PROGRESS)
-Plan:  2 of 4
+Plan:  4 of 5
 Status: In progress
-Last activity: 2026-02-01 - Completed 07.1-02-PLAN.md
+Last activity: 2026-02-01 - Completed 07.1-04-PLAN.md
 
-[###########                 ] 38%
+[############                ] 41%
 ```
 
-**Current Plan:** 07.1-02 complete, ready for 07.1-03
+**Current Plan:** 07.1-04 complete, ready for 07.1-05 (User Verification)
 
 ## Progress
 
@@ -34,13 +34,13 @@ Last activity: 2026-02-01 - Completed 07.1-02-PLAN.md
 | 5 | Review Interface | Complete | 4/4 |
 | 6 | Learning System & Output Generation | Complete | 6/6 |
 | 7 | AI-First Architecture Overhaul | In Progress | 7/8 |
-| 7.1 | AI Review Fixes | In Progress | 3/4 |
+| 7.1 | AI Review Fixes | In Progress | 4/5 |
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans completed | 38 |
+| Plans completed | 39 |
 | Plans failed | 0 |
 | Total iterations | 27 |
 | Avg iterations/plan | 1.0 |
@@ -141,6 +141,8 @@ Last activity: 2026-02-01 - Completed 07.1-02-PLAN.md
 | DPI requirements in user prompt | Document-specific context, not general system rules | 07.1-02 |
 | Default expanded review sections | Users see content first, can collapse to reduce clutter | 07.1-03 |
 | Chevron rotation for collapse state | Visual feedback with -90deg rotation | 07.1-03 |
+| Select all issues by default | Users more likely to want all issues included | 07.1-04 |
+| needs_attention -> error, suggestion -> warning | Matches existing annotation severity levels | 07.1-04 |
 
 ### Roadmap Evolution
 
@@ -156,8 +158,8 @@ Last activity: 2026-02-01 - Completed 07.1-02-PLAN.md
 
 ## Session Continuity
 
-Last session: 2026-02-01T09:41:00Z
-Stopped at: Completed 07.1-02-PLAN.md
+Last session: 2026-02-01T09:44:00Z
+Stopped at: Completed 07.1-04-PLAN.md
 Resume file: None
 
 ## Session Log
@@ -208,7 +210,8 @@ Resume file: None
 | 2026-02-01 | Completed 07.1-01 | Logo detection fix: mm dimensions and uncertainty hedging (1 min) |
 | 2026-02-01 | Completed 07.1-02 | Output format DPI dropdown for AI review (4 min) |
 | 2026-02-01 | Completed 07.1-03 | Collapsible review sections with toggle button (1 min) |
+| 2026-02-01 | Completed 07.1-04 | Comment List tab with JSON parsing and PDF generation (6 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-02-01T09:41:00Z*
+*Last updated: 2026-02-01T09:44:00Z*
