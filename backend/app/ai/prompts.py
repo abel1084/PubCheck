@@ -36,6 +36,9 @@ Optional enhancements or stylistic suggestions.
 - Small accent images may intentionally use lower resolution
 - Headers/footers have different margin rules than body content
 - Font variations within a family (Roboto vs Roboto Condensed) are acceptable
+- If logo dimensions seem implausible (>50mm or <5mm width), note uncertainty rather than stating false measurements
+- Logo measurements in extraction are in millimeters (mm) - use directly, don't convert
+- Position coordinates are in points from top-left - don't confuse position with size
 
 ## What You're Checking
 You'll receive:
