@@ -1,8 +1,8 @@
 # Roadmap: PubCheck
 
 **Created:** 2026-01-31
-**Phases:** 6
-**Requirements:** 43 mapped
+**Phases:** 7
+**Requirements:** 52 mapped
 
 ## Overview
 
@@ -219,6 +219,79 @@ Plans:
 
 ---
 
+## Phase 7: AI-First Architecture Overhaul
+
+**Goal:** Replace programmatic compliance checking with AI-driven decisions. Extractor becomes measurement-only, AI receives original PDF + extracted JSON + rules markdown, makes ALL compliance decisions with collegial review style.
+
+**Plans:** 8 plans
+
+Plans:
+- [x] 07-01-PLAN.md — Delete checks module, create rules context markdown files
+- [x] 07-02-PLAN.md — Rewrite AI client for Claude with PDF and streaming support
+- [x] 07-03-PLAN.md — Create useAIReview hook with SSE streaming
+- [x] 07-04-PLAN.md — Create AI reviewer module with collegial prompts
+- [x] 07-05-PLAN.md — Create ReviewResults component with sectioned cards
+- [x] 07-06-PLAN.md — Create streaming SSE review endpoint
+- [x] 07-07-PLAN.md — Update App.tsx, remove Settings, integrate review
+- [ ] 07-08-PLAN.md — User verification checkpoint
+
+**Requirements:**
+- ARCH-01: Extractor outputs measurements only (ZERO compliance judgments)
+- ARCH-02: Delete checker.py and all programmatic compliance logic
+- ARCH-03: AI receives original PDF file (not rendered screenshots)
+- ARCH-04: AI receives extracted JSON with measurements
+- ARCH-05: AI receives rules context as markdown files
+- ARCH-06: AI makes ALL compliance decisions with design intent awareness
+- ARCH-07: Frontend UI updated for new review format
+
+**Success Criteria:**
+1. Extractor produces clean JSON with measurements, no violations flagged
+2. AI identifies real issues only (not false positives like full-bleed images as margin violations)
+3. Decorative elements (thin lines, bullets, icons) not flagged as images requiring DPI checks
+4. Output reads like a helpful colleague's review, not an audit checklist
+5. Specific measurements cited ("logo is 18mm, spec requires 20mm minimum")
+
+**Dependencies:** Phase 6 (current codebase as starting point)
+
+**Research Notes:**
+- Current architecture: PDF -> PyMuPDF extracts -> checker.py flags violations -> AI reformats
+- New architecture: PDF -> Extractor (measurements only) -> AI (PDF + JSON + rules) -> decisions
+- Key insight: Programmatic checking lacks context (can't understand design intent, full-bleed images, decorative elements)
+- Claude has native PDF support - pass original PDF, not rendered images
+- Rules context converted from YAML to human-readable markdown per document type
+- Streaming via SSE for real-time UI updates
+
+---
+
+## Phase 7.1: AI Review Fixes
+
+**Goal:** Fix AI review issues identified during testing: logo measurements, DPI thresholds, UI improvements.
+
+**Plans:** 4 plans
+
+Plans:
+- [x] 07.1-01-PLAN.md — Logo detection: mm dimensions + uncertainty hedging
+- [x] 07.1-02-PLAN.md — Print/Digital/Both dropdown for DPI rules
+- [x] 07.1-03-PLAN.md — Collapsible review section cards
+- [x] 07.1-04-PLAN.md — Comment List tab with JSON issues for PDF annotation
+
+**Requirements:**
+- Fix logo measurements to use mm dimensions
+- Add uncertainty hedging for implausible logo sizes
+- Allow user to select output format (Print/Digital/Both) for DPI checks
+- Make review sections collapsible for better UX
+- Add Comment List tab with selectable issues for PDF annotation
+
+**Success Criteria:**
+1. Logo measurements shown in mm with uncertainty for implausible sizes
+2. User can select Print/Digital/Both and see appropriate DPI thresholds applied
+3. Review sections can be collapsed/expanded
+4. User can select specific issues from Comment List tab for PDF annotation
+
+**Dependencies:** Phase 7 (AI-First Architecture)
+
+---
+
 ## Progress
 
 | Phase | Name | Status | Requirements |
@@ -229,8 +302,10 @@ Plans:
 | 4 | AI Verification | Complete | 3 |
 | 5 | Review Interface | Complete | 5 |
 | 6 | Learning System & Output Generation | Complete | 5 |
+| 7 | AI-First Architecture Overhaul | In Progress | 7 |
+| 7.1 | AI Review Fixes | Complete | 5 |
 
-**Total:** 45 requirement mappings (OUTP-02 descoped)
+**Total:** 57 requirement mappings (OUTP-02 descoped)
 
 ---
 
@@ -253,6 +328,9 @@ Phase 5: Review Interface <-- Phase 3 + Phase 4 (all issues)
     |
     v
 Phase 6: Learning & Output <-- Phase 5 (issue selection)
+    |
+    v
+Phase 7: AI-First Architecture <-- Phase 6 (codebase refactor)
 ```
 
 ---
