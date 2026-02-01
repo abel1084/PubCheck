@@ -16,25 +16,21 @@ const variantConfig = {
     color: '#1890ff',
     tagColor: 'processing' as const,
     icon: <InfoCircleOutlined style={{ color: '#1890ff' }} />,
-    itemBg: '#e6f4ff',
   },
   attention: {
     color: '#ff4d4f',
     tagColor: 'error' as const,
     icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
-    itemBg: '#fff1f0',
   },
   good: {
     color: '#52c41a',
     tagColor: 'success' as const,
     icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-    itemBg: '#f6ffed',
   },
   suggestions: {
     color: '#faad14',
     tagColor: 'warning' as const,
     icon: <BulbOutlined style={{ color: '#faad14' }} />,
-    itemBg: '#fffbe6',
   },
 };
 
@@ -122,7 +118,7 @@ export function ReviewSection({ title, content, variant, isStreaming }: ReviewSe
             </div>
           )}
           {items.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div>
               {items.map((item, index) => (
                 <div
                   key={index}
@@ -130,9 +126,8 @@ export function ReviewSection({ title, content, variant, isStreaming }: ReviewSe
                     display: 'flex',
                     alignItems: 'flex-start',
                     gap: 10,
-                    padding: '8px 12px',
-                    background: config.itemBg,
-                    borderRadius: 6,
+                    padding: '10px 0',
+                    borderBottom: index < items.length - 1 ? '1px solid #f0f0f0' : 'none',
                   }}
                 >
                   <span style={{ flexShrink: 0, marginTop: 2 }}>{config.icon}</span>
