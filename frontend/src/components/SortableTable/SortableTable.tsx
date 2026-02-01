@@ -1,97 +1,57 @@
-import { useState } from 'react';
-import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  flexRender,
-  SortingState,
-  ColumnDef,
-} from '@tanstack/react-table';
-import './SortableTable.css';
+import { Table, Empty } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 
-interface SortableTableProps<T> {
+// Re-export ColumnsType for consumers
+export type { ColumnsType };
+
+interface SortableTableProps<T extends object> {
   data: T[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  columns: ColumnDef<T, any>[];
-  defaultSort?: SortingState;
+  columns: ColumnsType<T>;
+  rowKey?: string | ((record: T) => string);
   emptyMessage?: string;
 }
 
-export function SortableTable<T>({
+export function SortableTable<T extends object>({
   data,
   columns,
-  defaultSort = [],
-  emptyMessage = 'No data available'
+  rowKey = 'id',
+  emptyMessage = 'No data available',
 }: SortableTableProps<T>) {
-  const [sorting, setSorting] = useState<SortingState>(defaultSort);
-
-  const table = useReactTable({
-    data,
-    columns,
-    state: { sorting },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+  // Add sorter to each column that has a dataIndex
+  const columnsWithSort: ColumnsType<T> = columns.map((col) => {
+    // Only add sorter if not already defined and has dataIndex
+    if ('dataIndex' in col && col.dataIndex && !col.sorter) {
+      const dataIndex = col.dataIndex as keyof T;
+      return {
+        ...col,
+        sorter: (a: T, b: T) => {
+          const aVal = a[dataIndex];
+          const bVal = b[dataIndex];
+          if (typeof aVal === 'number' && typeof bVal === 'number') {
+            return aVal - bVal;
+          }
+          if (typeof aVal === 'string' && typeof bVal === 'string') {
+            return aVal.localeCompare(bVal);
+          }
+          return 0;
+        },
+      };
+    }
+    return col;
   });
 
   if (data.length === 0) {
-    return (
-      <div className="sortable-table__empty">
-        {emptyMessage}
-      </div>
-    );
+    return <Empty description={emptyMessage} />;
   }
 
   return (
-    <div className="sortable-table-container">
-      <table className="sortable-table">
-        <thead>
-          {table.getHeaderGroups().map(headerGroup => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map(header => {
-                const canSort = header.column.getCanSort();
-                const sortDirection = header.column.getIsSorted();
-
-                const headerClassNames = [
-                  'sortable-table__header',
-                  canSort ? 'sortable-table__header--sortable' : '',
-                  sortDirection ? 'sortable-table__header--sorted' : '',
-                ].filter(Boolean).join(' ');
-
-                return (
-                  <th
-                    key={header.id}
-                    onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
-                    className={headerClassNames}
-                  >
-                    <div className="sortable-table__header-content">
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                      {canSort && (
-                        <span className="sortable-table__sort-indicator">
-                          {sortDirection === 'asc' && ' \u25B2'}
-                          {sortDirection === 'desc' && ' \u25BC'}
-                          {!sortDirection && ' \u21C5'}
-                        </span>
-                      )}
-                    </div>
-                  </th>
-                );
-              })}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map(row => (
-            <tr key={row.id} className="sortable-table__row">
-              {row.getVisibleCells().map(cell => (
-                <td key={cell.id} className="sortable-table__cell">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Table<T>
+      columns={columnsWithSort}
+      dataSource={data}
+      rowKey={rowKey}
+      pagination={false}
+      size="small"
+      scroll={{ x: true }}
+    />
   );
 }

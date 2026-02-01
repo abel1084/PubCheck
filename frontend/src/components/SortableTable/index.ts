@@ -1,1 +1,1 @@
-export { SortableTable } from './SortableTable';
+export { SortableTable, type ColumnsType } from './SortableTable';
