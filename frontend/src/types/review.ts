@@ -107,6 +107,23 @@ export type ReviewAction =
 // ============================================================================
 
 /**
+ * Structured issue from AI review JSON output.
+ * Used for Comment List selection and PDF annotation.
+ */
+export interface ReviewIssue {
+  /** Unique ID: "issue-1", "issue-2", etc. */
+  id: string;
+  /** Category: needs_attention for required fixes, suggestion for optional */
+  category: 'needs_attention' | 'suggestion';
+  /** Brief issue title */
+  title: string;
+  /** Full description with measurements */
+  description: string;
+  /** Page numbers where issue appears */
+  pages: number[];
+}
+
+/**
  * Parsed review sections from AI response.
  * AI produces prose review organized by these sections.
  */
@@ -126,6 +143,8 @@ export interface AIReviewState {
   content: string;
   /** Parsed sections (updated as content streams) */
   sections: AIReviewSections;
+  /** Structured issues parsed from JSON block (populated after streaming completes) */
+  issues: ReviewIssue[];
   /** Currently streaming */
   isStreaming: boolean;
   /** Stream completed successfully */
@@ -143,10 +162,47 @@ export const INITIAL_AI_REVIEW_STATE: AIReviewState = {
     lookingGood: '',
     suggestions: '',
   },
+  issues: [],
   isStreaming: false,
   isComplete: false,
   error: null,
 };
+
+/**
+ * Parse JSON issues block from AI response content.
+ * Extracts issues array from the ```json block at end of content.
+ */
+export function parseReviewIssues(content: string): ReviewIssue[] {
+  // Look for JSON code block - could be ```json or just ```
+  const jsonBlockPattern = /```(?:json)?\s*\n(\{[\s\S]*?\})\s*\n```/;
+  const match = content.match(jsonBlockPattern);
+
+  if (!match || !match[1]) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(match[1]);
+    if (parsed.issues && Array.isArray(parsed.issues)) {
+      // Validate and clean each issue
+      return parsed.issues.map((issue: unknown, index: number) => {
+        const i = issue as Record<string, unknown>;
+        return {
+          id: typeof i.id === 'string' ? i.id : `issue-${index + 1}`,
+          category: i.category === 'suggestion' ? 'suggestion' : 'needs_attention',
+          title: typeof i.title === 'string' ? i.title : 'Untitled Issue',
+          description: typeof i.description === 'string' ? i.description : '',
+          pages: Array.isArray(i.pages) ? i.pages.filter((p): p is number => typeof p === 'number') : [1],
+        } as ReviewIssue;
+      });
+    }
+  } catch {
+    // JSON parse failed - return empty array
+    console.warn('Failed to parse review issues JSON');
+  }
+
+  return [];
+}
 
 /**
  * Parse markdown content into sections.

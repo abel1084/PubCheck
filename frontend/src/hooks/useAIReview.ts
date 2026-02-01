@@ -3,7 +3,8 @@ import type { ExtractionResult } from '../types/extraction';
 import {
   AIReviewState,
   INITIAL_AI_REVIEW_STATE,
-  parseReviewSections
+  parseReviewSections,
+  parseReviewIssues
 } from '../types/review';
 
 /**
@@ -21,6 +22,7 @@ export function useAIReview() {
     extraction: ExtractionResult,
     documentType: string,
     confidence: number,
+    outputFormat: string = 'digital',
   ) => {
     // Cancel any existing request
     if (abortControllerRef.current) {
@@ -43,6 +45,7 @@ export function useAIReview() {
 
     formData.append('document_type', documentType);
     formData.append('confidence', confidence.toString());
+    formData.append('output_format', outputFormat);
 
     try {
       const response = await fetch('/api/ai/review', {
@@ -96,11 +99,12 @@ export function useAIReview() {
         }
       }
 
-      // Mark as complete
+      // Mark as complete and parse issues from final content
       setState(prev => ({
         ...prev,
         isStreaming: false,
         isComplete: true,
+        issues: parseReviewIssues(prev.content),
       }));
 
     } catch (error) {
