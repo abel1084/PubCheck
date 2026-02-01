@@ -187,26 +187,35 @@ Plans:
 
 ## Phase 6: Learning System & Output Generation
 
-**Goal:** Users can mark exceptions to learn from, and generate professional review outputs (annotated PDF and Word document).
+**Goal:** Users can mark issues to ignore in future reviews (persisted by document type), and generate an annotated PDF with sticky notes at issue locations.
+
+**Plans:** 6 plans
+
+Plans:
+- [x] 06-01-PLAN.md — Backend learning module (models, service, API)
+- [x] 06-02-PLAN.md — Backend PDF annotation (annotator, API)
+- [x] 06-03-PLAN.md — Frontend learning integration (hook, toast, ignore button)
+- [x] 06-04-PLAN.md — Frontend PDF generation (progress modal, download)
+- [x] 06-05-PLAN.md — Settings tab and final integration
+- [x] 06-06-PLAN.md — User verification checkpoint
 
 **Requirements:**
 - LERN-01: User can mark issue to ignore in future reviews
-- LERN-02: User must provide reason when ignoring a rule
+- LERN-02: User must provide reason when ignoring a rule (OPTIONAL per user decision)
 - LERN-03: Ignored rules persisted to JSON file
 - OUTP-01: Generate annotated PDF with sticky notes at issue locations
-- OUTP-02: Generate Word document with review summary table
+- OUTP-02: Generate Word document with review summary table (DESCOPED)
 - OUTP-03: Include only user-selected issues in outputs
 
 **Success Criteria:**
-1. User can click "Ignore in Future" on an issue and provide a reason
+1. User can click "Ignore" on an issue with optional reason
 2. User can see ignored issues no longer appear in subsequent reviews of the same document type
 3. User can generate an annotated PDF with sticky notes at each selected issue location
-4. User can generate a Word document containing a summary table of all selected issues
-5. User can download both outputs with a single "Generate Reports" action
+4. User can download PDF with a single "Generate Report" action
 
 **Dependencies:** Phase 5 (review interface complete)
 
-**Research Notes:** Learning system starts simple (exact rule_id matching). PyMuPDF handles PDF annotations natively. python-docx for Word generation. Must track learning scope for future v2 enhancement.
+**Research Notes:** Learning system scoped to document type (not global). PyMuPDF handles PDF annotations natively. Word generation descoped per user direction. Sonner for toast notifications with undo.
 
 ---
 
@@ -219,9 +228,9 @@ Plans:
 | 3 | Design Compliance Checks | Complete | 21 |
 | 4 | AI Verification | Complete | 3 |
 | 5 | Review Interface | Complete | 5 |
-| 6 | Learning System & Output Generation | Pending | 6 |
+| 6 | Learning System & Output Generation | Complete | 5 |
 
-**Total:** 46 requirement mappings (43 unique, some phases share extraction foundation)
+**Total:** 45 requirement mappings (OUTP-02 descoped)
 
 ---
 
