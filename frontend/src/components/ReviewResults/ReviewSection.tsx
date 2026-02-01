@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Card, Spin, Tag } from 'antd';
-import { CaretRightOutlined } from '@ant-design/icons';
-import ReactMarkdown from 'react-markdown';
+import { Card, Spin, Tag, Typography } from 'antd';
+import { CaretRightOutlined, CheckCircleOutlined, ExclamationCircleOutlined, BulbOutlined, InfoCircleOutlined } from '@ant-design/icons';
+
+const { Paragraph } = Typography;
 
 interface ReviewSectionProps {
   title: string;
@@ -11,11 +12,61 @@ interface ReviewSectionProps {
 }
 
 const variantConfig = {
-  overview: { color: '#1890ff', tagColor: 'processing' as const },
-  attention: { color: '#ff4d4f', tagColor: 'error' as const },
-  good: { color: '#52c41a', tagColor: 'success' as const },
-  suggestions: { color: '#faad14', tagColor: 'warning' as const },
+  overview: {
+    color: '#1890ff',
+    tagColor: 'processing' as const,
+    icon: <InfoCircleOutlined style={{ color: '#1890ff' }} />,
+    itemBg: '#e6f4ff',
+  },
+  attention: {
+    color: '#ff4d4f',
+    tagColor: 'error' as const,
+    icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
+    itemBg: '#fff1f0',
+  },
+  good: {
+    color: '#52c41a',
+    tagColor: 'success' as const,
+    icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+    itemBg: '#f6ffed',
+  },
+  suggestions: {
+    color: '#faad14',
+    tagColor: 'warning' as const,
+    icon: <BulbOutlined style={{ color: '#faad14' }} />,
+    itemBg: '#fffbe6',
+  },
 };
+
+function parseContentToItems(content: string): string[] {
+  // Split by markdown list items (-, *, or numbered)
+  const lines = content.split('\n');
+  const items: string[] = [];
+  let currentItem = '';
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    // Check if it's a list item start
+    if (/^[-*]\s+/.test(trimmed) || /^\d+\.\s+/.test(trimmed)) {
+      if (currentItem) {
+        items.push(currentItem.trim());
+      }
+      // Remove the bullet/number prefix
+      currentItem = trimmed.replace(/^[-*]\s+/, '').replace(/^\d+\.\s+/, '');
+    } else if (trimmed && currentItem) {
+      // Continuation of previous item
+      currentItem += ' ' + trimmed;
+    } else if (trimmed && !currentItem) {
+      // Standalone paragraph
+      items.push(trimmed);
+    }
+  }
+  if (currentItem) {
+    items.push(currentItem.trim());
+  }
+
+  return items.filter(item => item.length > 0);
+}
 
 export function ReviewSection({ title, content, variant, isStreaming }: ReviewSectionProps) {
   const [collapsed, setCollapsed] = useState(false);
@@ -25,10 +76,23 @@ export function ReviewSection({ title, content, variant, isStreaming }: ReviewSe
     return null;
   }
 
+  const items = content ? parseContentToItems(content) : [];
+
   return (
     <Card
       size="small"
-      style={{ marginBottom: 12, borderLeft: `3px solid ${config.color}` }}
+      style={{
+        marginBottom: 0,
+        borderLeft: `3px solid ${config.color}`,
+        height: '100%',
+      }}
+      styles={{
+        body: {
+          padding: collapsed ? 0 : 12,
+          maxHeight: collapsed ? 0 : 400,
+          overflow: 'auto',
+        }
+      }}
       title={
         <div
           style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
@@ -57,9 +121,26 @@ export function ReviewSection({ title, content, variant, isStreaming }: ReviewSe
               <Spin size="small" />
             </div>
           )}
-          {content && (
-            <div className="markdown-content">
-              <ReactMarkdown>{content}</ReactMarkdown>
+          {items.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {items.map((item, index) => (
+                <div
+                  key={index}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 10,
+                    padding: '8px 12px',
+                    background: config.itemBg,
+                    borderRadius: 6,
+                  }}
+                >
+                  <span style={{ flexShrink: 0, marginTop: 2 }}>{config.icon}</span>
+                  <Paragraph style={{ margin: 0, flex: 1 }}>
+                    {item}
+                  </Paragraph>
+                </div>
+              ))}
             </div>
           )}
         </>

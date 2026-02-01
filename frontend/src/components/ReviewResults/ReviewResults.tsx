@@ -1,4 +1,4 @@
-import { Alert, Button, Spin, Typography, Space, Result } from 'antd';
+import { Alert, Button, Spin, Typography, Space, Result, Row, Col } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 import type { AIReviewSections } from '../../types/review';
 import { ReviewSection } from './ReviewSection';
@@ -66,7 +66,7 @@ export function ReviewResults({
   }
 
   return (
-    <div style={{ padding: 16 }}>
+    <div style={{ padding: 16, maxWidth: 1400, margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <Title level={4} style={{ margin: 0 }}>Design Review</Title>
         <Space>
@@ -75,33 +75,40 @@ export function ReviewResults({
         </Space>
       </div>
 
-      <ReviewSection
-        title="Overview"
-        content={sections.overview}
-        variant="overview"
-        isStreaming={isStreaming && !sections.needsAttention}
-      />
-
-      <ReviewSection
-        title="Needs Attention"
-        content={sections.needsAttention}
-        variant="attention"
-        isStreaming={isStreaming && !!sections.overview && !sections.lookingGood}
-      />
-
-      <ReviewSection
-        title="Looking Good"
-        content={sections.lookingGood}
-        variant="good"
-        isStreaming={isStreaming && !!sections.needsAttention && !sections.suggestions}
-      />
-
-      <ReviewSection
-        title="Suggestions"
-        content={sections.suggestions}
-        variant="suggestions"
-        isStreaming={isStreaming && !!sections.lookingGood}
-      />
+      <Row gutter={[16, 16]}>
+        <Col xs={24} lg={12}>
+          <ReviewSection
+            title="Overview"
+            content={sections.overview}
+            variant="overview"
+            isStreaming={isStreaming && !sections.needsAttention}
+          />
+        </Col>
+        <Col xs={24} lg={12}>
+          <ReviewSection
+            title="Looking Good"
+            content={sections.lookingGood}
+            variant="good"
+            isStreaming={isStreaming && !!sections.needsAttention && !sections.suggestions}
+          />
+        </Col>
+        <Col xs={24} lg={12}>
+          <ReviewSection
+            title="Needs Attention"
+            content={sections.needsAttention}
+            variant="attention"
+            isStreaming={isStreaming && !!sections.overview && !sections.lookingGood}
+          />
+        </Col>
+        <Col xs={24} lg={12}>
+          <ReviewSection
+            title="Suggestions"
+            content={sections.suggestions}
+            variant="suggestions"
+            isStreaming={isStreaming && !!sections.lookingGood}
+          />
+        </Col>
+      </Row>
 
       {onRetry && isComplete && (
         <div style={{ marginTop: 16, textAlign: 'center' }}>
