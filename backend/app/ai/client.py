@@ -27,7 +27,7 @@ class AIClient:
     Supports async streaming for real-time response delivery.
     """
 
-    DEFAULT_MODEL = "gemini-2.5-flash-preview-05-20"
+    DEFAULT_MODEL = "gemini-2.5-flash"
     DEFAULT_MAX_TOKENS = 16384  # Gemini supports larger outputs
 
     def __init__(self):
