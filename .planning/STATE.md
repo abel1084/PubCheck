@@ -1,27 +1,27 @@
 # Project State: PubCheck
 
 **Current Phase:** 8 (In Progress)
-**Status:** Phase 8 - Ant Design Frontend Refactor in progress. Plan 04 complete.
+**Status:** Phase 8 - Ant Design Frontend Refactor in progress. Plan 05 complete.
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-31)
 
 **Core value:** Catch 95%+ of design compliance issues automatically, producing professional review outputs
-**Current focus:** Phase 8 - Sidebar refactored to antd
+**Current focus:** Phase 8 - Settings modal refactored to antd
 
 ## Current Position
 
 ```
 Phase: 8 of 8 - Ant Design Frontend Refactor (IN PROGRESS)
-Plan:  04 of 8
+Plan:  05 of 8
 Status: In progress
-Last activity: 2026-02-01 - Completed 08-04-PLAN.md
+Last activity: 2026-02-01 - Completed 08-05-PLAN.md
 
-[============                ] 50%
+[===============             ] 62%
 ```
 
-**Current Plan:** 08-04 complete - Sidebar antd refactor
+**Current Plan:** 08-05 complete - Settings modal antd refactor
 
 ## Progress
 
@@ -35,13 +35,13 @@ Last activity: 2026-02-01 - Completed 08-04-PLAN.md
 | 6 | Learning System & Output Generation | Complete | 6/6 |
 | 7 | AI-First Architecture Overhaul | Complete | 8/8 |
 | 7.1 | AI Review Fixes | Complete | 4/4 |
-| 8 | Ant Design Frontend Refactor | In Progress | 4/8 |
+| 8 | Ant Design Frontend Refactor | In Progress | 5/8 |
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans completed | 41 |
+| Plans completed | 42 |
 | Plans failed | 0 |
 | Total iterations | 27 |
 | Avg iterations/plan | 1.0 |
@@ -147,6 +147,8 @@ Last activity: 2026-02-01 - Completed 08-04-PLAN.md
 | Gemini 2.5 Flash (thinking) over Claude | External change - user preference | 07-08 |
 | Settings page restored | Allow users to update config and add new rules | 07-08 |
 | Inline styles for simple layouts | antd component styling + inline styles, no CSS file needed | 08-04 |
+| modal.confirm for confirmations | Replace window.confirm with antd modal.confirm | 08-05 |
+| message API for notifications | Replace sonner toast with antd message.success/error | 08-05 |
 | Semantic Tag colors | Use antd preset colors (success/warning/error) for confidence | 08-04 |
 | beforeUpload for file validation | Workaround for known accept+drag issue in antd Upload | 08-02 |
 | return false in beforeUpload | Prevents antd auto-upload, lets app handle manually | 08-02 |
@@ -166,8 +168,8 @@ Last activity: 2026-02-01 - Completed 08-04-PLAN.md
 
 ## Session Continuity
 
-Last session: 2026-02-01T15:48:00Z
-Stopped at: Completed 08-04-PLAN.md
+Last session: 2026-02-01T15:55:00Z
+Stopped at: Completed 08-05-PLAN.md
 Resume file: None
 
 ## Session Log
@@ -226,7 +228,8 @@ Resume file: None
 | 2026-02-01 | Phase 8 added | Ant Design Frontend Refactor added to roadmap |
 | 2026-02-01 | Completed 08-04 | Sidebar antd refactor (3 min) |
 | 2026-02-01 | Completed 08-02 | DropZone antd migration - Upload.Dragger + Alert + Spin (3 min) |
+| 2026-02-01 | Completed 08-05 | Settings modal antd refactor - Modal, Tabs, Collapse, Form (5 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-02-01T15:50:00Z*
+*Last updated: 2026-02-01T15:55:00Z*
