@@ -174,3 +174,92 @@ body {
   display: flex;
   overflow: hidden;
 }
+
+/* Review tabs */
+.app__review-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--color-border, #e0e0e0);
+}
+
+.app__review-tab {
+  padding: 0.75rem 1.25rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-muted, #666);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app__review-tab:hover:not(:disabled) {
+  color: var(--color-primary, #1976d2);
+}
+
+.app__review-tab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.app__review-tab--active {
+  color: var(--color-primary, #1976d2);
+  border-bottom-color: var(--color-primary, #1976d2);
+}
+
+.app__review-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: var(--color-primary, #1976d2);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 10px;
+}
+
+/* Output format dropdown */
+.app__output-format {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.app__output-format-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.app__output-format-select {
+  padding: 5px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.app__output-format-select:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.app__output-format-select:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.app__output-format-select option {
+  background: #333;
+  color: white;
+}

@@ -1,13 +1,17 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { DropZone } from './components/DropZone';
 import { DataTabs } from './components/DataTabs';
 import { Sidebar } from './components/Sidebar';
 import { ReviewResults } from './components/ReviewResults/ReviewResults';
+import { CommentList } from './components/CommentList/CommentList';
 import { ToastProvider } from './components/Toast/ToastProvider';
 import { useExtraction } from './hooks/useExtraction';
 import { useAIReview } from './hooks/useAIReview';
 import type { DocumentType, Confidence } from './types/extraction';
 import './App.css';
+
+// Tab types for review views
+type ReviewTab = 'review' | 'comments';
 
 // Output format types for DPI requirements
 type OutputFormat = 'print' | 'digital' | 'both';
@@ -32,6 +36,7 @@ function App() {
   const { isUploading, error, result, upload, reset } = useExtraction();
   const {
     sections,
+    issues,
     isStreaming,
     isComplete,
     error: reviewError,
@@ -41,7 +46,29 @@ function App() {
 
   const [documentType, setDocumentType] = useState<DocumentType | null>(null);
   const [outputFormat, setOutputFormat] = useState<OutputFormat>('digital');
+  const [activeTab, setActiveTab] = useState<ReviewTab>('review');
+  const [selectedIssueIds, setSelectedIssueIds] = useState<Set<string>>(new Set());
   const uploadedFileRef = useRef<File | null>(null);
+
+  // Toggle issue selection
+  const handleToggleIssue = useCallback((id: string) => {
+    setSelectedIssueIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  // Initialize selection when issues change (select all by default)
+  useEffect(() => {
+    if (issues.length > 0) {
+      setSelectedIssueIds(new Set(issues.map(i => i.id)));
+    }
+  }, [issues]);
 
   // Sync document type from result when it changes
   useEffect(() => {
@@ -61,6 +88,8 @@ function App() {
     resetReview();
     setDocumentType(null);
     setOutputFormat('digital');
+    setActiveTab('review');
+    setSelectedIssueIds(new Set());
     uploadedFileRef.current = null;
   };
 
@@ -152,13 +181,46 @@ function App() {
           onNewDocument={handleNewDocument}
         />
         <main className="app__main">
-          <ReviewResults
-            sections={sections}
-            isStreaming={isStreaming}
-            isComplete={isComplete}
-            error={reviewError}
-            onRetry={handleReview}
-          />
+          {/* Review tabs */}
+          <div className="app__review-tabs">
+            <button
+              type="button"
+              className={`app__review-tab ${activeTab === 'review' ? 'app__review-tab--active' : ''}`}
+              onClick={() => setActiveTab('review')}
+            >
+              Design Review
+            </button>
+            <button
+              type="button"
+              className={`app__review-tab ${activeTab === 'comments' ? 'app__review-tab--active' : ''}`}
+              onClick={() => setActiveTab('comments')}
+              disabled={issues.length === 0}
+              title={issues.length === 0 ? 'Run a review to see comments' : ''}
+            >
+              Comment List
+              {issues.length > 0 && (
+                <span className="app__review-tab-count">{issues.length}</span>
+              )}
+            </button>
+          </div>
+
+          {/* Tab content */}
+          {activeTab === 'review' ? (
+            <ReviewResults
+              sections={sections}
+              isStreaming={isStreaming}
+              isComplete={isComplete}
+              error={reviewError}
+              onRetry={handleReview}
+            />
+          ) : (
+            <CommentList
+              issues={issues}
+              selectedIds={selectedIssueIds}
+              onToggleSelect={handleToggleIssue}
+            />
+          )}
+
           <DataTabs
             extraction={result.extraction}
             defaultCollapsed={true}
