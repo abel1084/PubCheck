@@ -1,27 +1,27 @@
 # Project State: PubCheck
 
 **Current Phase:** 8 (In Progress)
-**Status:** Phase 8 - Ant Design Frontend Refactor in progress. Plan 03 complete.
+**Status:** Phase 8 - Ant Design Frontend Refactor in progress. Plan 06 complete.
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-31)
 
 **Core value:** Catch 95%+ of design compliance issues automatically, producing professional review outputs
-**Current focus:** Phase 8 - Tables and tabs refactored to antd
+**Current focus:** Phase 8 - ReviewResults and CommentList refactored to antd
 
 ## Current Position
 
 ```
 Phase: 8 of 8 - Ant Design Frontend Refactor (IN PROGRESS)
-Plan:  03 of 8
+Plan:  06 of 8
 Status: In progress
-Last activity: 2026-02-01 - Completed 08-03-PLAN.md
+Last activity: 2026-02-01 - Completed 08-06-PLAN.md
 
-[==========                  ] 37%
+[==================          ] 75%
 ```
 
-**Current Plan:** 08-03 complete - Tables and tabs antd refactor
+**Current Plan:** 08-06 complete - ReviewResults and CommentList antd refactor
 
 ## Progress
 
@@ -35,13 +35,13 @@ Last activity: 2026-02-01 - Completed 08-03-PLAN.md
 | 6 | Learning System & Output Generation | Complete | 6/6 |
 | 7 | AI-First Architecture Overhaul | Complete | 8/8 |
 | 7.1 | AI Review Fixes | Complete | 4/4 |
-| 8 | Ant Design Frontend Refactor | In Progress | 3/8 |
+| 8 | Ant Design Frontend Refactor | In Progress | 6/8 |
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans completed | 42 |
+| Plans completed | 45 |
 | Plans failed | 0 |
 | Total iterations | 27 |
 | Avg iterations/plan | 1.0 |
@@ -154,6 +154,9 @@ Last activity: 2026-02-01 - Completed 08-03-PLAN.md
 | return false in beforeUpload | Prevents antd auto-upload, lets app handle manually | 08-02 |
 | antd Table auto-sorter | Add sorter function based on dataIndex type (number/string) | 08-03 |
 | Collapse+Tabs combo | Collapse for section expand/collapse, Tabs for content | 08-03 |
+| Card with CaretRightOutlined | Consistent collapse/expand with rotation animation | 08-06 |
+| Affix for sticky buttons | Better UX than fixed positioning, handles scroll containers | 08-06 |
+| Collapse ghost style | Minimal visual chrome for expandable lists | 08-06 |
 | Descriptions for metadata | Better UX than table for key-value display | 08-03 |
 
 ### Roadmap Evolution
@@ -172,7 +175,7 @@ Last activity: 2026-02-01 - Completed 08-03-PLAN.md
 ## Session Continuity
 
 Last session: 2026-02-01T15:50:00Z
-Stopped at: Completed 08-03-PLAN.md
+Stopped at: Completed 08-06-PLAN.md
 Resume file: None
 
 ## Session Log
@@ -233,7 +236,8 @@ Resume file: None
 | 2026-02-01 | Completed 08-02 | DropZone antd migration - Upload.Dragger + Alert + Spin (3 min) |
 | 2026-02-01 | Completed 08-05 | Settings modal antd refactor - Modal, Tabs, Collapse, Form (5 min) |
 | 2026-02-01 | Completed 08-03 | Tables and tabs antd refactor - Table, Tabs, Collapse, Descriptions (3 min) |
+| 2026-02-01 | Completed 08-06 | ReviewResults/CommentList antd - Card, Collapse, Checkbox, Affix (5 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-02-01T15:50:00Z*
+*Last updated: 2026-02-01T15:52:00Z*
