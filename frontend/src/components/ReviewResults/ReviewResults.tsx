@@ -75,8 +75,8 @@ export function ReviewResults({
         </Space>
       </div>
 
-      <Row gutter={16}>
-        <Col xs={24} sm={12} xl={6}>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={12} xxl={6}>
           <ReviewSection
             title="Overview"
             content={sections.overview}
@@ -84,7 +84,7 @@ export function ReviewResults({
             isStreaming={isStreaming && !sections.needsAttention}
           />
         </Col>
-        <Col xs={24} sm={12} xl={6}>
+        <Col xs={24} md={12} xxl={6}>
           <ReviewSection
             title="Looking Good"
             content={sections.lookingGood}
@@ -92,7 +92,7 @@ export function ReviewResults({
             isStreaming={isStreaming && !!sections.needsAttention && !sections.suggestions}
           />
         </Col>
-        <Col xs={24} sm={12} xl={6}>
+        <Col xs={24} md={12} xxl={6}>
           <ReviewSection
             title="Needs Attention"
             content={sections.needsAttention}
@@ -100,7 +100,7 @@ export function ReviewResults({
             isStreaming={isStreaming && !!sections.overview && !sections.lookingGood}
           />
         </Col>
-        <Col xs={24} sm={12} xl={6}>
+        <Col xs={24} md={12} xxl={6}>
           <ReviewSection
             title="Suggestions"
             content={sections.suggestions}

@@ -121,7 +121,7 @@ export function ReviewSection({ title, content, variant, isStreaming }: ReviewSe
       size="small"
       style={{
         marginBottom: 0,
-        borderLeft: `3px solid ${config.color}`,
+        borderTop: `3px solid ${config.color}`,
         height: '100%',
       }}
       styles={{
