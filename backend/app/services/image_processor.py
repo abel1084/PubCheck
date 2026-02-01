@@ -74,6 +74,10 @@ def extract_images(doc: pymupdf.Document, page: pymupdf.Page, page_num: int) -> 
             else:
                 bbox = tuple(rect)
 
+            # Calculate dimensions in mm from rendered size (points / 72 * 25.4)
+            width_mm = bbox_width / 72 * 25.4
+            height_mm = bbox_height / 72 * 25.4
+
             images.append(ImageInfo(
                 xref=xref,
                 width=img_width,
@@ -89,6 +93,8 @@ def extract_images(doc: pymupdf.Document, page: pymupdf.Page, page_num: int) -> 
                 ),
                 page=page_num,
                 has_mask=smask != 0,
+                width_mm=round(width_mm, 1),
+                height_mm=round(height_mm, 1),
             ))
 
     return images
