@@ -1,24 +1,18 @@
 import { useState } from 'react';
+import { Collapse, Checkbox, Button, Typography, Empty, Tag, Affix, type CollapseProps } from 'antd';
+import { FilePdfOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
 import type { ReviewIssue } from '../../types/review';
-import './CommentList.css';
+
+const { Text, Title } = Typography;
 
 interface CommentListProps {
-  /** All issues from AI review */
   issues: ReviewIssue[];
-  /** Currently selected issue IDs */
   selectedIds: Set<string>;
-  /** Toggle selection callback */
   onToggleSelect: (id: string) => void;
-  /** Generate PDF callback */
   onGeneratePdf?: () => void;
-  /** Whether PDF generation is in progress */
   isGenerating?: boolean;
 }
 
-/**
- * Selectable list of AI review issues for PDF annotation.
- * Groups issues by category with collapsible sections.
- */
 export function CommentList({
   issues,
   selectedIds,
@@ -26,33 +20,28 @@ export function CommentList({
   onGeneratePdf,
   isGenerating = false,
 }: CommentListProps) {
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [expandedIds, setExpandedIds] = useState<string[]>([]);
 
   // Group issues by category
   const needsAttention = issues.filter(i => i.category === 'needs_attention');
   const suggestions = issues.filter(i => i.category === 'suggestion');
 
-  const toggleExpanded = (id: string) => {
-    setExpandedIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
+  if (issues.length === 0) {
+    return (
+      <Empty
+        description="No issues found. Run a review to see selectable comments."
+        style={{ padding: 40 }}
+      />
+    );
+  }
 
-  // Render a section (Needs Attention or Suggestions)
+  // Create section with checkbox header
   const renderSection = (
     title: string,
     sectionIssues: ReviewIssue[],
-    variant: 'attention' | 'suggestions'
+    variant: 'error' | 'warning'
   ) => {
-    if (sectionIssues.length === 0) {
-      return null;
-    }
+    if (sectionIssues.length === 0) return null;
 
     const selectedInSection = sectionIssues.filter(i => selectedIds.has(i.id)).length;
     const allSelected = selectedInSection === sectionIssues.length;
@@ -60,137 +49,96 @@ export function CommentList({
 
     const handleSectionToggle = () => {
       if (allSelected) {
-        // Deselect all in section
         sectionIssues.forEach(i => {
-          if (selectedIds.has(i.id)) {
-            onToggleSelect(i.id);
-          }
+          if (selectedIds.has(i.id)) onToggleSelect(i.id);
         });
       } else {
-        // Select all in section
         sectionIssues.forEach(i => {
-          if (!selectedIds.has(i.id)) {
-            onToggleSelect(i.id);
-          }
+          if (!selectedIds.has(i.id)) onToggleSelect(i.id);
         });
       }
     };
 
+    const collapseItems: CollapseProps['items'] = sectionIssues.map(issue => ({
+      key: issue.id,
+      label: (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} onClick={e => e.stopPropagation()}>
+          <Checkbox
+            checked={selectedIds.has(issue.id)}
+            onChange={() => onToggleSelect(issue.id)}
+          />
+          <Text strong style={{ flex: 1 }}>{issue.title}</Text>
+          <Tag>
+            {issue.pages.length === 1
+              ? `p. ${issue.pages[0]}`
+              : `pp. ${issue.pages.join(', ')}`}
+          </Tag>
+        </div>
+      ),
+      children: <Text type="secondary">{issue.description}</Text>,
+    }));
+
     return (
-      <div className={`comment-list__section comment-list__section--${variant}`}>
-        <div className="comment-list__section-header">
-          <label className="comment-list__section-checkbox">
-            <input
-              type="checkbox"
-              checked={allSelected}
-              ref={el => {
-                if (el) el.indeterminate = someSelected;
-              }}
-              onChange={handleSectionToggle}
-            />
-            <span className="comment-list__section-title">{title}</span>
-          </label>
-          <span className="comment-list__section-count">
-            {selectedInSection}/{sectionIssues.length}
-          </span>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '8px 12px',
+          background: variant === 'error' ? '#fff2f0' : '#fffbe6',
+          borderLeft: `3px solid ${variant === 'error' ? '#ff4d4f' : '#faad14'}`,
+          marginBottom: 8,
+        }}>
+          <Checkbox
+            checked={allSelected}
+            indeterminate={someSelected}
+            onChange={handleSectionToggle}
+          />
+          <Text strong style={{ marginLeft: 8, flex: 1 }}>{title}</Text>
+          <Text type="secondary">{selectedInSection}/{sectionIssues.length}</Text>
         </div>
-
-        <div className="comment-list__items">
-          {sectionIssues.map(issue => (
-            <div
-              key={issue.id}
-              className={`comment-list__item ${selectedIds.has(issue.id) ? 'comment-list__item--selected' : ''}`}
-            >
-              <div className="comment-list__item-header">
-                <label className="comment-list__item-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.has(issue.id)}
-                    onChange={() => onToggleSelect(issue.id)}
-                  />
-                  <span className="comment-list__item-title">{issue.title}</span>
-                </label>
-                <span className="comment-list__item-pages">
-                  {issue.pages.length === 1
-                    ? `p. ${issue.pages[0]}`
-                    : `pp. ${issue.pages.join(', ')}`}
-                </span>
-                <button
-                  type="button"
-                  className={`comment-list__expand-btn ${expandedIds.has(issue.id) ? 'comment-list__expand-btn--expanded' : ''}`}
-                  onClick={() => toggleExpanded(issue.id)}
-                  aria-label={expandedIds.has(issue.id) ? 'Collapse' : 'Expand'}
-                >
-                  <svg
-                    className="comment-list__expand-icon"
-                    viewBox="0 0 24 24"
-                    width="16"
-                    height="16"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"
-                    />
-                  </svg>
-                </button>
-              </div>
-
-              {expandedIds.has(issue.id) && (
-                <div className="comment-list__item-description">
-                  {issue.description}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        <Collapse
+          activeKey={expandedIds}
+          onChange={(keys) => setExpandedIds(keys as string[])}
+          items={collapseItems}
+          ghost
+          expandIcon={({ isActive }) => isActive ? <UpOutlined /> : <DownOutlined />}
+        />
       </div>
     );
   };
 
-  if (issues.length === 0) {
-    return (
-      <div className="comment-list comment-list--empty">
-        <p className="comment-list__empty-text">
-          No issues found. Run a review to see selectable comments.
-        </p>
-      </div>
-    );
-  }
-
   const totalSelected = selectedIds.size;
 
   return (
-    <div className="comment-list">
-      <div className="comment-list__header">
-        <h3 className="comment-list__title">Comments for PDF</h3>
-        <span className="comment-list__total-count">
-          {totalSelected} of {issues.length} selected
-        </span>
+    <div style={{ padding: 16, paddingBottom: 80 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <Title level={5} style={{ margin: 0 }}>Comments for PDF</Title>
+        <Text type="secondary">{totalSelected} of {issues.length} selected</Text>
       </div>
 
-      {renderSection('Needs Attention', needsAttention, 'attention')}
-      {renderSection('Suggestions', suggestions, 'suggestions')}
+      {renderSection('Needs Attention', needsAttention, 'error')}
+      {renderSection('Suggestions', suggestions, 'warning')}
 
-      {/* Footer with Generate PDF button */}
       {onGeneratePdf && (
-        <div className="comment-list__footer">
-          <button
-            type="button"
-            className={`comment-list__generate-btn ${isGenerating ? 'comment-list__generate-btn--loading' : ''}`}
-            onClick={onGeneratePdf}
-            disabled={totalSelected === 0 || isGenerating}
-            title={totalSelected === 0 ? 'Select at least one issue' : 'Generate annotated PDF'}
-          >
-            {isGenerating ? (
-              <>
-                <span className="comment-list__spinner"></span>
-                Generating...
-              </>
-            ) : (
-              `Generate PDF (${totalSelected} comments)`
-            )}
-          </button>
-        </div>
+        <Affix offsetBottom={0}>
+          <div style={{
+            background: '#fff',
+            padding: 16,
+            borderTop: '1px solid #f0f0f0',
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}>
+            <Button
+              type="primary"
+              icon={<FilePdfOutlined />}
+              onClick={onGeneratePdf}
+              disabled={totalSelected === 0}
+              loading={isGenerating}
+            >
+              Generate PDF ({totalSelected} comments)
+            </Button>
+          </div>
+        </Affix>
       )}
     </div>
   );
