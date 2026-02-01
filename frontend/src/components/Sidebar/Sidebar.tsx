@@ -1,5 +1,8 @@
+import { Button, Select, Tag, Typography, Space, Divider } from 'antd';
+import { FileOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { DocumentMetadata, DocumentType, Confidence } from '../../types/extraction';
-import './Sidebar.css';
+
+const { Text, Title } = Typography;
 
 interface SidebarProps {
   filename: string;
@@ -18,6 +21,12 @@ const DOCUMENT_TYPES: DocumentType[] = [
   'Publication',
 ];
 
+const confidenceColors: Record<Confidence, string> = {
+  high: 'success',
+  medium: 'warning',
+  low: 'error',
+};
+
 export function Sidebar({
   filename,
   documentType,
@@ -27,46 +36,71 @@ export function Sidebar({
   onNewDocument,
 }: SidebarProps) {
   return (
-    <aside className="sidebar">
-      <div className="sidebar__header">
-        <h2>Document Info</h2>
-        <button className="sidebar__new-btn" onClick={onNewDocument}>
-          New Document
-        </button>
-      </div>
-
-      <div className="sidebar__section">
-        <label className="sidebar__label">Filename</label>
-        <p className="sidebar__value">{filename}</p>
-      </div>
-
-      <div className="sidebar__section">
-        <label className="sidebar__label">Pages</label>
-        <p className="sidebar__value">{metadata.page_count}</p>
-      </div>
-
-      <div className="sidebar__section">
-        <label className="sidebar__label">Document Type</label>
-        <select
-          className="sidebar__select"
-          value={documentType}
-          onChange={e => onDocumentTypeChange(e.target.value as DocumentType)}
+    <aside style={{
+      width: 280,
+      padding: 16,
+      background: '#fafafa',
+      borderRight: '1px solid #f0f0f0',
+      height: '100%',
+      overflow: 'auto',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <Title level={5} style={{ margin: 0 }}>Document Info</Title>
+        <Button
+          icon={<ReloadOutlined />}
+          onClick={onNewDocument}
+          size="small"
         >
-          {DOCUMENT_TYPES.map(type => (
-            <option key={type} value={type}>{type}</option>
-          ))}
-        </select>
-        <span className={`sidebar__confidence sidebar__confidence--${confidence}`}>
-          {confidence} confidence
-        </span>
+          New
+        </Button>
       </div>
 
-      {metadata.title && (
-        <div className="sidebar__section">
-          <label className="sidebar__label">Title</label>
-          <p className="sidebar__value sidebar__value--title">{metadata.title}</p>
+      <Divider style={{ margin: '12px 0' }} />
+
+      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <div>
+          <Text type="secondary" style={{ display: 'block', marginBottom: 4 }}>
+            Filename
+          </Text>
+          <Text strong ellipsis style={{ display: 'block' }}>
+            <FileOutlined style={{ marginRight: 8 }} />
+            {filename}
+          </Text>
         </div>
-      )}
+
+        <div>
+          <Text type="secondary" style={{ display: 'block', marginBottom: 4 }}>
+            Pages
+          </Text>
+          <Text>{metadata.page_count}</Text>
+        </div>
+
+        <div>
+          <Text type="secondary" style={{ display: 'block', marginBottom: 4 }}>
+            Document Type
+          </Text>
+          <Select
+            value={documentType}
+            onChange={onDocumentTypeChange}
+            style={{ width: '100%' }}
+            options={DOCUMENT_TYPES.map(type => ({ value: type, label: type }))}
+          />
+          <div style={{ marginTop: 8 }}>
+            <Tag color={confidenceColors[confidence]}>
+              {confidence} confidence
+            </Tag>
+          </div>
+        </div>
+
+        {metadata.title && (
+          <div>
+            <Text type="secondary" style={{ display: 'block', marginBottom: 4 }}>
+              Title
+            </Text>
+            <Text style={{ display: 'block' }}>{metadata.title}</Text>
+          </div>
+        )}
+      </Space>
     </aside>
   );
 }
