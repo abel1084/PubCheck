@@ -20,7 +20,7 @@ export function useAIReview() {
     file: File,
     extraction: ExtractionResult,
     documentType: string,
-    confidence: number,
+    confidence: string,
   ) => {
     // Cancel any existing request
     if (abortControllerRef.current) {

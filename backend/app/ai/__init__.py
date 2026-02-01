@@ -1,37 +1,25 @@
 """
-AI infrastructure module for Claude Vision integration.
-
-Provides:
-- AIClient: Anthropic client wrapper with retry logic
-- Pydantic schemas for AI responses
-- Prompt templates and checklist generation
-- PDF page rendering for vision API
-- DocumentAnalyzer: Orchestrates concurrent page analysis
+AI module for document review.
+Provides Claude-powered document analysis with native PDF support.
 """
-from .client import AIClient, get_ai_client
-from .schemas import AIFinding, PageAnalysisResult, DocumentAnalysisResult
-from .prompts import generate_checklist, build_analysis_prompt, SYSTEM_PROMPT
-from .renderer import render_page_to_base64
-from .analyzer import DocumentAnalyzer, analyze_document
-from .router import router
+from .client import AIClient, AIClientError, AIConfigurationError, get_ai_client
+from .reviewer import review_document, load_rules_context
+from .prompts import build_system_prompt, build_user_prompt
+from .schemas import ReviewRequest, ReviewMetadata
 
 __all__ = [
     # Client
     "AIClient",
+    "AIClientError",
+    "AIConfigurationError",
     "get_ai_client",
-    # Schemas
-    "AIFinding",
-    "PageAnalysisResult",
-    "DocumentAnalysisResult",
+    # Reviewer
+    "review_document",
+    "load_rules_context",
     # Prompts
-    "generate_checklist",
-    "build_analysis_prompt",
-    "SYSTEM_PROMPT",
-    # Renderer
-    "render_page_to_base64",
-    # Analyzer
-    "DocumentAnalyzer",
-    "analyze_document",
-    # Router
-    "router",
+    "build_system_prompt",
+    "build_user_prompt",
+    # Schemas
+    "ReviewRequest",
+    "ReviewMetadata",
 ]

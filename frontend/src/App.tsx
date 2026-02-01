@@ -2,32 +2,34 @@ import { useState, useEffect, useRef } from 'react';
 import { DropZone } from './components/DropZone';
 import { DataTabs } from './components/DataTabs';
 import { Sidebar } from './components/Sidebar';
-import { Settings } from './components/Settings';
+import { ReviewResults } from './components/ReviewResults/ReviewResults';
 import { ToastProvider } from './components/Toast/ToastProvider';
 import { useExtraction } from './hooks/useExtraction';
-import { useComplianceCheck } from './hooks/useComplianceCheck';
-import { useAIAnalysis } from './hooks/useAIAnalysis';
+import { useAIReview } from './hooks/useAIReview';
 import type { DocumentType } from './types/extraction';
 import './App.css';
 
 // Map frontend DocumentType to backend document_type IDs
-// Backend expects: factsheet, policy-brief, issue-note, working-paper, publication
 const DOCUMENT_TYPE_MAP: Record<DocumentType, string> = {
   'Factsheet': 'factsheet',
   'Policy Brief': 'policy-brief',
   'Working Paper': 'working-paper',
-  'Technical Report': 'issue-note',  // Technical Report maps to issue-note template
+  'Technical Report': 'issue-note',
   'Publication': 'publication',
 };
 
 function App() {
   const { isUploading, error, result, upload, reset } = useExtraction();
-  const { isChecking, checkResult, checkError, runCheck, clearResult } = useComplianceCheck();
-  const { isAnalyzing, progress, aiResult, aiError, analyze, reset: resetAI } = useAIAnalysis();
-  const [documentType, setDocumentType] = useState<DocumentType | null>(null);
-  const [showSettings, setShowSettings] = useState(false);
+  const {
+    sections,
+    isStreaming,
+    isComplete,
+    error: reviewError,
+    startReview,
+    reset: resetReview
+  } = useAIReview();
 
-  // Store the uploaded file for AI analysis
+  const [documentType, setDocumentType] = useState<DocumentType | null>(null);
   const uploadedFileRef = useRef<File | null>(null);
 
   // Sync document type from result when it changes
@@ -45,51 +47,23 @@ function App() {
 
   const handleNewDocument = () => {
     reset();
-    clearResult();
-    resetAI();
+    resetReview();
     setDocumentType(null);
     uploadedFileRef.current = null;
   };
 
-  // Handle check button click
-  const handleCheck = () => {
-    if (result && documentType) {
-      // Use mapping to convert DocumentType to backend document_type ID
-      const docTypeId = DOCUMENT_TYPE_MAP[documentType];
-      runCheck(docTypeId, result.extraction);
-    }
-  };
-
-  // Handle AI analyze button click
-  const handleAIAnalyze = () => {
+  // Handle review button click
+  const handleReview = () => {
     if (result && documentType && uploadedFileRef.current) {
-      // Use mapping to convert DocumentType to backend document_type ID
       const docTypeId = DOCUMENT_TYPE_MAP[documentType];
-      analyze(uploadedFileRef.current, result.extraction, docTypeId);
+      startReview(
+        uploadedFileRef.current,
+        result.extraction,
+        docTypeId,
+        result.confidence
+      );
     }
   };
-
-  // Show settings view
-  if (showSettings) {
-    return (
-      <div className="app app--settings">
-        <ToastProvider />
-        <header className="app__header app__header--compact">
-          <h1>PubCheck</h1>
-          <button
-            type="button"
-            className="app__settings-button"
-            onClick={() => setShowSettings(false)}
-          >
-            Back
-          </button>
-        </header>
-        <main className="app__settings-content">
-          <Settings onClose={() => setShowSettings(false)} />
-        </main>
-      </div>
-    );
-  }
 
   // Show upload view if no result
   if (!result) {
@@ -102,13 +76,6 @@ function App() {
               <h1>PubCheck</h1>
               <p>UNEP PDF Design Compliance Checker</p>
             </div>
-            <button
-              type="button"
-              className="app__settings-button"
-              onClick={() => setShowSettings(true)}
-            >
-              Settings
-            </button>
           </div>
         </header>
         <main className="app__upload-area">
@@ -131,55 +98,23 @@ function App() {
         <div className="app__header-buttons">
           <button
             type="button"
-            className={`app__check-button ${isChecking ? 'app__check-button--loading' : ''}`}
-            onClick={handleCheck}
-            disabled={!result || isChecking}
-            title={!result ? 'Upload a PDF first' : 'Run compliance check'}
+            className={`app__review-button ${isStreaming ? 'app__review-button--loading' : ''}`}
+            onClick={handleReview}
+            disabled={!result || isStreaming}
+            title={!result ? 'Upload a PDF first' : 'Run design review'}
           >
-            {isChecking ? (
+            {isStreaming ? (
               <>
                 <span className="app__spinner"></span>
-                Checking...
+                Reviewing...
               </>
             ) : (
-              'Check'
+              'Review'
             )}
-          </button>
-          <button
-            type="button"
-            className={`app__ai-button ${isAnalyzing ? 'app__ai-button--loading' : ''}`}
-            onClick={handleAIAnalyze}
-            disabled={!result || isAnalyzing}
-            title={!result ? 'Upload a PDF first' : 'Run AI analysis'}
-          >
-            {isAnalyzing ? (
-              <>
-                <span className="app__spinner"></span>
-                Analyzing...
-              </>
-            ) : (
-              'Analyze with AI'
-            )}
-          </button>
-          <button
-            type="button"
-            className="app__settings-button"
-            onClick={() => setShowSettings(true)}
-          >
-            Settings
           </button>
         </div>
       </header>
-      {checkError && (
-        <div className="app__check-error">
-          Check failed: {checkError}
-        </div>
-      )}
-      {aiError && (
-        <div className="app__check-error">
-          AI analysis failed: {aiError}
-        </div>
-      )}
+
       <div className="app__content">
         <Sidebar
           filename={result.filename}
@@ -190,17 +125,16 @@ function App() {
           onNewDocument={handleNewDocument}
         />
         <main className="app__main">
+          <ReviewResults
+            sections={sections}
+            isStreaming={isStreaming}
+            isComplete={isComplete}
+            error={reviewError}
+            onRetry={handleReview}
+          />
           <DataTabs
             extraction={result.extraction}
-            checkResult={checkResult}
-            isChecking={isChecking}
-            onRecheck={handleCheck}
-            aiResult={aiResult}
-            isAnalyzing={isAnalyzing}
-            aiProgress={progress}
-            onReanalyze={handleAIAnalyze}
-            documentType={documentType ? DOCUMENT_TYPE_MAP[documentType] : undefined}
-            pdfFile={uploadedFileRef.current}
+            defaultCollapsed={true}
           />
         </main>
       </div>
@@ -208,4 +142,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

@@ -1,142 +1,94 @@
 """
-Prompt templates and checklist generation for AI analysis.
+Prompts for AI-powered document review.
+Produces collegial, helpful feedback organized by priority sections.
 """
-from typing import Any, Dict
 
-from app.config.models import Template
+SYSTEM_PROMPT_TEMPLATE = '''You are a helpful colleague reviewing UNEP publications for design compliance. Your review should read like feedback from an experienced designer who wants the document to succeed.
+
+## Review Style
+- Be collegial and constructive: "The logo looks a bit small at 18mm - spec asks for 20mm minimum"
+- Cite measurements when relevant: sizes, margins, DPI values
+- Use honest hedging when uncertain: "This might be intentional, but..."
+- No formal confidence scores - express uncertainty naturally in prose
+
+## Response Structure
+Organize your review into these sections, using markdown headers:
+
+### Overview
+Brief 2-3 sentence summary of the document's compliance state. Mention the document type and overall impression.
+
+### Needs Attention
+Issues that should be fixed before publication. Group related issues naturally.
+Each issue should explain what's wrong and suggest a fix.
+If there are no issues, write "Everything looks good!" and skip to Looking Good.
+
+### Looking Good
+Specific things the document does well. Acknowledge good design work.
+Mention 2-3 positive observations.
+
+### Suggestions
+Minor improvements that would enhance the document but aren't requirements.
+Optional enhancements or stylistic suggestions.
+
+## Common Pitfalls to Avoid in Your Analysis
+- Full-bleed images are intentional design, not margin violations
+- Decorative elements (thin lines, bullets, icons under ~5mm) don't need DPI checks
+- Small accent images may intentionally use lower resolution
+- Headers/footers have different margin rules than body content
+- Font variations within a family (Roboto vs Roboto Condensed) are acceptable
+
+## What You're Checking
+You'll receive:
+1. The original PDF document (you can see all pages)
+2. Extracted measurements as JSON (fonts, images, margins, text blocks)
+3. Document type with confidence score - validate this matches the actual document
+
+{rules_context}
+'''
 
 
-SYSTEM_PROMPT = """You are a document compliance analyst for UNEP publications. Your task is to analyze page images against a design checklist and report any issues found.
-
-Return your analysis as a JSON object with this structure:
-{
-  "findings": [
-    {
-      "check_name": "Name of the check",
-      "passed": true/false,
-      "confidence": "high" | "medium" | "low",
-      "message": "Brief description of finding",
-      "reasoning": "Explanation (only for non-obvious findings)",
-      "location": "Descriptive location (e.g., 'top-right corner')",
-      "suggestion": "Fix suggestion (only for failures)"
-    }
-  ]
-}
-
-Confidence calibration:
-- "high": Clear violation or clear compliance, no ambiguity
-- "medium": Likely issue but visual inspection should confirm
-- "low": Possible issue, requires human judgment
-
-Guidelines:
-- Only include findings for checks that are relevant to this page
-- Include reasoning only for non-obvious findings (skip for clear violations like "No ISBN")
-- Include suggestion only for failures
-- Use descriptive locations, not coordinates
-- Be concise in messages (one sentence)
-- Return empty findings array if page passes all relevant checks"""
-
-
-def generate_checklist(template: Template) -> str:
+def build_system_prompt(rules_context: str) -> str:
     """
-    Generate a simplified checklist from rule template.
-
-    Takes merged rules from RuleService and creates a bullet-point
-    checklist grouped by category.
+    Build system prompt with rules context injected.
 
     Args:
-        template: Merged Template with rules
+        rules_context: Markdown rules for the document type
 
     Returns:
-        Markdown-formatted checklist string
+        Complete system prompt
     """
-    lines = []
-
-    for cat_id, category in template.categories.items():
-        # Only include categories with enabled rules
-        enabled_rules = [
-            (rule_id, rule)
-            for rule_id, rule in category.rules.items()
-            if rule.enabled
-        ]
-
-        if not enabled_rules:
-            continue
-
-        lines.append(f"## {category.name}")
-
-        for rule_id, rule in enabled_rules:
-            # Build requirement description from expected values
-            expected = rule.expected.dict()
-            requirement_parts = []
-
-            # Handle different check types
-            if rule.check_type == "position":
-                if expected.get("position"):
-                    requirement_parts.append(f"Position: {expected['position']}")
-                if expected.get("min_size_mm"):
-                    requirement_parts.append(f"Minimum size: {expected['min_size_mm']}mm")
-
-            elif rule.check_type == "range":
-                if expected.get("min") is not None:
-                    requirement_parts.append(f"Minimum: {expected['min']}")
-                if expected.get("max") is not None:
-                    requirement_parts.append(f"Maximum: {expected['max']}")
-                if expected.get("unit"):
-                    requirement_parts[-1] += expected['unit']
-
-            elif rule.check_type == "font":
-                if expected.get("font_family"):
-                    requirement_parts.append(f"Font: {expected['font_family']}")
-                if expected.get("min_size") and expected.get("max_size"):
-                    requirement_parts.append(f"Size: {expected['min_size']}-{expected['max_size']}pt")
-
-            elif rule.check_type == "regex":
-                if expected.get("pattern"):
-                    requirement_parts.append(f"Pattern: {expected['pattern']}")
-
-            elif rule.check_type == "presence":
-                if expected.get("required"):
-                    requirement_parts.append("Required")
-                if expected.get("location"):
-                    requirement_parts.append(f"Location: {expected['location']}")
-
-            elif rule.check_type == "color":
-                if expected.get("hex"):
-                    requirement_parts.append(f"Color: {expected['hex']}")
-
-            # Build the checklist line
-            if requirement_parts:
-                requirement_str = ", ".join(requirement_parts)
-                lines.append(f"- {rule.name}: {requirement_str}")
-            else:
-                lines.append(f"- {rule.name}: {rule.description}")
-
-        lines.append("")  # Blank line between categories
-
-    return "\n".join(lines)
+    return SYSTEM_PROMPT_TEMPLATE.format(rules_context=rules_context)
 
 
-def build_analysis_prompt(checklist: str, extraction_summary: str) -> str:
+def build_user_prompt(
+    extraction_json: str,
+    document_type: str,
+    confidence: float,
+) -> str:
     """
-    Build the analysis prompt for a page.
-
-    Combines the checklist with page-specific context from extraction.
+    Build user prompt with extraction data and document type.
 
     Args:
-        checklist: Markdown checklist from generate_checklist
-        extraction_summary: Page-specific extraction data summary
+        extraction_json: JSON string of ExtractionResult
+        document_type: Detected document type
+        confidence: Detection confidence (0-1)
 
     Returns:
-        Complete prompt for Claude API
+        User prompt for document review
     """
-    return f"""Analyze this page image against the following design checklist.
+    confidence_note = ""
+    if confidence < 0.8:
+        confidence_note = f"\n(Please verify this is actually a {document_type} - detection confidence is only {confidence:.0%})"
 
-## Checklist
-{checklist}
+    return f'''Please review this {document_type} for design compliance.
 
-## Page Context
-{extraction_summary}
+Document type confidence: {confidence:.0%}{confidence_note}
 
-Review the page image and report any compliance issues found. Return your findings as JSON.
-If no issues are found for this page, return an empty findings array."""
+## Extracted Measurements
+The following JSON contains measurements extracted from the PDF. Use this data to verify specific values (font sizes, margins, DPI, etc.) but also visually inspect the document for issues the extraction might miss.
+
+```json
+{extraction_json}
+```
+
+Review the document and provide your assessment using the section structure from your instructions (Overview, Needs Attention, Looking Good, Suggestions).'''
