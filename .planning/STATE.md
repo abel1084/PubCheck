@@ -1,27 +1,27 @@
 # Project State: PubCheck
 
 **Current Phase:** 7.1 (In Progress)
-**Status:** Executing Phase 7.1 - AI Review Fixes (Plan 1 complete)
+**Status:** Executing Phase 7.1 - AI Review Fixes (Plan 3 complete)
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-31)
 
 **Core value:** Catch 95%+ of design compliance issues automatically, producing professional review outputs
-**Current focus:** AI Review Fixes - improving logo detection and extraction
+**Current focus:** AI Review Fixes - collapsible review sections
 
 ## Current Position
 
 ```
 Phase: 7.1 of 7.1 - AI Review Fixes (IN PROGRESS)
-Plan:  1 of 4
+Plan:  3 of 4
 Status: In progress
-Last activity: 2026-02-01 - Completed 07.1-01-PLAN.md
+Last activity: 2026-02-01 - Completed 07.1-03-PLAN.md
 
-[##########                  ] 36%
+[###########                 ] 38%
 ```
 
-**Current Plan:** 07.1-01 complete, ready for 07.1-02
+**Current Plan:** 07.1-03 complete, ready for 07.1-04
 
 ## Progress
 
@@ -34,13 +34,13 @@ Last activity: 2026-02-01 - Completed 07.1-01-PLAN.md
 | 5 | Review Interface | Complete | 4/4 |
 | 6 | Learning System & Output Generation | Complete | 6/6 |
 | 7 | AI-First Architecture Overhaul | In Progress | 7/8 |
-| 7.1 | AI Review Fixes | In Progress | 1/4 |
+| 7.1 | AI Review Fixes | In Progress | 3/4 |
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans completed | 36 |
+| Plans completed | 38 |
 | Plans failed | 0 |
 | Total iterations | 27 |
 | Avg iterations/plan | 1.0 |
@@ -137,6 +137,8 @@ Last activity: 2026-02-01 - Completed 07.1-01-PLAN.md
 | DataTabs collapsed by default | Extraction data secondary to review results | 07-07 |
 | mm dimensions from rendered bbox | Gives actual print size, not pixel dimensions | 07.1-01 |
 | Logo uncertainty for implausible measurements | AI hedges when logo <5mm or >50mm | 07.1-01 |
+| Default expanded review sections | Users see content first, can collapse to reduce clutter | 07.1-03 |
+| Chevron rotation for collapse state | Visual feedback with -90deg rotation | 07.1-03 |
 
 ### Roadmap Evolution
 
@@ -152,8 +154,8 @@ Last activity: 2026-02-01 - Completed 07.1-01-PLAN.md
 
 ## Session Continuity
 
-Last session: 2026-02-01T09:38:28Z
-Stopped at: Completed 07.1-01-PLAN.md
+Last session: 2026-02-01T09:38:42Z
+Stopped at: Completed 07.1-03-PLAN.md
 Resume file: None
 
 ## Session Log
@@ -202,7 +204,8 @@ Resume file: None
 | 2026-02-01 | Completed 07-05 | ReviewResults component with markdown rendering (3 min) |
 | 2026-02-01 | Completed 07-07 | App integration with AI review, DataTabs simplified (6 min) |
 | 2026-02-01 | Completed 07.1-01 | Logo detection fix: mm dimensions and uncertainty hedging (1 min) |
+| 2026-02-01 | Completed 07.1-03 | Collapsible review sections with toggle button (1 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-02-01T09:38:28Z*
+*Last updated: 2026-02-01T09:38:42Z*
