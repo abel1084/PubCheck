@@ -35,6 +35,8 @@ class ImageInfo(BaseModel):
     bbox: Tuple[float, float, float, float]  # x0, y0, x1, y1
     page: int
     has_mask: bool
+    width_mm: Optional[float] = None  # Rendered width in millimeters
+    height_mm: Optional[float] = None  # Rendered height in millimeters
 
     class Config:
         arbitrary_types_allowed = True
