@@ -249,7 +249,7 @@ interface CoverFormProps {
 
 function CoverForm({ config, onChange }: CoverFormProps) {
   return (
-    <Space direction="vertical" style={{ width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
       <div>
         <Text type="secondary" style={{ display: 'block', marginBottom: 4 }}>Logo Position</Text>
         <Select
@@ -283,7 +283,7 @@ function CoverForm({ config, onChange }: CoverFormProps) {
           <Input value={config.heading_color} onChange={e => onChange({ ...config, heading_color: e.target.value })} style={{ width: 100 }} />
         </Space>
       </div>
-    </Space>
+    </div>
   );
 }
 
@@ -304,7 +304,7 @@ function TypographyForm({ config, onChange }: { config: DocumentTypeConfig['typo
   };
 
   return (
-    <Space direction="vertical" style={{ width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
       {fontFields.map(({ key, label }) => (
         <div key={key} style={{ padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>
           <Checkbox
@@ -339,14 +339,14 @@ function TypographyForm({ config, onChange }: { config: DocumentTypeConfig['typo
           )}
         </div>
       ))}
-    </Space>
+    </div>
   );
 }
 
 // ImagesForm
 function ImagesForm({ config, onChange }: { config: DocumentTypeConfig['images']; onChange: (c: DocumentTypeConfig['images']) => void }) {
   return (
-    <Space direction="vertical" style={{ width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
       <div>
         <Text type="secondary" style={{ display: 'block', marginBottom: 4 }}>Minimum DPI</Text>
         <InputNumber value={config.min_dpi} onChange={v => onChange({ ...config, min_dpi: v ?? 0 })} />
@@ -363,14 +363,14 @@ function ImagesForm({ config, onChange }: { config: DocumentTypeConfig['images']
           onChange={v => onChange({ ...config, color_spaces: v as string[] })}
         />
       </div>
-    </Space>
+    </div>
   );
 }
 
 // MarginsForm
 function MarginsForm({ config, onChange }: { config: DocumentTypeConfig['margins']; onChange: (c: DocumentTypeConfig['margins']) => void }) {
   return (
-    <Space direction="vertical" style={{ width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
       <RangeInput label="Top Margin" value={config.top} onChange={top => onChange({ ...config, top })} />
       <RangeInput label="Bottom Margin" value={config.bottom} onChange={bottom => onChange({ ...config, bottom })} />
       <RangeInput label="Inside Margin (Binding)" value={config.inside} onChange={inside => onChange({ ...config, inside })} />
@@ -378,7 +378,7 @@ function MarginsForm({ config, onChange }: { config: DocumentTypeConfig['margins
       <Checkbox checked={config.full_bleed_allowed} onChange={e => onChange({ ...config, full_bleed_allowed: e.target.checked })}>
         Allow full-bleed images (won't flag as margin violations)
       </Checkbox>
-    </Space>
+    </div>
   );
 }
 
@@ -403,7 +403,7 @@ function RequiredElementsForm({ config, onChange }: { config: DocumentTypeConfig
   };
 
   return (
-    <Space direction="vertical" style={{ width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
       {elements.map(({ key, label }) => (
         <div key={key}>
           <Checkbox checked={config[key].required} onChange={e => updateElement(key, { required: e.target.checked })}>
@@ -419,14 +419,14 @@ function RequiredElementsForm({ config, onChange }: { config: DocumentTypeConfig
           )}
         </div>
       ))}
-    </Space>
+    </div>
   );
 }
 
 // CustomRulesForm
 function CustomRulesForm({ rules, onChange }: { rules: string[]; onChange: (r: string[]) => void }) {
   return (
-    <Space direction="vertical" style={{ width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
       {rules.map((rule, index) => (
         <Space key={index} style={{ width: '100%' }}>
           <Input
@@ -447,6 +447,6 @@ function CustomRulesForm({ rules, onChange }: { rules: string[]; onChange: (r: s
       <Button type="dashed" onClick={() => onChange([...rules, ''])} block>
         + Add Rule
       </Button>
-    </Space>
+    </div>
   );
 }

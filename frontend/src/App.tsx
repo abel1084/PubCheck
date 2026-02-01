@@ -148,7 +148,7 @@ function App() {
   // Upload view
   if (!result) {
     return (
-      <Layout style={{ minHeight: '100vh' }}>
+      <Layout style={{ minHeight: '100vh', maxWidth: 1920, margin: '0 auto' }}>
         {showSettings && <Settings onClose={() => setShowSettings(false)} />}
         <Header style={{ background: '#fff', padding: '0 24px', borderBottom: '1px solid #f0f0f0' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%' }}>
@@ -215,7 +215,7 @@ function App() {
   ];
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh', maxWidth: 1920, margin: '0 auto' }}>
       {showSettings && <Settings onClose={() => setShowSettings(false)} />}
       <Header style={{ background: '#fff', padding: '0 24px', borderBottom: '1px solid #f0f0f0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%' }}>

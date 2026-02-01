@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Collapse, Checkbox, Button, Typography, Empty, Tag, Affix, type CollapseProps } from 'antd';
-import { FilePdfOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
+import { Card, Checkbox, Button, Typography, Empty, Tag, Affix } from 'antd';
+import { FilePdfOutlined, CaretRightOutlined } from '@ant-design/icons';
 import type { ReviewIssue } from '../../types/review';
 
 const { Text, Title } = Typography;
@@ -13,6 +13,11 @@ interface CommentListProps {
   isGenerating?: boolean;
 }
 
+const variantConfig = {
+  error: { color: '#ff4d4f', bgColor: '#fff2f0' },
+  warning: { color: '#faad14', bgColor: '#fffbe6' },
+};
+
 export function CommentList({
   issues,
   selectedIds,
@@ -20,7 +25,7 @@ export function CommentList({
   onGeneratePdf,
   isGenerating = false,
 }: CommentListProps) {
-  const [expandedIds, setExpandedIds] = useState<string[]>([]);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   // Group issues by category
   const needsAttention = issues.filter(i => i.category === 'needs_attention');
@@ -35,6 +40,61 @@ export function CommentList({
     );
   }
 
+  const toggleExpanded = (id: string) => {
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  // Render individual issue card (matching ReviewSection style)
+  const renderIssueCard = (issue: ReviewIssue, variant: 'error' | 'warning') => {
+    const config = variantConfig[variant];
+    const isExpanded = expandedIds.has(issue.id);
+
+    return (
+      <Card
+        key={issue.id}
+        size="small"
+        style={{ marginBottom: 12, borderLeft: `3px solid ${config.color}` }}
+        title={
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Checkbox
+              checked={selectedIds.has(issue.id)}
+              onChange={() => onToggleSelect(issue.id)}
+              onClick={e => e.stopPropagation()}
+              style={{ marginRight: 8 }}
+            />
+            <div
+              style={{ display: 'flex', alignItems: 'center', flex: 1, cursor: 'pointer' }}
+              onClick={() => toggleExpanded(issue.id)}
+            >
+              <CaretRightOutlined
+                style={{
+                  marginRight: 8,
+                  transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s',
+                }}
+              />
+              <span style={{ flex: 1 }}>{issue.title}</span>
+              <Tag>
+                {issue.pages.length === 1
+                  ? `p. ${issue.pages[0]}`
+                  : `pp. ${issue.pages.join(', ')}`}
+              </Tag>
+            </div>
+          </div>
+        }
+      >
+        {isExpanded && (
+          <Text type="secondary">{issue.description}</Text>
+        )}
+      </Card>
+    );
+  };
+
   // Create section with checkbox header
   const renderSection = (
     title: string,
@@ -43,6 +103,7 @@ export function CommentList({
   ) => {
     if (sectionIssues.length === 0) return null;
 
+    const config = variantConfig[variant];
     const selectedInSection = sectionIssues.filter(i => selectedIds.has(i.id)).length;
     const allSelected = selectedInSection === sectionIssues.length;
     const someSelected = selectedInSection > 0 && !allSelected;
@@ -59,34 +120,16 @@ export function CommentList({
       }
     };
 
-    const collapseItems: CollapseProps['items'] = sectionIssues.map(issue => ({
-      key: issue.id,
-      label: (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} onClick={e => e.stopPropagation()}>
-          <Checkbox
-            checked={selectedIds.has(issue.id)}
-            onChange={() => onToggleSelect(issue.id)}
-          />
-          <Text strong style={{ flex: 1 }}>{issue.title}</Text>
-          <Tag>
-            {issue.pages.length === 1
-              ? `p. ${issue.pages[0]}`
-              : `pp. ${issue.pages.join(', ')}`}
-          </Tag>
-        </div>
-      ),
-      children: <Text type="secondary">{issue.description}</Text>,
-    }));
-
     return (
       <div style={{ marginBottom: 16 }}>
         <div style={{
           display: 'flex',
           alignItems: 'center',
           padding: '8px 12px',
-          background: variant === 'error' ? '#fff2f0' : '#fffbe6',
-          borderLeft: `3px solid ${variant === 'error' ? '#ff4d4f' : '#faad14'}`,
-          marginBottom: 8,
+          background: config.bgColor,
+          borderLeft: `3px solid ${config.color}`,
+          marginBottom: 12,
+          borderRadius: 4,
         }}>
           <Checkbox
             checked={allSelected}
@@ -96,13 +139,7 @@ export function CommentList({
           <Text strong style={{ marginLeft: 8, flex: 1 }}>{title}</Text>
           <Text type="secondary">{selectedInSection}/{sectionIssues.length}</Text>
         </div>
-        <Collapse
-          activeKey={expandedIds}
-          onChange={(keys) => setExpandedIds(keys as string[])}
-          items={collapseItems}
-          ghost
-          expandIcon={({ isActive }) => isActive ? <UpOutlined /> : <DownOutlined />}
-        />
+        {sectionIssues.map(issue => renderIssueCard(issue, variant))}
       </div>
     );
   };
