@@ -2,88 +2,110 @@
 phase: quick
 plan: 001
 subsystem: security
-tags: [authentication, http-basic, middleware]
+tags: [authentication, session, login-page]
 requires: []
-provides: [HTTP Basic Auth protection]
-affects: [all-api-routes]
+provides: [Session-based auth with login page]
+affects: [all-api-routes, frontend]
 tech-stack:
   added: []
-  patterns: [FastAPI global dependency, secrets.compare_digest]
+  patterns: [session cookies, FastAPI dependencies, antd Form]
 key-files:
   created:
     - backend/app/auth/__init__.py
     - backend/app/auth/middleware.py
+    - backend/app/auth/router.py
+    - frontend/src/components/Login.tsx
   modified:
     - backend/app/main.py
+    - frontend/src/App.tsx
     - .env.example
 decisions:
-  - All endpoints protected (no public routes)
-  - Browser-native auth dialog via HTTPBasic
+  - Login page shown before any app access
+  - Session cookies for auth state
+  - Logout button in header
   - Default password "pubcheck" for development
 metrics:
-  duration: 5 min
+  duration: 10 min
   completed: 2026-02-01
 ---
 
-# Quick Task 001: HTTP Basic Authentication Summary
+# Quick Task 001: Login Page Authentication Summary
 
-**One-liner:** Browser-native HTTP Basic Auth protecting all API routes with configurable shared password.
+**One-liner:** Session-based authentication with login page, blocking all app access until authenticated.
 
 ## What Was Built
 
-Added HTTP Basic Authentication to PubCheck using FastAPI's security dependencies:
+Replaced HTTP Basic Auth (browser dialog) with proper login page and session cookies:
 
 1. **Auth Middleware** (`backend/app/auth/middleware.py`)
-   - HTTPBasic security scheme triggers browser's native login dialog
-   - Verifies password from `PUBCHECK_PASSWORD` environment variable
-   - Uses `secrets.compare_digest` for constant-time comparison (timing attack prevention)
-   - Default password: "pubcheck" (for development convenience)
+   - Session token verification via cookie
+   - In-memory session storage (use Redis for production)
+   - Constant-time password comparison
 
-2. **Global Protection** (`backend/app/main.py`)
-   - Added `verify_password` as FastAPI app-level dependency
-   - All routes automatically protected without per-route decorators
-   - No public endpoints - browser caches credentials for session
+2. **Auth Router** (`backend/app/auth/router.py`)
+   - `POST /api/auth/login` - verify password, set session cookie
+   - `POST /api/auth/logout` - invalidate session, clear cookie
+   - `GET /api/auth/check` - verify current session status
 
-3. **Configuration** (`.env.example`)
-   - Documented `PUBCHECK_PASSWORD` setting
-   - Clear instructions for production deployment
+3. **Route Protection** (`backend/app/main.py`)
+   - Auth routes are public (no auth required)
+   - All other routes require valid session via `verify_session` dependency
+
+4. **Login Component** (`frontend/src/components/Login.tsx`)
+   - Antd Card with password form
+   - Error display for wrong password
+   - Loading state during auth check
+
+5. **App Integration** (`frontend/src/App.tsx`)
+   - Auth check on mount
+   - Login screen shown when not authenticated
+   - Logout button in header (upload and results views)
 
 ## Key Implementation Details
 
 ```python
-# middleware.py - constant-time password check
-password_correct = secrets.compare_digest(
-    credentials.password.encode("utf-8"),
-    correct_password.encode("utf-8"),
-)
+# Session creation
+token = secrets.token_urlsafe(32)
+_valid_sessions.add(token)
+response.set_cookie(key="pubcheck_session", value=token, httponly=True)
 
-# main.py - global dependency
-app = FastAPI(
-    dependencies=[Depends(verify_password)],
-)
+# Route protection
+app.include_router(upload_router, dependencies=[Depends(verify_session)])
+```
+
+```tsx
+// Auth check on mount
+useEffect(() => {
+  fetch('/api/auth/check', { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => setIsAuthenticated(data.authenticated));
+}, []);
+
+// Login gate
+if (!isAuthenticated) {
+  return <Login onLogin={() => setIsAuthenticated(true)} />;
+}
 ```
 
 ## Verification Results
 
 | Test | Result |
 |------|--------|
-| Request without auth | 401 Unauthorized |
-| WWW-Authenticate header | Present (triggers browser dialog) |
-| Request with correct password | 200 OK |
-| Request with wrong password | 401 Unauthorized |
-
-## Deviations from Plan
-
-None - plan executed exactly as written.
+| Fresh page load | Shows login page |
+| Correct password | Redirects to app |
+| Wrong password | Shows error message |
+| API request without session | 401 Unauthorized |
+| Logout click | Returns to login page |
 
 ## Files Changed
 
 | File | Change |
 |------|--------|
-| `backend/app/auth/__init__.py` | Created - auth package |
-| `backend/app/auth/middleware.py` | Created - verify_password dependency |
-| `backend/app/main.py` | Modified - added global auth dependency |
-| `.env.example` | Modified - documented PUBCHECK_PASSWORD |
+| `backend/app/auth/middleware.py` | Rewritten - session-based auth |
+| `backend/app/auth/router.py` | Created - login/logout/check endpoints |
+| `backend/app/main.py` | Modified - per-router auth dependencies |
+| `frontend/src/components/Login.tsx` | Created - antd login form |
+| `frontend/src/App.tsx` | Modified - auth state, login gate, logout |
 
 ## Usage
 
@@ -94,9 +116,9 @@ PUBCHECK_PASSWORD=your-secure-password
 # Start app
 python start.py
 
-# Browser will show login dialog on first request
-# Username: anything (ignored)
-# Password: value from PUBCHECK_PASSWORD
+# Browser shows login page
+# Enter password to access app
+# Click logout to return to login
 ```
 
 ## Commits
@@ -105,3 +127,4 @@ python start.py
 |------|---------|
 | c29b240 | feat(quick-001): add HTTP Basic Auth middleware |
 | 4186bae | feat(quick-001): protect all API routes with HTTP Basic Auth |
+| 594bf55 | fix(auth): replace HTTP Basic with login page and session auth |
