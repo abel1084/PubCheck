@@ -39,9 +39,12 @@ COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 # Set working directory to backend for uvicorn
 WORKDIR /app/backend
 
-# Expose port
+# Debug: verify file structure
+RUN echo "=== Backend structure ===" && ls -la && ls -la app/
+
+# Expose port (Railway may override via PORT env var)
 EXPOSE 8003
 
-# Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8003"]
+# Use shell form to allow PORT env var substitution
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8003}
 
