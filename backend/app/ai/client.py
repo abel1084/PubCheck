@@ -2,6 +2,7 @@
 Google Gemini client wrapper with native PDF support and streaming.
 Uses Gemini 2.5 Flash with thinking mode for AI-powered document review.
 """
+import io
 import os
 from typing import AsyncGenerator, Optional
 
@@ -29,6 +30,7 @@ class AIClient:
 
     DEFAULT_MODEL = "gemini-2.5-flash"
     DEFAULT_MAX_TOKENS = 16384  # Gemini supports larger outputs
+    INLINE_SIZE_LIMIT = 900 * 1024  # 900KB - stay under 1MB inline limit
 
     def __init__(self):
         """Initialize the AI client. API key validated on first use."""
@@ -49,6 +51,21 @@ class AIClient:
             self._client = genai.Client(api_key=api_key)
 
         return self._client
+
+    def _upload_file(self, pdf_bytes: bytes, filename: str = "document.pdf"):
+        """Upload PDF to Gemini Files API for large documents."""
+        client = self._ensure_client()
+
+        # Upload using file-like object
+        file_obj = io.BytesIO(pdf_bytes)
+        file_obj.name = filename
+
+        uploaded_file = client.files.upload(
+            file=file_obj,
+            config={"mime_type": "application/pdf"}
+        )
+
+        return uploaded_file
 
     async def review_document_stream(
         self,
@@ -74,11 +91,26 @@ class AIClient:
             AIConfigurationError: If API key is missing
         """
         client = self._ensure_client()
+        uploaded_file = None
 
         try:
-            # Build content with PDF document inline
+            # Use File API for large PDFs, inline for small ones
+            if len(pdf_bytes) > self.INLINE_SIZE_LIMIT:
+                # Upload large file first
+                uploaded_file = self._upload_file(pdf_bytes)
+                pdf_part = types.Part.from_uri(
+                    file_uri=uploaded_file.uri,
+                    mime_type="application/pdf"
+                )
+            else:
+                # Use inline bytes for small files
+                pdf_part = types.Part.from_bytes(
+                    data=pdf_bytes,
+                    mime_type="application/pdf"
+                )
+
             contents = [
-                types.Part.from_bytes(data=pdf_bytes, mime_type="application/pdf"),
+                pdf_part,
                 types.Part.from_text(text=user_prompt),
             ]
 
@@ -119,9 +151,17 @@ class AIClient:
                 raise AIClientError(f"Rate limit exceeded: {e}") from e
 
             if "too large" in error_str or "size" in error_str:
-                raise AIClientError(f"Document too large: {e}") from e
+                raise AIClientError(f"Document too large for processing: {e}") from e
 
             raise AIClientError(f"API error: {e}") from e
+
+        finally:
+            # Clean up uploaded file if used
+            if uploaded_file:
+                try:
+                    client.files.delete(name=uploaded_file.name)
+                except Exception:
+                    pass  # Ignore cleanup errors
 
 
 # Singleton instance
