@@ -27,7 +27,7 @@ export function useComplianceCheck(): UseComplianceCheckResult {
     setCheckError(null);
 
     try {
-      const response = await fetch(`http://localhost:8002/api/check/${documentType}`, {
+      const response = await fetch(`/api/check/${documentType}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(extraction),

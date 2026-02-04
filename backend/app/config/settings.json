@@ -1,0 +1,919 @@
+{
+  "factsheet": {
+    "name": "Factsheet",
+    "description": "Single page or spread documents with emphasis on visual communication",
+    "cover": {
+      "logo": {
+        "position": "top-right",
+        "width_min": 20.0,
+        "width_target": 27.5,
+        "height": null,
+        "enabled": true
+      },
+      "back_logo_position": null,
+      "title_size": {
+        "min": 28.0,
+        "max": 34.0,
+        "target": null,
+        "unit": "pt"
+      },
+      "subtitle_size": {
+        "min": 18.0,
+        "max": 24.0,
+        "target": null,
+        "unit": "pt"
+      },
+      "heading_color": "#00AEEF",
+      "partner_logo_spacing": 10.0,
+      "cover_image_dpi": 300
+    },
+    "typography": {
+      "body": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 11.0,
+          "max": 12.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": null,
+        "style": null,
+        "enabled": true
+      },
+      "h1": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 18.0,
+          "max": 24.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Bold",
+        "color": "#00AEEF",
+        "style": null,
+        "enabled": true
+      },
+      "h2": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 14.0,
+          "max": 18.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Bold",
+        "color": "#00AEEF",
+        "style": null,
+        "enabled": true
+      },
+      "h3": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 12.0,
+          "max": 14.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": "#00AEEF",
+        "style": "underlined",
+        "enabled": true
+      },
+      "h4": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 10.0,
+          "max": 12.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Bold",
+        "color": null,
+        "style": null,
+        "enabled": true
+      },
+      "captions": {
+        "family": "Roboto",
+        "fallback": "Roboto",
+        "size": {
+          "min": 9.0,
+          "max": 10.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": null,
+        "style": null,
+        "enabled": true
+      },
+      "charts": {
+        "family": "Roboto Condensed",
+        "fallback": "Roboto",
+        "size": {
+          "min": 8.0,
+          "max": 8.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": null,
+        "style": null,
+        "enabled": true
+      }
+    },
+    "images": {
+      "min_dpi": 300,
+      "max_width": null,
+      "color_spaces": [
+        "RGB",
+        "CMYK"
+      ],
+      "chart_stroke_weight": null,
+      "enabled": true
+    },
+    "margins": {
+      "top": {
+        "min": 15.0,
+        "max": 20.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "bottom": {
+        "min": 15.0,
+        "max": 20.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "inside": {
+        "min": 20.0,
+        "max": 25.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "outside": {
+        "min": 20.0,
+        "max": 25.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "full_bleed_allowed": true
+    },
+    "required_elements": {
+      "isbn": {
+        "required": false,
+        "pattern": "ISBN 978-xxx or 979-xxx",
+        "description": null
+      },
+      "doi": {
+        "required": false,
+        "pattern": null,
+        "description": null
+      },
+      "job_number": {
+        "required": false,
+        "pattern": null,
+        "description": null
+      },
+      "copyright_notice": {
+        "required": false,
+        "pattern": "(C) [year] United Nations Environment Programme",
+        "description": null
+      },
+      "territorial_disclaimer": {
+        "required": false,
+        "pattern": null,
+        "description": "designations employed...do not imply...opinion...United Nations"
+      },
+      "commercial_disclaimer": {
+        "required": false,
+        "pattern": null,
+        "description": "mention of...commercial products...does not imply endorsement"
+      },
+      "views_disclaimer": {
+        "required": false,
+        "pattern": null,
+        "description": "views expressed...do not necessarily reflect...United Nations"
+      },
+      "suggested_citation": {
+        "required": false,
+        "pattern": null,
+        "description": null
+      },
+      "sdg_icons": {
+        "required": false,
+        "pattern": null,
+        "description": "1-3 SDG icons should be displayed"
+      },
+      "table_of_contents": {
+        "required": false,
+        "pattern": null,
+        "description": "tagged and linked"
+      },
+      "page_numbers": {
+        "required": true,
+        "pattern": null,
+        "description": null
+      }
+    },
+    "notes": [
+      "Factsheets are typically single page or spreads",
+      "Compact layout with emphasis on visual communication",
+      "No ISBN required for factsheets"
+    ]
+  },
+  "brief": {
+    "name": "Policy Brief",
+    "description": "4-8 page documents with executive summary and recommendations",
+    "cover": {
+      "logo": {
+        "position": "top-right",
+        "width_min": 20.0,
+        "width_target": 27.5,
+        "height": null,
+        "enabled": true
+      },
+      "back_logo_position": null,
+      "title_size": {
+        "min": 28.0,
+        "max": 34.0,
+        "target": null,
+        "unit": "pt"
+      },
+      "subtitle_size": {
+        "min": 12.0,
+        "max": 14.0,
+        "target": null,
+        "unit": "pt"
+      },
+      "heading_color": "#00AEEF",
+      "partner_logo_spacing": 10.0,
+      "cover_image_dpi": 300
+    },
+    "typography": {
+      "body": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 10.0,
+          "max": 12.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": null,
+        "style": null,
+        "enabled": true
+      },
+      "h1": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 18.0,
+          "max": 24.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Bold",
+        "color": "#00AEEF",
+        "style": null,
+        "enabled": true
+      },
+      "h2": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 14.0,
+          "max": 16.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Bold",
+        "color": "#00AEEF",
+        "style": null,
+        "enabled": true
+      },
+      "h3": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 12.0,
+          "max": 14.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": "#00AEEF",
+        "style": "underlined",
+        "enabled": true
+      },
+      "h4": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 10.0,
+          "max": 12.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Bold",
+        "color": null,
+        "style": null,
+        "enabled": true
+      },
+      "captions": {
+        "family": "Roboto",
+        "fallback": "Roboto",
+        "size": {
+          "min": 8.0,
+          "max": 9.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": null,
+        "style": null,
+        "enabled": true
+      },
+      "charts": {
+        "family": "Roboto Condensed",
+        "fallback": "Roboto",
+        "size": {
+          "min": 8.0,
+          "max": 8.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": null,
+        "style": null,
+        "enabled": true
+      }
+    },
+    "images": {
+      "min_dpi": 300,
+      "max_width": null,
+      "color_spaces": [
+        "RGB",
+        "CMYK"
+      ],
+      "chart_stroke_weight": null,
+      "enabled": true
+    },
+    "margins": {
+      "top": {
+        "min": 20.0,
+        "max": 25.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "bottom": {
+        "min": 20.0,
+        "max": 25.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "inside": {
+        "min": 20.0,
+        "max": 25.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "outside": {
+        "min": 20.0,
+        "max": 25.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "full_bleed_allowed": true
+    },
+    "required_elements": {
+      "isbn": {
+        "required": false,
+        "pattern": "ISBN 978-xxx or 979-xxx",
+        "description": null
+      },
+      "doi": {
+        "required": false,
+        "pattern": null,
+        "description": null
+      },
+      "job_number": {
+        "required": false,
+        "pattern": null,
+        "description": null
+      },
+      "copyright_notice": {
+        "required": false,
+        "pattern": "(C) [year] United Nations Environment Programme",
+        "description": null
+      },
+      "territorial_disclaimer": {
+        "required": false,
+        "pattern": null,
+        "description": "designations employed...do not imply...opinion...United Nations"
+      },
+      "commercial_disclaimer": {
+        "required": false,
+        "pattern": null,
+        "description": "mention of...commercial products...does not imply endorsement"
+      },
+      "views_disclaimer": {
+        "required": false,
+        "pattern": null,
+        "description": "views expressed...do not necessarily reflect...United Nations"
+      },
+      "suggested_citation": {
+        "required": false,
+        "pattern": null,
+        "description": null
+      },
+      "sdg_icons": {
+        "required": false,
+        "pattern": null,
+        "description": "1-3 SDG icons should be displayed"
+      },
+      "table_of_contents": {
+        "required": false,
+        "pattern": null,
+        "description": "tagged and linked"
+      },
+      "page_numbers": {
+        "required": true,
+        "pattern": null,
+        "description": null
+      }
+    },
+    "notes": [
+      "Policy briefs focus on actionable recommendations",
+      "Executive summary should be concise (1-2 paragraphs)",
+      "No ISBN required for briefs"
+    ]
+  },
+  "working_paper": {
+    "name": "Working Paper",
+    "description": "10-30 page research documents with detailed analysis",
+    "cover": {
+      "logo": {
+        "position": "top-right",
+        "width_min": 20.0,
+        "width_target": 27.5,
+        "height": null,
+        "enabled": true
+      },
+      "back_logo_position": null,
+      "title_size": {
+        "min": 28.0,
+        "max": 34.0,
+        "target": null,
+        "unit": "pt"
+      },
+      "subtitle_size": {
+        "min": 12.0,
+        "max": 14.0,
+        "target": null,
+        "unit": "pt"
+      },
+      "heading_color": "#00AEEF",
+      "partner_logo_spacing": 10.0,
+      "cover_image_dpi": 300
+    },
+    "typography": {
+      "body": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 10.0,
+          "max": 12.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": null,
+        "style": null,
+        "enabled": true
+      },
+      "h1": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 18.0,
+          "max": 24.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Bold",
+        "color": "#00AEEF",
+        "style": null,
+        "enabled": true
+      },
+      "h2": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 14.0,
+          "max": 16.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Bold",
+        "color": "#00AEEF",
+        "style": null,
+        "enabled": true
+      },
+      "h3": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 12.0,
+          "max": 14.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": "#00AEEF",
+        "style": null,
+        "enabled": true
+      },
+      "h4": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 10.0,
+          "max": 12.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Bold",
+        "color": null,
+        "style": null,
+        "enabled": true
+      },
+      "captions": {
+        "family": "Roboto",
+        "fallback": "Roboto",
+        "size": {
+          "min": 8.0,
+          "max": 9.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": null,
+        "style": null,
+        "enabled": true
+      },
+      "charts": {
+        "family": "Roboto Condensed",
+        "fallback": "Roboto",
+        "size": {
+          "min": 8.0,
+          "max": 8.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": null,
+        "style": null,
+        "enabled": true
+      }
+    },
+    "images": {
+      "min_dpi": 300,
+      "max_width": null,
+      "color_spaces": [
+        "RGB",
+        "CMYK"
+      ],
+      "chart_stroke_weight": null,
+      "enabled": true
+    },
+    "margins": {
+      "top": {
+        "min": 20.0,
+        "max": 25.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "bottom": {
+        "min": 20.0,
+        "max": 25.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "inside": {
+        "min": 20.0,
+        "max": 30.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "outside": {
+        "min": 20.0,
+        "max": 25.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "full_bleed_allowed": true
+    },
+    "required_elements": {
+      "isbn": {
+        "required": false,
+        "pattern": "ISBN 978-xxx or 979-xxx",
+        "description": null
+      },
+      "doi": {
+        "required": false,
+        "pattern": null,
+        "description": null
+      },
+      "job_number": {
+        "required": false,
+        "pattern": null,
+        "description": null
+      },
+      "copyright_notice": {
+        "required": false,
+        "pattern": "(C) [year] United Nations Environment Programme",
+        "description": null
+      },
+      "territorial_disclaimer": {
+        "required": false,
+        "pattern": null,
+        "description": "designations employed...do not imply...opinion...United Nations"
+      },
+      "commercial_disclaimer": {
+        "required": false,
+        "pattern": null,
+        "description": "mention of...commercial products...does not imply endorsement"
+      },
+      "views_disclaimer": {
+        "required": false,
+        "pattern": null,
+        "description": "views expressed...do not necessarily reflect...United Nations"
+      },
+      "suggested_citation": {
+        "required": false,
+        "pattern": null,
+        "description": null
+      },
+      "sdg_icons": {
+        "required": false,
+        "pattern": null,
+        "description": "1-3 SDG icons should be displayed"
+      },
+      "table_of_contents": {
+        "required": true,
+        "pattern": null,
+        "description": "recommended for longer papers"
+      },
+      "page_numbers": {
+        "required": true,
+        "pattern": null,
+        "description": null
+      }
+    },
+    "notes": [
+      "Working papers present research in progress",
+      "More detailed methodology and analysis sections",
+      "May have table of contents for longer papers"
+    ]
+  },
+  "publication": {
+    "name": "Publication",
+    "description": "Formal UNEP publications with full metadata requirements",
+    "cover": {
+      "logo": {
+        "position": "top-right",
+        "width_min": 20.0,
+        "width_target": 27.5,
+        "height": 30.0,
+        "enabled": true
+      },
+      "back_logo_position": "bottom-left",
+      "title_size": {
+        "min": 28.0,
+        "max": 34.0,
+        "target": null,
+        "unit": "pt"
+      },
+      "subtitle_size": {
+        "min": 12.0,
+        "max": 14.0,
+        "target": null,
+        "unit": "pt"
+      },
+      "heading_color": "#00AEEF",
+      "partner_logo_spacing": 10.0,
+      "cover_image_dpi": 300
+    },
+    "typography": {
+      "body": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 9.0,
+          "max": 12.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": null,
+        "style": null,
+        "enabled": true
+      },
+      "h1": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 18.0,
+          "max": 24.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Bold",
+        "color": "#00AEEF",
+        "style": null,
+        "enabled": true
+      },
+      "h2": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 14.0,
+          "max": 18.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Bold",
+        "color": "#00AEEF",
+        "style": null,
+        "enabled": true
+      },
+      "h3": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 12.0,
+          "max": 14.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": "#00AEEF",
+        "style": "underlined",
+        "enabled": true
+      },
+      "h4": {
+        "family": "Roboto Flex",
+        "fallback": "Roboto",
+        "size": {
+          "min": 10.0,
+          "max": 12.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Bold",
+        "color": null,
+        "style": null,
+        "enabled": true
+      },
+      "captions": {
+        "family": "Roboto",
+        "fallback": "Roboto",
+        "size": {
+          "min": 7.0,
+          "max": 7.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": null,
+        "style": null,
+        "enabled": true
+      },
+      "charts": {
+        "family": "Roboto Condensed",
+        "fallback": "Roboto",
+        "size": {
+          "min": 8.0,
+          "max": 8.0,
+          "target": null,
+          "unit": "pt"
+        },
+        "weight": "Regular",
+        "color": null,
+        "style": null,
+        "enabled": true
+      }
+    },
+    "images": {
+      "min_dpi": 300,
+      "max_width": 160.0,
+      "color_spaces": [
+        "RGB",
+        "CMYK"
+      ],
+      "chart_stroke_weight": {
+        "min": 0.3,
+        "max": 0.4,
+        "target": null,
+        "unit": "pt"
+      },
+      "enabled": true
+    },
+    "margins": {
+      "top": {
+        "min": 20.0,
+        "max": 25.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "bottom": {
+        "min": 20.0,
+        "max": 30.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "inside": {
+        "min": 20.0,
+        "max": 30.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "outside": {
+        "min": 20.0,
+        "max": 25.0,
+        "target": null,
+        "unit": "mm"
+      },
+      "full_bleed_allowed": true
+    },
+    "required_elements": {
+      "isbn": {
+        "required": true,
+        "pattern": "ISBN 978-xxx or 979-xxx",
+        "description": null
+      },
+      "doi": {
+        "required": true,
+        "pattern": null,
+        "description": null
+      },
+      "job_number": {
+        "required": true,
+        "pattern": null,
+        "description": "UNEP job number"
+      },
+      "copyright_notice": {
+        "required": true,
+        "pattern": "(C) [year] United Nations Environment Programme",
+        "description": null
+      },
+      "territorial_disclaimer": {
+        "required": true,
+        "pattern": null,
+        "description": "designations employed...do not imply...opinion...United Nations"
+      },
+      "commercial_disclaimer": {
+        "required": true,
+        "pattern": null,
+        "description": "mention of...commercial products...does not imply endorsement"
+      },
+      "views_disclaimer": {
+        "required": true,
+        "pattern": null,
+        "description": "views expressed...do not necessarily reflect...United Nations"
+      },
+      "suggested_citation": {
+        "required": true,
+        "pattern": null,
+        "description": null
+      },
+      "sdg_icons": {
+        "required": true,
+        "pattern": null,
+        "description": "1-3 SDG icons should be displayed"
+      },
+      "table_of_contents": {
+        "required": true,
+        "pattern": null,
+        "description": "tagged and linked"
+      },
+      "page_numbers": {
+        "required": true,
+        "pattern": null,
+        "description": "Roman numerals for front matter, Arabic for main content"
+      }
+    },
+    "notes": [
+      "Publications are formal UNEP documents requiring all metadata",
+      "Pay attention to heading hierarchy consistency",
+      "Cross-reference table of contents with actual page numbers"
+    ]
+  }
+}

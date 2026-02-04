@@ -238,7 +238,7 @@ export function useRuleSettings(documentType: DocumentTypeId): UseRuleSettingsRe
   const loadRules = useCallback(async () => {
     dispatch({ type: 'LOADING' });
     try {
-      const response = await fetch(`http://localhost:8002/api/rules/${documentType}`);
+      const response = await fetch(`/api/rules/${documentType}`);
       if (!response.ok) {
         throw new Error(`Failed to load rules: ${response.statusText}`);
       }
@@ -289,7 +289,7 @@ export function useRuleSettings(documentType: DocumentTypeId): UseRuleSettingsRe
     dispatch({ type: 'SAVE_START' });
     try {
       const overrides = computeOverrides(state.originalRules, state.rules);
-      const response = await fetch(`http://localhost:8002/api/rules/${documentType}`, {
+      const response = await fetch(`/api/rules/${documentType}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(overrides),
@@ -314,7 +314,7 @@ export function useRuleSettings(documentType: DocumentTypeId): UseRuleSettingsRe
   // Reset to template defaults via API (deletes user overrides)
   const resetToDefaults = useCallback(async () => {
     try {
-      const response = await fetch(`http://localhost:8002/api/rules/${documentType}/reset`, {
+      const response = await fetch(`/api/rules/${documentType}/reset`, {
         method: 'POST',
       });
       if (!response.ok) {

@@ -1,45 +1,36 @@
-# Brief / Policy Brief / Working Paper / Issue Note Design Requirements
+# Policy Brief Design Requirements
 
 ## Cover Page
-- UNEP logo on front: top-right corner, minimum 20mm width, target 27.5mm
-- UNEP logo on back: bottom-left corner, minimum 20mm width
-- Document type label: Must show "POLICY BRIEF", "WORKING PAPER", or "ISSUE NOTE"
-- Main title: 24-32pt, UNEP Cyan (#00ADD8)
-- Cover image: minimum 300 DPI
-- Partner logos: inner pages only (unless joint copyright)
+- UNEP logo: top-right corner, minimum 20.0mm width, target 27.5mm
+- Main title: 28.0-34.0pt
+- Subtitle: 12.0-14.0pt
+- Heading color: UNEP Cyan (#00AEEF)
+- Partner logos: 10.0mm spacing from other elements
 
 ## Typography
-- Body text: Sans-serif font (Arial, Helvetica, Roboto, or Roboto Flex)
-- One-column layout: 11-12pt body text
-- Two-column layout: 9-10pt body text
-- H1 headings: 24-32pt, bold, UNEP Cyan (#00ADD8)
-- H2 headings: 18-22pt, bold, UNEP Cyan (#00ADD8)
-- H3 headings: 14-16pt, bold, UNEP Cyan (#00ADD8)
-- H4 headings: 12pt, bold, black
+- Body text: 10.0-12.0pt, Roboto Flex preferred (Roboto acceptable)
+- Chapter titles (H1): 18.0-24.0pt, Roboto Flex preferred (Roboto acceptable), bold, color #00AEEF
+- Section headings (H2): 14.0-16.0pt, Roboto Flex preferred (Roboto acceptable), bold, color #00AEEF
+- Subsection headings (H3): 12.0-14.0pt, Roboto Flex preferred (Roboto acceptable), color #00AEEF, underlined
+- Sub-subsection (H4): 10.0-12.0pt, Roboto Flex preferred (Roboto acceptable), bold
+- Captions: 8.0-9.0pt, Roboto
+- Charts/axis labels: 8.0pt, Roboto Condensed preferred (Roboto acceptable)
 
 ## Images
-- Minimum DPI: 300 for print, 150 for web-only
-- Figure captions: Follow "Figure N: Description" format
-- Table captions: Follow "Table N: Description" format
+- Minimum DPI: 300 for print quality
+- Color space: RGB or CMYK
 
 ## Margins
-- Top margin: 23-27mm (target 25mm)
-- Bottom margin: 18-22mm (target 20mm)
-- Inside margin (binding): 18-22mm (target 20mm)
-- Outside margin: 18-22mm (target 20mm)
+- Top margin: 20.0-25.0mm
+- Bottom margin: 20.0-25.0mm
+- Inside margin (binding): 20.0-25.0mm
+- Outside margin: 20.0-25.0mm
 - Full-bleed images are acceptable and intentional
 
 ## Required Elements
-- Copyright notice: (C) United Nations Environment Programme
-- Standard disclaimers (territorial, commercial, views)
-- Suggested citation: "United Nations Environment Programme (year)"
-- Page numbers
+- Page numbers: Must be present
 
-## Optional Elements
-- DOI (when assigned)
-
-## Notes
-- Briefs and working papers follow similar design rules
-- Issue notes use the same template as briefs
-- Emphasis on clear visual hierarchy and readability
-- Two-column layouts allow smaller body text
+## Additional Rules
+- Policy briefs focus on actionable recommendations
+- Executive summary should be concise (1-2 paragraphs)
+- No ISBN required for briefs

@@ -1,41 +1,37 @@
 # Working Paper Design Requirements
 
-Working papers follow the same design requirements as Policy Briefs and Issue Notes. See the brief.md file for complete specifications.
-
-## Key Differences from Full Publications
-- ISBN is NOT required for working papers
-- DOI is optional
-- Less formal metadata requirements
-- More flexibility in layout choices
-
 ## Cover Page
-- UNEP logo on front: top-right corner, minimum 20mm width, target 27.5mm
-- UNEP logo on back: bottom-left corner, minimum 20mm width
-- Document type label: Must show "WORKING PAPER"
-- Main title: 24-32pt, UNEP Cyan (#00ADD8)
-- Cover image: minimum 300 DPI
+- UNEP logo: top-right corner, minimum 20.0mm width, target 27.5mm
+- Main title: 28.0-34.0pt
+- Subtitle: 12.0-14.0pt
+- Heading color: UNEP Cyan (#00AEEF)
+- Partner logos: 10.0mm spacing from other elements
 
 ## Typography
-- Body text: Sans-serif font (Arial, Helvetica, Roboto, or Roboto Flex)
-- One-column layout: 11-12pt body text
-- Two-column layout: 9-10pt body text
-- Consistent heading hierarchy using UNEP Cyan for major headings
+- Body text: 10.0-12.0pt, Roboto Flex preferred (Roboto acceptable)
+- Chapter titles (H1): 18.0-24.0pt, Roboto Flex preferred (Roboto acceptable), bold, color #00AEEF
+- Section headings (H2): 14.0-16.0pt, Roboto Flex preferred (Roboto acceptable), bold, color #00AEEF
+- Subsection headings (H3): 12.0-14.0pt, Roboto Flex preferred (Roboto acceptable), color #00AEEF
+- Sub-subsection (H4): 10.0-12.0pt, Roboto Flex preferred (Roboto acceptable), bold
+- Captions: 8.0-9.0pt, Roboto
+- Charts/axis labels: 8.0pt, Roboto Condensed preferred (Roboto acceptable)
 
 ## Images
-- Minimum DPI: 300 for print
-- Figure/table captions following standard format
+- Minimum DPI: 300 for print quality
+- Color space: RGB or CMYK
 
 ## Margins
-- Target: 20-25mm on all sides
-- Inside margin may be slightly larger for binding
+- Top margin: 20.0-25.0mm
+- Bottom margin: 20.0-25.0mm
+- Inside margin (binding): 20.0-30.0mm
+- Outside margin: 20.0-25.0mm
+- Full-bleed images are acceptable and intentional
 
 ## Required Elements
-- Copyright notice
-- Standard disclaimers
-- Suggested citation
-- Page numbers
+- Table of contents: Must be present - recommended for longer papers
+- Page numbers: Must be present
 
-## Notes
-- Working papers are less formal than full publications
-- Focus on content clarity and readability
-- Standard academic paper formatting acceptable
+## Additional Rules
+- Working papers present research in progress
+- More detailed methodology and analysis sections
+- May have table of contents for longer papers

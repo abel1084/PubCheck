@@ -29,7 +29,7 @@ export function DropZone({ onFileAccepted, isProcessing, error }: DropZoneProps)
   };
 
   return (
-    <div style={{ padding: '40px', maxWidth: '600px', margin: '0 auto' }}>
+    <div style={{ padding: '40px', maxWidth: '600px', width: '100%', margin: '0 auto' }}>
       {error && (
         <Alert
           message="Upload Error"
@@ -40,7 +40,7 @@ export function DropZone({ onFileAccepted, isProcessing, error }: DropZoneProps)
         />
       )}
 
-      <Dragger {...uploadProps}>
+      <Dragger {...uploadProps} style={{ padding: '0 40px' }}>
         {isProcessing ? (
           <div style={{ padding: '40px 0' }}>
             <Spin size="large" />
@@ -53,7 +53,7 @@ export function DropZone({ onFileAccepted, isProcessing, error }: DropZoneProps)
             <p className="ant-upload-drag-icon">
               <InboxOutlined />
             </p>
-            <p className="ant-upload-text">
+            <p className="ant-upload-text" style={{ padding: '0 24px' }}>
               Drop PDF here or click to browse
             </p>
             <p className="ant-upload-hint">
