@@ -3,13 +3,11 @@ FROM node:20-slim AS frontend-builder
 
 WORKDIR /app/frontend
 
-# Copy package files and install dependencies
-COPY frontend/package*.json ./
-RUN npm ci
-
-# Copy frontend source and build
+# Copy ALL frontend files first to ensure fresh build
 COPY frontend/ ./
-RUN npm run build
+
+# Install dependencies and build
+RUN npm ci && npm run build
 
 # Stage 2: Python backend with built frontend
 FROM python:3.12-slim
