@@ -40,8 +40,9 @@ export function useAIReview() {
     const formData = new FormData();
     formData.append('file', file);
 
-    // Send extraction as JSON string (backend expects Form field, not file)
-    formData.append('extraction', JSON.stringify(extraction));
+    // Send extraction as file to bypass form field size limits for large documents
+    const extractionBlob = new Blob([JSON.stringify(extraction)], { type: 'application/json' });
+    formData.append('extraction_file', extractionBlob, 'extraction.json');
 
     formData.append('document_type', documentType);
     formData.append('confidence', confidence.toString());

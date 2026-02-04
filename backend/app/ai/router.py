@@ -81,7 +81,7 @@ async def generate_review_events(
 @router.post("/review")
 async def review_pdf(
     file: UploadFile = File(...),
-    extraction: str = Form(...),
+    extraction_file: UploadFile = File(...),
     document_type: str = Form(...),
     confidence: float = Form(...),
     output_format: str = Form("digital"),
@@ -93,7 +93,7 @@ async def review_pdf(
 
     Args:
         file: The PDF file to review
-        extraction: JSON string of ExtractionResult
+        extraction_file: JSON file containing ExtractionResult (supports large documents)
         document_type: Type of document (factsheet, publication, etc.)
         confidence: Document type detection confidence (0-1)
         output_format: Output format for DPI rules (digital, print, both)
@@ -119,16 +119,17 @@ async def review_pdf(
                 detail=f"Invalid document_type: {document_type}. Must be one of: {valid_types}"
             )
 
-        # Parse extraction JSON
+        # Read and parse extraction JSON from file
         try:
-            extraction_data = ExtractionResult.model_validate_json(extraction)
+            extraction_bytes = await extraction_file.read()
+            extraction_data = ExtractionResult.model_validate_json(extraction_bytes)
         except Exception as e:
             raise HTTPException(
                 status_code=400,
                 detail=f"Invalid extraction JSON: {e}"
             )
 
-        logger.info(f"Extraction parsed: {extraction_data.metadata.page_count} pages")
+        logger.info(f"Extraction parsed: {extraction_data.metadata.page_count} pages, {len(extraction_bytes)} bytes")
 
         # Read PDF bytes
         pdf_bytes = await file.read()
