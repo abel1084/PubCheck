@@ -7,6 +7,3 @@ healthcheckPath = "/api/health"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
-
-[[services]]
-port = 8003
