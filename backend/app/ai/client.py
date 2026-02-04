@@ -3,11 +3,14 @@ Google Gemini client wrapper with native PDF support and streaming.
 Uses Gemini 2.5 Flash with thinking mode for AI-powered document review.
 """
 import io
+import logging
 import os
 from typing import AsyncGenerator, Optional
 
 from google import genai
 from google.genai import types
+
+logger = logging.getLogger(__name__)
 
 
 class AIClientError(Exception):
@@ -94,15 +97,21 @@ class AIClient:
         uploaded_file = None
 
         try:
+            pdf_size = len(pdf_bytes)
+            logger.info(f"PDF size: {pdf_size} bytes ({pdf_size/1024:.1f}KB)")
+
             # Use File API for large PDFs, inline for small ones
-            if len(pdf_bytes) > self.INLINE_SIZE_LIMIT:
+            if pdf_size > self.INLINE_SIZE_LIMIT:
+                logger.info(f"Using Files API (size {pdf_size} > limit {self.INLINE_SIZE_LIMIT})")
                 # Upload large file first
                 uploaded_file = self._upload_file(pdf_bytes)
+                logger.info(f"File uploaded: {uploaded_file.name}, uri={uploaded_file.uri}")
                 pdf_part = types.Part.from_uri(
                     file_uri=uploaded_file.uri,
                     mime_type="application/pdf"
                 )
             else:
+                logger.info(f"Using inline bytes (size {pdf_size} <= limit {self.INLINE_SIZE_LIMIT})")
                 # Use inline bytes for small files
                 pdf_part = types.Part.from_bytes(
                     data=pdf_bytes,
@@ -142,6 +151,7 @@ class AIClient:
                                         yield part.text
 
         except Exception as e:
+            logger.error(f"AI API error: {type(e).__name__}: {e}")
             error_str = str(e).lower()
 
             if "invalid" in error_str and "key" in error_str:
@@ -150,7 +160,7 @@ class AIClient:
             if "rate" in error_str or "quota" in error_str or "429" in error_str:
                 raise AIClientError(f"Rate limit exceeded: {e}") from e
 
-            if "too large" in error_str or "size" in error_str:
+            if "too large" in error_str or "size" in error_str or "1024kb" in error_str:
                 raise AIClientError(f"Document too large for processing: {e}") from e
 
             raise AIClientError(f"API error: {e}") from e
