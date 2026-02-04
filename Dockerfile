@@ -6,6 +6,10 @@ WORKDIR /app/frontend
 # Copy ALL frontend files first to ensure fresh build
 COPY frontend/ ./
 
+# Debug: list hooks and types directories
+RUN echo "=== Contents of src/hooks ===" && ls -la src/hooks/ && \
+    echo "=== Contents of src/types ===" && ls -la src/types/
+
 # Install dependencies and build
 RUN npm ci && npm run build
 
