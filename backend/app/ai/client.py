@@ -34,6 +34,7 @@ class AIClient:
     DEFAULT_MODEL = "gemini-2.5-flash"
     DEFAULT_MAX_TOKENS = 16384  # Gemini supports larger outputs
     INLINE_SIZE_LIMIT = 900 * 1024  # 900KB - stay under 1MB inline limit
+    MAX_PDF_SIZE = 20 * 1024 * 1024  # 20MB - practical limit for token context
 
     def __init__(self):
         """Initialize the AI client. API key validated on first use."""
@@ -100,6 +101,14 @@ class AIClient:
             pdf_size = len(pdf_bytes)
             logger.info(f"PDF size: {pdf_size} bytes ({pdf_size/1024:.1f}KB)")
 
+            # Pre-check for documents likely to exceed token limits
+            if pdf_size > self.MAX_PDF_SIZE:
+                raise AIClientError(
+                    f"Document too large ({pdf_size/1024/1024:.1f}MB). "
+                    f"Maximum supported size is {self.MAX_PDF_SIZE/1024/1024:.0f}MB. "
+                    "Try a shorter document."
+                )
+
             # Use File API for large PDFs, inline for small ones
             if pdf_size > self.INLINE_SIZE_LIMIT:
                 logger.info(f"Using Files API (size {pdf_size} > limit {self.INLINE_SIZE_LIMIT})")
@@ -158,7 +167,15 @@ class AIClient:
                 raise AIConfigurationError(f"Invalid API key: {e}") from e
 
             if "rate" in error_str or "quota" in error_str or "429" in error_str:
-                raise AIClientError(f"Rate limit exceeded: {e}") from e
+                raise AIClientError(
+                    "Rate limit exceeded. Please wait a moment and try again."
+                ) from e
+
+            if "token" in error_str and ("exceed" in error_str or "limit" in error_str):
+                raise AIClientError(
+                    "Document too large for AI review. The 105+ page document exceeds "
+                    "the model's context limit. Try reviewing a shorter document (under 50 pages)."
+                ) from e
 
             if "too large" in error_str or "size" in error_str or "1024kb" in error_str:
                 raise AIClientError(f"Document too large for processing: {e}") from e
