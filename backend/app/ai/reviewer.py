@@ -407,21 +407,42 @@ async def review_document(
     """
     Stream AI document review.
 
-    Sends PDF + extraction + rules context to Claude and yields text chunks.
+    Automatically detects large documents and delegates to chunked review.
+    For documents over 40 pages, splits into chunks and processes in parallel.
+    For smaller documents, processes directly.
 
     Args:
         pdf_bytes: Raw PDF file bytes
         extraction: Extracted document data
         document_type: Document type ID
         confidence: Document type detection confidence
+        output_format: Output format (digital, print, both)
 
     Yields:
-        Text chunks from AI response
+        Text chunks from AI response (or JSON events for chunked review)
 
     Raises:
         AIClientError: On API errors
         FileNotFoundError: If rules context missing
     """
+    # Check if document needs chunking
+    chunker = DocumentChunker()
+    if chunker.needs_chunking(extraction.metadata.page_count):
+        logger.info(
+            f"Large document ({extraction.metadata.page_count} pages) - "
+            "using chunked review"
+        )
+        async for event in review_document_chunked(
+            pdf_bytes=pdf_bytes,
+            extraction=extraction,
+            document_type=document_type,
+            confidence=confidence,
+            output_format=output_format,
+        ):
+            yield event
+        return
+
+    # Standard review for smaller documents
     # DPI requirements by output format
     DPI_REQUIREMENTS = {
         "digital": {"min": 72, "label": "Digital"},
@@ -440,7 +461,10 @@ async def review_document(
         extraction_json, document_type, confidence, output_format, dpi_info["min"]
     )
 
-    logger.info(f"Starting review: {extraction.metadata.page_count} pages, type={document_type}, format={output_format} ({dpi_info['min']} DPI)")
+    logger.info(
+        f"Starting review: {extraction.metadata.page_count} pages, "
+        f"type={document_type}, format={output_format} ({dpi_info['min']} DPI)"
+    )
 
     # Stream from AI client
     client = get_ai_client()
