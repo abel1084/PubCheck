@@ -14,14 +14,14 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 
 ```
 Phase: 9 of 9 - Chunked Document Review
-Plan:  03 of 5
+Plan:  04 of 5
 Status: In progress
-Last activity: 2026-02-05 - Completed 09-03-PLAN.md (chunked review orchestration)
+Last activity: 2026-02-05 - Completed 09-04-PLAN.md (chunk progress wiring)
 
 [=============================] ~99%
 ```
 
-**Current Plan:** 09-03 complete, continuing to 09-04
+**Current Plan:** 09-04 complete, continuing to 09-05
 
 ## Progress
 
@@ -36,13 +36,13 @@ Last activity: 2026-02-05 - Completed 09-03-PLAN.md (chunked review orchestratio
 | 7 | AI-First Architecture Overhaul | Complete | 8/8 |
 | 7.1 | AI Review Fixes | Complete | 4/4 |
 | 8 | Ant Design Frontend Refactor | Complete | 8/8 |
-| 9 | Chunked Document Review | In Progress | 3/5 |
+| 9 | Chunked Document Review | In Progress | 4/5 |
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans completed | 50 |
+| Plans completed | 51 |
 | Plans failed | 0 |
 | Total iterations | 27 |
 | Avg iterations/plan | 1.0 |
@@ -168,6 +168,7 @@ Last activity: 2026-02-05 - Completed 09-03-PLAN.md (chunked review orchestratio
 | Issue hash key: title+min_page+category | Stable identity across chunk overlaps | 09-03 |
 | asyncio.as_completed for chunk progress | Emit progress events as chunks complete, not in order | 09-03 |
 | Merged review structure | Combine prose sections, deduplicate JSON issues | 09-03 |
+| JSON detection for chunked mode | Try JSON.parse, catch for plaintext | 09-04 |
 
 ### Roadmap Evolution
 
@@ -191,8 +192,8 @@ Last activity: 2026-02-05 - Completed 09-03-PLAN.md (chunked review orchestratio
 
 ## Session Continuity
 
-Last session: 2026-02-05T22:00:00Z
-Stopped at: Completed 09-03-PLAN.md (chunked review orchestration)
+Last session: 2026-02-05T18:20:00Z
+Stopped at: Completed 09-04-PLAN.md (chunk progress wiring)
 Resume file: None
 
 ## Session Log
@@ -261,7 +262,8 @@ Resume file: None
 | 2026-02-05 | Phase 9 started | Chunked Document Review for large PDFs |
 | 2026-02-05 | Completed 09-01 | Chunking foundation: DocumentChunker, extract_page_range, filter_extraction_for_chunk, build_chunk_user_prompt (5 min) |
 | 2026-02-05 | Completed 09-03 | Chunked review orchestration: parallel processing, deduplication, auto-delegation (4 min) |
+| 2026-02-05 | Completed 09-04 | Chunk progress wiring: router events + hook state management (5 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-02-05T22:00:00Z*
+*Last updated: 2026-02-05T18:20:00Z*
