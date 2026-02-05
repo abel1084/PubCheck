@@ -14,14 +14,14 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 
 ```
 Phase: 9 of 9 - Chunked Document Review
-Plan:  01 of 5
+Plan:  03 of 5
 Status: In progress
-Last activity: 2026-02-05 - Completed 09-01-PLAN.md (chunking foundation)
+Last activity: 2026-02-05 - Completed 09-03-PLAN.md (chunked review orchestration)
 
-[=============================] ~98%
+[=============================] ~99%
 ```
 
-**Current Plan:** 09-01 complete, continuing to 09-02
+**Current Plan:** 09-03 complete, continuing to 09-04
 
 ## Progress
 
@@ -36,13 +36,13 @@ Last activity: 2026-02-05 - Completed 09-01-PLAN.md (chunking foundation)
 | 7 | AI-First Architecture Overhaul | Complete | 8/8 |
 | 7.1 | AI Review Fixes | Complete | 4/4 |
 | 8 | Ant Design Frontend Refactor | Complete | 8/8 |
-| 9 | Chunked Document Review | In Progress | 1/5 |
+| 9 | Chunked Document Review | In Progress | 3/5 |
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans completed | 48 |
+| Plans completed | 50 |
 | Plans failed | 0 |
 | Total iterations | 27 |
 | Avg iterations/plan | 1.0 |
@@ -165,6 +165,9 @@ Last activity: 2026-02-05 - Completed 09-01-PLAN.md (chunking foundation)
 | 2-page overlap between chunks | Context continuity across chunk boundaries | 09-01 |
 | 40-page threshold for chunking | Small documents don't need chunking overhead | 09-01 |
 | Preserve actual page numbers | AI findings must reference correct document pages | 09-01 |
+| Issue hash key: title+min_page+category | Stable identity across chunk overlaps | 09-03 |
+| asyncio.as_completed for chunk progress | Emit progress events as chunks complete, not in order | 09-03 |
+| Merged review structure | Combine prose sections, deduplicate JSON issues | 09-03 |
 
 ### Roadmap Evolution
 
@@ -188,8 +191,8 @@ Last activity: 2026-02-05 - Completed 09-01-PLAN.md (chunking foundation)
 
 ## Session Continuity
 
-Last session: 2026-02-05T21:15:00Z
-Stopped at: Completed 09-01-PLAN.md (chunking foundation)
+Last session: 2026-02-05T22:00:00Z
+Stopped at: Completed 09-03-PLAN.md (chunked review orchestration)
 Resume file: None
 
 ## Session Log
@@ -257,7 +260,8 @@ Resume file: None
 | 2026-02-01 | Phase 8 Complete | All 8 plans executed, antd refactor finished |
 | 2026-02-05 | Phase 9 started | Chunked Document Review for large PDFs |
 | 2026-02-05 | Completed 09-01 | Chunking foundation: DocumentChunker, extract_page_range, filter_extraction_for_chunk, build_chunk_user_prompt (5 min) |
+| 2026-02-05 | Completed 09-03 | Chunked review orchestration: parallel processing, deduplication, auto-delegation (4 min) |
 
 ---
 *State initialized: 2026-01-31*
-*Last updated: 2026-02-05T21:15:00Z*
+*Last updated: 2026-02-05T22:00:00Z*
