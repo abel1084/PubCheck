@@ -2,15 +2,19 @@
 Document reviewer module.
 Orchestrates AI document review by combining PDF, extraction, and rules context.
 """
+import asyncio
+import hashlib
 import json
 import logging
+import re
 from pathlib import Path
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator, Dict, List
 
 from app.models.extraction import ExtractionResult
 
+from .chunker import DocumentChunker, extract_page_range, filter_extraction_for_chunk
 from .client import get_ai_client
-from .prompts import build_system_prompt, build_user_prompt
+from .prompts import build_chunk_user_prompt, build_system_prompt, build_user_prompt
 
 
 logger = logging.getLogger(__name__)
@@ -26,6 +30,36 @@ RULES_CONTEXT_MAP = {
     "working-paper": "working_paper.md",
     "publication": "publication.md",
 }
+
+
+def deduplicate_issues(all_issues: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Remove duplicate issues from chunk overlaps.
+
+    Deduplicates by hashing (title + min_page + category).
+    For duplicates, keeps the first occurrence.
+
+    Args:
+        all_issues: List of issue dicts from parsed JSON
+
+    Returns:
+        Deduplicated list of issues
+    """
+    seen = set()
+    unique = []
+
+    for issue in all_issues:
+        # Create hash key from issue identity
+        pages = issue.get("pages", [1])
+        min_page = min(pages) if pages else 1
+        key_parts = f"{issue.get('title', '')}|{min_page}|{issue.get('category', '')}"
+        key = hashlib.md5(key_parts.encode()).hexdigest()
+
+        if key not in seen:
+            seen.add(key)
+            unique.append(issue)
+
+    return unique
 
 
 def load_rules_context(document_type: str) -> str:
