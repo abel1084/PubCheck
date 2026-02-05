@@ -33,27 +33,49 @@ async def generate_review_events(
     """
     Generate SSE events from AI review stream.
 
+    Handles both regular text streaming and chunked review events.
+    - Non-chunked review: yields plain text chunks, wrapped in text events
+    - Chunked review: yields JSON event objects, passed through with proper event types
+
     Yields:
         SSE event dicts with 'event' and 'data' keys
     """
+    chunked_mode = False
+
     try:
-        async for text_chunk in review_document(
+        async for item in review_document(
             pdf_bytes=pdf_bytes,
             extraction=extraction,
             document_type=document_type,
             confidence=confidence,
             output_format=output_format,
         ):
-            yield {
-                "event": "text",
-                "data": json.dumps({"text": text_chunk}),
-            }
+            # Check if item is JSON event object (chunked mode)
+            # vs plain text chunk (non-chunked mode)
+            try:
+                event_data = json.loads(item)
+                # JSON parsed successfully - this is a chunked review event
+                event_type = event_data.pop("event", "text")
+                chunked_mode = True
 
-        # Send completion event
-        yield {
-            "event": "complete",
-            "data": json.dumps({"status": "complete"}),
-        }
+                yield {
+                    "event": event_type,
+                    "data": json.dumps(event_data),
+                }
+            except json.JSONDecodeError:
+                # Plain text chunk (non-chunked review)
+                yield {
+                    "event": "text",
+                    "data": json.dumps({"text": item}),
+                }
+
+        # Send completion event only for non-chunked mode
+        # (chunked review already sends its own complete event)
+        if not chunked_mode:
+            yield {
+                "event": "complete",
+                "data": json.dumps({"status": "complete"}),
+            }
 
     except AIConfigurationError as e:
         logger.error(f"AI configuration error: {e}")
