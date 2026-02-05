@@ -124,6 +124,25 @@ export interface ReviewIssue {
 }
 
 /**
+ * Progress information for a single chunk during chunked review.
+ * Emitted as chunks complete processing.
+ */
+export interface ChunkProgress {
+  /** Chunk number (1-indexed) */
+  chunk: number;
+  /** Total number of chunks */
+  total: number;
+  /** Start page number (1-indexed, actual document page) */
+  startPage: number;
+  /** End page number (1-indexed, actual document page, inclusive) */
+  endPage: number;
+  /** Whether this chunk completed successfully */
+  success: boolean;
+  /** Error message if chunk failed */
+  error?: string;
+}
+
+/**
  * Parsed review sections from AI response.
  * AI produces prose review organized by these sections.
  */
@@ -151,6 +170,14 @@ export interface AIReviewState {
   isComplete: boolean;
   /** Error message if failed */
   error: string | null;
+  /** Whether document is being reviewed in chunks */
+  isChunked: boolean;
+  /** Total number of chunks (0 if not chunked) */
+  totalChunks: number;
+  /** Number of chunks completed so far */
+  completedChunks: number;
+  /** Progress info for each completed chunk */
+  chunkProgress: ChunkProgress[];
 }
 
 /** Initial empty AI review state */
@@ -166,6 +193,10 @@ export const INITIAL_AI_REVIEW_STATE: AIReviewState = {
   isStreaming: false,
   isComplete: false,
   error: null,
+  isChunked: false,
+  totalChunks: 0,
+  completedChunks: 0,
+  chunkProgress: [],
 };
 
 /**
