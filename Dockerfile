@@ -38,6 +38,15 @@ WORKDIR /app/backend
 # Expose default port (Railway overrides via PORT env var)
 EXPOSE 8003
 
-# Use shell form to allow PORT env var substitution
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8003}
+# Use gunicorn with uvicorn workers for production:
+# --max-requests 50: recycle worker after 50 requests to reclaim leaked memory
+# --max-requests-jitter 10: stagger restarts to avoid simultaneous recycling
+CMD gunicorn app.main:app \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --workers 1 \
+    --bind 0.0.0.0:${PORT:-8003} \
+    --max-requests 50 \
+    --max-requests-jitter 10 \
+    --timeout 600 \
+    --graceful-timeout 30
 
