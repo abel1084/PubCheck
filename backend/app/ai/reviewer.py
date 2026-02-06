@@ -3,7 +3,7 @@ Document reviewer module.
 Orchestrates AI document review by combining PDF, extraction, and rules context.
 """
 import asyncio
-import hashlib
+import gc
 import json
 import logging
 import re
@@ -12,9 +12,15 @@ from typing import Any, AsyncGenerator, Dict, List
 
 from app.models.extraction import ExtractionResult
 
-from .chunker import DocumentChunker, extract_page_range, filter_extraction_for_chunk
+from .chunker import (
+    DocumentChunker,
+    compress_pdf_for_ai,
+    extract_page_range,
+    filter_extraction_for_chunk,
+    needs_compression,
+)
 from .client import get_ai_client
-from .prompts import build_chunk_user_prompt, build_system_prompt, build_user_prompt
+from .prompts import build_chain_chunk_prompt, build_system_prompt, build_user_prompt
 
 
 logger = logging.getLogger(__name__)
@@ -30,36 +36,6 @@ RULES_CONTEXT_MAP = {
     "working-paper": "working_paper.md",
     "publication": "publication.md",
 }
-
-
-def deduplicate_issues(all_issues: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """
-    Remove duplicate issues from chunk overlaps.
-
-    Deduplicates by hashing (title + min_page + category).
-    For duplicates, keeps the first occurrence.
-
-    Args:
-        all_issues: List of issue dicts from parsed JSON
-
-    Returns:
-        Deduplicated list of issues
-    """
-    seen = set()
-    unique = []
-
-    for issue in all_issues:
-        # Create hash key from issue identity
-        pages = issue.get("pages", [1])
-        min_page = min(pages) if pages else 1
-        key_parts = f"{issue.get('title', '')}|{min_page}|{issue.get('category', '')}"
-        key = hashlib.md5(key_parts.encode()).hexdigest()
-
-        if key not in seen:
-            seen.add(key)
-            unique.append(issue)
-
-    return unique
 
 
 def load_rules_context(document_type: str) -> str:
@@ -231,6 +207,19 @@ def build_merged_review(
     return "".join(merged)
 
 
+CHUNK_TIMEOUT = 300  # 5 minutes per chunk
+
+
+async def _collect_stream(client, chunk_pdf: bytes, user_prompt: str, system_prompt: str) -> str:
+    """Collect all text from AI review stream into a single string."""
+    parts = []
+    async for text in client.review_document_stream(
+        pdf_bytes=chunk_pdf, user_prompt=user_prompt, system_prompt=system_prompt
+    ):
+        parts.append(text)
+    return "".join(parts)
+
+
 async def review_document_chunked(
     pdf_bytes: bytes,
     extraction: ExtractionResult,
@@ -239,7 +228,11 @@ async def review_document_chunked(
     output_format: str = "digital",
 ) -> AsyncGenerator[str, None]:
     """
-    Review large document in chunks with parallel processing.
+    Review large document in sequential chunks with chain consolidation.
+
+    Each chunk receives the accumulated issue list from all previous chunks.
+    The AI consolidates, deduplicates, and updates page references as it goes,
+    so the last successful chunk's output IS the final issue list.
 
     Yields:
         JSON-encoded SSE events:
@@ -266,120 +259,149 @@ async def review_document_chunked(
     system_prompt = build_system_prompt(rules_context)
 
     logger.info(
-        f"Starting chunked review: {total_chunks} chunks, "
+        f"Starting sequential chain review: {total_chunks} chunks, "
         f"{extraction.metadata.page_count} pages"
     )
 
     # Emit start event
     yield json.dumps({"event": "review_start", "total_chunks": total_chunks})
 
-    semaphore = asyncio.Semaphore(chunker.MAX_CONCURRENT)
-    all_content: List[str] = [""] * total_chunks  # Store content by chunk index
-    all_issues: List[Dict[str, Any]] = []
+    # Pre-extract all chunk PDFs in a single pass, then release original PDF
+    logger.info(f"Pre-extracting {total_chunks} chunk PDFs...")
+    chunk_pdfs: list[bytes | None] = []
+    for start, end in chunks:
+        chunk_pdf = extract_page_range(pdf_bytes, start, end)
+        chunk_pdfs.append(chunk_pdf)
+
+    # Release original PDF — chunks are self-contained now
+    del pdf_bytes
+    gc.collect()
+    logger.info("Chunk extraction complete, original PDF released")
+
+    client = get_ai_client()
+    accumulated_issues: List[Dict[str, Any]] = []
+    all_content: List[str] = [""] * total_chunks
     errors: List[Dict[str, Any]] = []
 
-    async def process_chunk(chunk_idx: int, start: int, end: int) -> tuple:
-        """Process a single chunk and return (index, content, issues, error)."""
-        async with semaphore:
-            try:
-                # 1-indexed page numbers for prompts
-                actual_start = start + 1
-                actual_end = end  # end is exclusive 0-indexed = inclusive 1-indexed
+    for chunk_idx, (start, end) in enumerate(chunks):
+        # 1-indexed page numbers for prompts
+        actual_start = start + 1
+        actual_end = end  # end is exclusive 0-indexed = inclusive 1-indexed
 
-                logger.info(
-                    f"Processing chunk {chunk_idx + 1}/{total_chunks}: "
-                    f"pages {actual_start}-{actual_end}"
-                )
+        logger.info(
+            f"Processing chunk {chunk_idx + 1}/{total_chunks}: "
+            f"pages {actual_start}-{actual_end}"
+        )
 
-                # Extract chunk PDF
-                chunk_pdf = extract_page_range(pdf_bytes, start, end)
+        try:
+            chunk_pdf = chunk_pdfs[chunk_idx]
 
-                # Filter extraction for this chunk
-                chunk_extraction = filter_extraction_for_chunk(extraction, start, end)
-                extraction_json = json.dumps(
-                    chunk_extraction.dict(), indent=2, default=str
-                )
-
-                # Build chunk-specific prompt
-                is_first = chunk_idx == 0
-                user_prompt = build_chunk_user_prompt(
-                    extraction_json=extraction_json,
-                    document_type=document_type,
-                    confidence=confidence,
-                    output_format=output_format,
-                    dpi_min=dpi_info["min"],
-                    chunk_start=actual_start,
-                    chunk_end=actual_end,
-                    is_first_chunk=is_first,
-                    total_chunks=total_chunks,
-                    chunk_number=chunk_idx + 1,
-                )
-
-                # Stream from AI client
-                client = get_ai_client()
-                content_parts = []
-                async for text in client.review_document_stream(
-                    pdf_bytes=chunk_pdf,
-                    user_prompt=user_prompt,
-                    system_prompt=system_prompt,
-                ):
-                    content_parts.append(text)
-
-                content = "".join(content_parts)
-
-                # Parse issues from this chunk's content
-                chunk_issues = parse_chunk_issues(content)
-
-                return (chunk_idx, content, chunk_issues, None)
-
-            except Exception as e:
-                logger.error(f"Chunk {chunk_idx + 1} failed: {e}")
-                return (chunk_idx, "", [], str(e))
-
-    # Create tasks for all chunks
-    tasks = [process_chunk(i, start, end) for i, (start, end) in enumerate(chunks)]
-
-    # Process as they complete
-    for coro in asyncio.as_completed(tasks):
-        chunk_idx, content, chunk_issues, error = await coro
-        start, end = chunks[chunk_idx]
-
-        if error:
-            errors.append(
-                {"chunk": chunk_idx + 1, "pages": f"{start + 1}-{end}", "error": error}
+            # Filter extraction for this chunk
+            chunk_extraction = filter_extraction_for_chunk(extraction, start, end)
+            extraction_json = json.dumps(
+                chunk_extraction.dict(), indent=2, default=str
             )
-            yield json.dumps(
-                {
-                    "event": "chunk_progress",
-                    "chunk": chunk_idx + 1,
-                    "total": total_chunks,
-                    "pages": f"{start + 1}-{end}",
-                    "status": "error",
-                    "error": error,
-                }
+
+            # Pass accumulated issues to continuation chunks
+            previous_issues_json = (
+                json.dumps(accumulated_issues, indent=2)
+                if accumulated_issues else None
             )
-        else:
+
+            user_prompt = build_chain_chunk_prompt(
+                extraction_json=extraction_json,
+                document_type=document_type,
+                confidence=confidence,
+                output_format=output_format,
+                dpi_min=dpi_info["min"],
+                chunk_start=actual_start,
+                chunk_end=actual_end,
+                is_first_chunk=(chunk_idx == 0),
+                total_chunks=total_chunks,
+                chunk_number=chunk_idx + 1,
+                previous_issues_json=previous_issues_json,
+            )
+
+            # Collect full stream with timeout
+            content = await asyncio.wait_for(
+                _collect_stream(client, chunk_pdf, user_prompt, system_prompt),
+                timeout=CHUNK_TIMEOUT,
+            )
             all_content[chunk_idx] = content
-            all_issues.extend(chunk_issues)
+
+            # Parse issues from this chunk's response
+            chunk_issues = parse_chunk_issues(content)
+
+            # Check if AI actually consolidated (issues reference prior pages)
+            has_prior_pages = any(
+                any(p < actual_start for p in issue.get("pages", []))
+                for issue in chunk_issues
+            )
+
+            if has_prior_pages or chunk_idx == 0:
+                # AI properly consolidated — replace with full list
+                accumulated_issues = chunk_issues
+            else:
+                # AI only returned new issues for its pages — extend
+                logger.info(
+                    f"Chunk {chunk_idx + 1}: AI did not consolidate, "
+                    f"extending ({len(chunk_issues)} new + "
+                    f"{len(accumulated_issues)} prior)"
+                )
+                accumulated_issues = accumulated_issues + chunk_issues
+
             yield json.dumps(
                 {
                     "event": "chunk_progress",
                     "chunk": chunk_idx + 1,
                     "total": total_chunks,
-                    "pages": f"{start + 1}-{end}",
+                    "pages": f"{actual_start}-{actual_end}",
                     "status": "complete",
                 }
             )
 
-    # Merge and deduplicate results
+        except asyncio.TimeoutError:
+            errors.append(
+                {"chunk": chunk_idx + 1, "pages": f"{actual_start}-{actual_end}",
+                 "error": "Chunk processing timed out after 5 minutes"}
+            )
+            yield json.dumps(
+                {
+                    "event": "chunk_progress",
+                    "chunk": chunk_idx + 1,
+                    "total": total_chunks,
+                    "pages": f"{actual_start}-{actual_end}",
+                    "status": "error",
+                    "error": "Chunk processing timed out after 5 minutes",
+                }
+            )
+            # Don't break the chain — next chunk gets same accumulated_issues
+
+        except Exception as e:
+            logger.error(f"Chunk {chunk_idx + 1} failed: {e}")
+            errors.append(
+                {"chunk": chunk_idx + 1, "pages": f"{actual_start}-{actual_end}",
+                 "error": str(e)}
+            )
+            yield json.dumps(
+                {
+                    "event": "chunk_progress",
+                    "chunk": chunk_idx + 1,
+                    "total": total_chunks,
+                    "pages": f"{actual_start}-{actual_end}",
+                    "status": "error",
+                    "error": str(e),
+                }
+            )
+
+        finally:
+            # Release chunk PDF after processing
+            chunk_pdfs[chunk_idx] = None
+            gc.collect()
+
+    # Build merged review — accumulated_issues is already consolidated
     if any(all_content):
-        # Deduplicate issues from overlapping regions
-        unique_issues = deduplicate_issues(all_issues)
-
-        # Build merged content with overview noting chunked review
-        merged = build_merged_review(all_content, unique_issues, errors, total_chunks)
-
-        # Emit merged content as text event
+        merged = build_merged_review(all_content, accumulated_issues, errors, total_chunks)
         yield json.dumps({"event": "text", "text": merged})
 
     # Emit completion
@@ -408,7 +430,7 @@ async def review_document(
     Stream AI document review.
 
     Automatically detects large documents and delegates to chunked review.
-    For documents over 40 pages, splits into chunks and processes in parallel.
+    For documents over 40 pages, splits into sequential chunks with chain consolidation.
     For smaller documents, processes directly.
 
     Args:
@@ -425,13 +447,23 @@ async def review_document(
         AIClientError: On API errors
         FileNotFoundError: If rules context missing
     """
-    # Check if document needs chunking
+    # Strategy for large documents:
+    # 1. Try compression first (single coherent review, lower cost)
+    # 2. Fall back to chunking if compression fails
+
+    pdf_to_review = pdf_bytes
+    pdf_size_mb = len(pdf_bytes) / 1024 / 1024
+    page_count = extraction.metadata.page_count
+
+    # Strategy for large documents:
+    # - Token limit is ~1M tokens, each page uses ~1500 visual tokens
+    # - Safe limit is ~50 pages for single review (~75K visual tokens + JSON + prompts)
+    # - Documents over 40 pages MUST be chunked regardless of file size
+    # - Compression helps reduce file transfer but doesn't reduce token count significantly
+
     chunker = DocumentChunker()
-    if chunker.needs_chunking(extraction.metadata.page_count):
-        logger.info(
-            f"Large document ({extraction.metadata.page_count} pages) - "
-            "using chunked review"
-        )
+    if chunker.needs_chunking(page_count):
+        logger.info(f"Large document ({page_count} pages, {pdf_size_mb:.1f}MB) - using chunked review")
         async for event in review_document_chunked(
             pdf_bytes=pdf_bytes,
             extraction=extraction,
@@ -441,6 +473,17 @@ async def review_document(
         ):
             yield event
         return
+
+    # For smaller documents, try compression if file is large
+    if needs_compression(pdf_bytes, threshold_mb=20.0):
+        logger.info(f"Compressing PDF ({pdf_size_mb:.1f}MB)")
+        try:
+            compressed = compress_pdf_for_ai(pdf_bytes, target_size_mb=18.0)
+            if compressed:
+                pdf_to_review = compressed
+                logger.info(f"Compressed: {len(compressed)/1024/1024:.1f}MB")
+        except Exception as e:
+            logger.warning(f"Compression failed: {e}")
 
     # Standard review for smaller documents
     # DPI requirements by output format
@@ -466,10 +509,10 @@ async def review_document(
         f"type={document_type}, format={output_format} ({dpi_info['min']} DPI)"
     )
 
-    # Stream from AI client
+    # Stream from AI client (use possibly-compressed PDF)
     client = get_ai_client()
     async for chunk in client.review_document_stream(
-        pdf_bytes=pdf_bytes,
+        pdf_bytes=pdf_to_review,
         user_prompt=user_prompt,
         system_prompt=system_prompt,
     ):

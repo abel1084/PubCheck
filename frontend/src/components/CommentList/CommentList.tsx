@@ -234,7 +234,9 @@ export function CommentList({
             <Tag style={{ marginBottom: 16 }}>
               {issue.pages.length === 1
                 ? `p. ${issue.pages[0]}`
-                : `pp. ${issue.pages.join(', ')}`}
+                : issue.pages.length <= 6
+                  ? `pp. ${issue.pages.join(', ')}`
+                  : `pp. ${issue.pages.slice(0, 5).join(', ')}… ${issue.pages[issue.pages.length - 1]}`}
             </Tag>
             <div style={{ marginBottom: 8 }}>
               <EditableText

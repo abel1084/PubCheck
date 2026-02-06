@@ -147,7 +147,7 @@ The following JSON contains measurements extracted from the PDF. Use this data t
 Review the document and provide your assessment using the section structure from your instructions (Overview, Needs Attention, Looking Good, Suggestions).'''
 
 
-def build_chunk_user_prompt(
+def build_chain_chunk_prompt(
     extraction_json: str,
     document_type: str,
     confidence: float,
@@ -158,12 +158,14 @@ def build_chunk_user_prompt(
     is_first_chunk: bool,
     total_chunks: int,
     chunk_number: int,  # 1-indexed chunk number
+    previous_issues_json: str | None = None,
 ) -> str:
     """
-    Build user prompt for a specific chunk of a large document.
+    Build user prompt for a sequential-chain chunked review.
 
-    Used when documents exceed the token limit and must be reviewed in chunks.
-    Preserves actual page numbers so AI findings reference correct pages.
+    Each chunk receives the accumulated issue list from previous chunks and
+    outputs the COMPLETE consolidated list (not just new issues). The AI
+    merges, deduplicates, and updates page references as it goes.
 
     Args:
         extraction_json: JSON string of filtered ExtractionResult for this chunk
@@ -176,6 +178,8 @@ def build_chunk_user_prompt(
         is_first_chunk: True if this is the first chunk (includes doc-wide checks)
         total_chunks: Total number of chunks in the document
         chunk_number: Current chunk number (1-indexed)
+        previous_issues_json: JSON string of accumulated issues from prior chunks,
+            or None for the first chunk
 
     Returns:
         User prompt for chunk review
@@ -206,13 +210,22 @@ This is the **FIRST** chunk. Include document-wide checks:
 - Colophon page elements
 - Logo placement and sizing on cover/first pages"""
     else:
-        chunk_instructions = """
-This is a **CONTINUATION** chunk. **SKIP document-wide checks** (already done in first chunk).
-Focus ONLY on:
-- Typography issues (font sizes, styles, consistency)
-- Image resolution and placement
-- Margin compliance
-- Layout issues on these specific pages"""
+        prev_end = chunk_start - 1
+        chunk_instructions = f"""
+This is a **CONTINUATION** chunk (pages {chunk_start}-{chunk_end}).
+
+## Previous Findings (Pages 1-{prev_end})
+The following issues were found in earlier chunks. Your task:
+- **KEEP** all issues that are still valid
+- **UPDATE** page arrays if you find the same issue on new pages
+- **MERGE** systematic issues into single entries (e.g. "margin issue on every page" → one entry)
+- **REMOVE** issues that seem incorrect based on new context
+- **ADD** any genuinely new issues found on pages {chunk_start}-{chunk_end}
+- Output the **COMPLETE consolidated list** in the JSON block (not just new issues)
+
+```json
+{previous_issues_json}
+```"""
 
     return f'''{chunk_header}
 {chunk_instructions}
