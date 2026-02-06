@@ -203,7 +203,6 @@ export function Settings({ onClose }: SettingsProps) {
       />
 
       <Collapse
-        defaultActiveKey={['cover', 'typography', 'images', 'margins', 'required']}
         items={collapseItems}
       />
     </Modal>
@@ -428,7 +427,7 @@ function CustomRulesForm({ rules, onChange }: { rules: string[]; onChange: (r: s
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
       {rules.map((rule, index) => (
-        <Space key={index} style={{ width: '100%' }}>
+        <div key={index} style={{ display: 'flex', gap: 8, width: '100%' }}>
           <Input
             value={rule}
             onChange={e => {
@@ -442,7 +441,7 @@ function CustomRulesForm({ rules, onChange }: { rules: string[]; onChange: (r: s
           <Button danger onClick={() => onChange(rules.filter((_, i) => i !== index))}>
             Remove
           </Button>
-        </Space>
+        </div>
       ))}
       <Button type="dashed" onClick={() => onChange([...rules, ''])} block>
         + Add Rule
