@@ -16,7 +16,7 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 Phase: 9 of 9 - Chunked Document Review
 Plan:  04 of 5
 Status: In progress
-Last activity: 2026-02-05 - Completed 09-04-PLAN.md (chunk progress wiring)
+Last activity: 2026-02-06 - Completed quick task 002: Settings modal full-width rules + collapsed sections
 
 [=============================] ~99%
 ```
