@@ -9,10 +9,15 @@ from dotenv import load_dotenv
 env_path = Path(__file__).parent.parent.parent / ".env"
 load_dotenv(env_path)
 
+from starlette.formparsers import MultiPartParser
+
 from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+
+# Allow large PDF + extraction JSON uploads (default 1MB is too small)
+MultiPartParser.max_file_size = 1024 * 1024 * 200  # 200MB
 
 from app.auth.middleware import verify_session
 from app.auth.router import router as auth_router
