@@ -1,0 +1,18 @@
+{
+  "phase": "",
+  "plan": "",
+  "status": "not_started",
+  "current_task_id": "",
+  "active_agent": "null",
+  "last_activity": 0,
+  "files_modified": 0,
+  "deviation_count": 0,
+  "blocked": true,
+  "blocker_reason": "[GSD-HOOK] BLOCKED: Invalid commit format. Expected: {type}({phase}): {description}. Got: \"$(cat <<\"",
+  "verification_passed": false,
+  "verification_timestamp": 0,
+  "resilience_passed": false,
+  "uat_confirmed": false,
+  "uat_confirmed_at": 0,
+  "last_gate_failure": ""
+}

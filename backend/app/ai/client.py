@@ -34,7 +34,7 @@ class AIClient:
     DEFAULT_MODEL = "gemini-2.5-flash"
     DEFAULT_MAX_TOKENS = 16384  # Gemini supports larger outputs
     INLINE_SIZE_LIMIT = 900 * 1024  # 900KB - stay under 1MB inline limit
-    MAX_PDF_SIZE = 20 * 1024 * 1024  # 20MB - practical limit for token context
+    MAX_PDF_SIZE = 50 * 1024 * 1024  # 50MB - Gemini Files API handles up to 2GB
 
     def __init__(self):
         """Initialize the AI client. API key validated on first use."""
@@ -64,12 +64,14 @@ class AIClient:
         file_obj = io.BytesIO(pdf_bytes)
         file_obj.name = filename
 
-        uploaded_file = client.files.upload(
-            file=file_obj,
-            config={"mime_type": "application/pdf"}
-        )
-
-        return uploaded_file
+        try:
+            uploaded_file = client.files.upload(
+                file=file_obj,
+                config={"mime_type": "application/pdf"}
+            )
+            return uploaded_file
+        finally:
+            file_obj.close()
 
     async def review_document_stream(
         self,
@@ -187,8 +189,8 @@ class AIClient:
             if uploaded_file:
                 try:
                     client.files.delete(name=uploaded_file.name)
-                except Exception:
-                    pass  # Ignore cleanup errors
+                except Exception as e:
+                    logger.warning(f"Failed to cleanup uploaded file: {e}")
 
 
 # Singleton instance

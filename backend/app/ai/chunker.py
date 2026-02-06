@@ -1,13 +1,24 @@
 """
-Document chunking utilities for large PDF review.
+Document chunking and compression utilities for large PDF review.
 
-Splits large documents into reviewable chunks with context overlap
-to handle Gemini's token limits for documents >40 pages.
+Provides two strategies for handling large documents:
+1. Compression: Reduce image quality/DPI for AI review (preferred)
+2. Chunking: Split into overlapping chunks (fallback)
 """
+import gc
+import logging
 from io import BytesIO
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import fitz  # PyMuPDF
+
+logger = logging.getLogger(__name__)
+
+
+# Compression settings for AI review (don't need print quality)
+AI_REVIEW_DPI = 150  # 150 DPI is plenty for visual inspection
+AI_REVIEW_JPEG_QUALITY = 70  # Good balance of quality vs size
+TARGET_SIZE_MB = 18  # Target size under 20MB limit
 
 from app.models.extraction import (
     DocumentMetadata,
@@ -17,6 +28,112 @@ from app.models.extraction import (
     PageMargins,
     TextBlock,
 )
+
+
+def compress_pdf_for_ai(
+    pdf_bytes: bytes,
+    target_size_mb: float = TARGET_SIZE_MB,
+    min_dpi: int = 72,
+    max_dpi: int = AI_REVIEW_DPI,
+) -> Optional[bytes]:
+    """
+    Compress PDF by rendering pages as images at reduced DPI.
+
+    For AI visual review, we don't need print-quality images.
+    This renders each page at a lower DPI and creates a new image-based PDF.
+
+    Args:
+        pdf_bytes: Original PDF bytes
+        target_size_mb: Target file size in MB
+        min_dpi: Minimum DPI to try (won't go below this)
+        max_dpi: Starting DPI to try
+
+    Returns:
+        Compressed PDF bytes, or None if compression failed/not needed
+    """
+    original_size = len(pdf_bytes)
+    original_mb = original_size / 1024 / 1024
+    target_bytes = target_size_mb * 1024 * 1024
+
+    # Don't compress if already under target
+    if original_size <= target_bytes:
+        logger.info(f"PDF already under target ({original_mb:.1f}MB <= {target_size_mb}MB)")
+        return None
+
+    logger.info(f"Compressing PDF: {original_mb:.1f}MB -> target {target_size_mb}MB")
+
+    src_doc = None
+    try:
+        src_doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+        page_count = src_doc.page_count
+
+        # Binary search for optimal DPI
+        dpi = max_dpi
+        best_result = None
+
+        while dpi >= min_dpi:
+            logger.info(f"Trying DPI {dpi}...")
+            new_doc = fitz.open()
+
+            for page_num in range(page_count):
+                page = src_doc[page_num]
+                # Render page as pixmap at target DPI
+                mat = fitz.Matrix(dpi / 72, dpi / 72)
+                pix = page.get_pixmap(matrix=mat, alpha=False)
+
+                # Convert to JPEG bytes for smaller size
+                img_bytes = pix.tobytes("jpeg", jpg_quality=AI_REVIEW_JPEG_QUALITY)
+                pix = None  # Free pixmap immediately (~2-3MB each)
+
+                # Create new page from image
+                img_doc = fitz.open(stream=img_bytes, filetype="jpeg")
+                rect = img_doc[0].rect
+                new_page = new_doc.new_page(width=rect.width, height=rect.height)
+                new_page.insert_image(rect, stream=img_bytes)
+                img_doc.close()
+                img_bytes = None  # Free JPEG bytes
+
+            # Check size
+            buffer = BytesIO()
+            new_doc.save(buffer, deflate=True)
+            compressed_size = buffer.tell()
+            new_doc.close()
+
+            logger.info(f"DPI {dpi}: {compressed_size/1024/1024:.1f}MB")
+
+            if compressed_size <= target_bytes:
+                buffer.seek(0)
+                best_result = buffer.read()
+                buffer.close()
+                reduction = 100 * (1 - compressed_size / original_size)
+                logger.info(
+                    f"Compression successful: {original_mb:.1f}MB -> "
+                    f"{compressed_size/1024/1024:.1f}MB ({reduction:.0f}% reduction) at {dpi} DPI"
+                )
+                return best_result
+
+            # Didn't fit — close buffer and force GC before next DPI attempt
+            buffer.close()
+            gc.collect()
+
+            # Try lower DPI
+            dpi = dpi - 25 if dpi > 100 else dpi - 10
+
+        logger.warning(f"Could not compress to target size even at {min_dpi} DPI")
+        return None
+
+    except Exception as e:
+        logger.error(f"Compression failed: {e}")
+        return None
+
+    finally:
+        if src_doc:
+            src_doc.close()
+
+
+def needs_compression(pdf_bytes: bytes, threshold_mb: float = 20.0) -> bool:
+    """Check if PDF needs compression before AI review."""
+    return len(pdf_bytes) > threshold_mb * 1024 * 1024
 
 
 class DocumentChunker:
@@ -96,8 +213,8 @@ def extract_page_range(pdf_bytes: bytes, start: int, end: int) -> bytes:
     """
     Extract a subset of pages from a PDF document.
 
-    Uses PyMuPDF's select() method to create a new PDF containing
-    only the specified page range.
+    Creates a NEW PDF document and copies only the specified pages,
+    which ensures only the resources needed by those pages are included.
 
     Args:
         pdf_bytes: Original PDF as bytes
@@ -107,31 +224,51 @@ def extract_page_range(pdf_bytes: bytes, start: int, end: int) -> bytes:
     Returns:
         New PDF bytes containing only pages [start, end)
     """
-    doc = None
+    original_size = len(pdf_bytes)
+    logger.info(
+        f"extract_page_range called: pages {start}-{end}, "
+        f"original size: {original_size/1024/1024:.1f}MB"
+    )
+
+    src_doc = None
+    new_doc = None
     try:
-        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+        src_doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+        original_pages = src_doc.page_count
+        logger.info(f"Opened PDF: {original_pages} pages")
 
         # Validate range
         start = max(0, start)
-        end = min(end, doc.page_count)
+        end = min(end, src_doc.page_count)
 
         if start >= end:
             raise ValueError(f"Invalid page range: start={start}, end={end}")
 
-        # Select only the specified pages
-        # select() expects a list of page indices to keep
-        pages_to_keep = list(range(start, end))
-        doc.select(pages_to_keep)
+        # Create NEW document and insert pages (copies only needed resources)
+        new_doc = fitz.open()
+        new_doc.insert_pdf(src_doc, from_page=start, to_page=end - 1)
+        logger.info(f"Copied {new_doc.page_count} pages to new document")
 
-        # Write to buffer
+        # Write with aggressive compression
         buffer = BytesIO()
-        doc.save(buffer)
+        new_doc.save(buffer, garbage=4, deflate=True, clean=True)
         buffer.seek(0)
-        return buffer.read()
+        chunk_bytes = buffer.read()
+        buffer.close()
+
+        reduction = 100 * (1 - len(chunk_bytes) / original_size)
+        logger.info(
+            f"Extracted pages {start}-{end}: "
+            f"{len(chunk_bytes)/1024/1024:.1f}MB "
+            f"(from {original_size/1024/1024:.1f}MB, {reduction:.0f}% reduction)"
+        )
+        return chunk_bytes
 
     finally:
-        if doc:
-            doc.close()
+        if src_doc:
+            src_doc.close()
+        if new_doc:
+            new_doc.close()
 
 
 def filter_extraction_for_chunk(
