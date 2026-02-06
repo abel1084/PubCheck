@@ -1,8 +1,8 @@
 # Roadmap: PubCheck
 
 **Created:** 2026-01-31
-**Phases:** 7
-**Requirements:** 52 mapped
+**Phases:** 9
+**Requirements:** 84 mapped
 
 ## Overview
 
@@ -233,7 +233,7 @@ Plans:
 - [x] 07-05-PLAN.md — Create ReviewResults component with sectioned cards
 - [x] 07-06-PLAN.md — Create streaming SSE review endpoint
 - [x] 07-07-PLAN.md — Update App.tsx, remove Settings, integrate review
-- [ ] 07-08-PLAN.md — User verification checkpoint
+- [x] 07-08-PLAN.md — User verification checkpoint
 
 **Requirements:**
 - ARCH-01: Extractor outputs measurements only (ZERO compliance judgments)
@@ -292,6 +292,106 @@ Plans:
 
 ---
 
+## Phase 8: Ant Design Frontend Refactor
+
+**Goal:** Refactor the entire PubCheck frontend to use Ant Design (antd) components, replacing all custom HTML/CSS elements with their Ant Design equivalents while maintaining all existing functionality.
+
+**Plans:** 8 plans
+
+Plans:
+- [x] 08-01-PLAN.md — Install antd, wrap App in providers, replace ToastProvider
+- [x] 08-02-PLAN.md — Replace DropZone with Upload.Dragger
+- [x] 08-03-PLAN.md — Replace SortableTable and DataTabs with antd Table/Tabs
+- [x] 08-04-PLAN.md — Replace Sidebar with antd Select, Button, Tag
+- [x] 08-05-PLAN.md — Replace Settings with antd Modal, Tabs, Collapse, forms
+- [x] 08-06-PLAN.md — Replace ReviewResults/CommentList with antd components
+- [x] 08-07-PLAN.md — Update App.tsx with antd Layout, cleanup CSS
+- [x] 08-08-PLAN.md — User verification checkpoint
+
+**Requirements:**
+- ANTD-01: Replace file drop zone with Upload.Dragger
+- ANTD-02: Replace all buttons with Ant Design Button
+- ANTD-03: Replace tabs with Ant Design Tabs
+- ANTD-04: Replace tables (fonts, images, margins, metadata) with sortable Table
+- ANTD-05: Replace collapsible categories with Collapse/Collapse.Panel
+- ANTD-06: Replace issue cards with Card or List.Item inside Collapse.Panel
+- ANTD-07: Replace checkboxes with Ant Design Checkbox
+- ANTD-08: Replace toggle buttons (severity filter) with Radio.Group/Radio.Button
+- ANTD-09: Replace dropdowns with Select
+- ANTD-10: Replace text inputs with Input/Input.TextArea
+- ANTD-11: Replace severity badges with Tag (red=error, orange=warning)
+- ANTD-12: Replace confidence icons with Tooltip
+- ANTD-13: Replace progress indicators with Spin
+- ANTD-14: Replace summary bar with Affix positioned at bottom
+- ANTD-15: Replace success banner with Result component
+- ANTD-16: Replace error messages with Alert
+- ANTD-17: Replace modals with Modal.confirm
+- ANTD-18: Replace toast notifications with message API
+- ANTD-19: Remove all custom CSS for replaced components
+- ANTD-20: Use Ant Design default theme
+
+**Success Criteria:**
+1. All custom HTML/CSS components replaced with Ant Design equivalents
+2. Upload page uses Upload.Dragger, Tables, Tabs
+3. Settings page uses Tabs, Input, Select, Checkbox, Button
+4. Review/Results page uses Collapse, Card/List, Tag, Tooltip, Affix
+5. All notifications use Ant Design message API instead of browser notifications
+6. Tables remain sortable by clicking column headers
+7. Layout structure preserved (sidebar, tabs, sticky bottom bar)
+8. All existing functionality maintained
+9. No custom CSS for replaced components
+
+**Dependencies:** Phase 7.1 (current UI as starting point)
+
+**Research Notes:**
+- Ant Design docs: https://ant.design/docs/spec/introduce
+- Component mappings defined in requirements
+- Frontend-only changes, no backend modifications
+- Must preserve all API calls and data flow
+
+---
+
+## Phase 9: Chunked Document Review for Large PDFs
+
+**Goal:** Implement automatic chunking for large documents that exceed Gemini's 1M token context limit, enabling review of documents over ~50 pages.
+
+**Plans:** 5 plans
+
+Plans:
+- [x] 09-01-PLAN.md — Chunker module and chunk-aware prompts
+- [x] 09-02-PLAN.md — Frontend chunk progress types
+- [x] 09-03-PLAN.md — Reviewer orchestration with sequential chain processing
+- [x] 09-04-PLAN.md — Router and frontend hook integration
+- [x] 09-05-PLAN.md — User verification checkpoint
+
+**Requirements:**
+- CHUNK-01: Detect when document exceeds token limit (>40 pages threshold)
+- CHUNK-02: Split PDF into chunks (~35 pages each) with 2-page overlap
+- CHUNK-03: Review chunks in parallel with concurrency limit (2 simultaneous)
+- CHUNK-04: Stream combined results as chunks complete
+- CHUNK-05: Deduplicate findings from overlapping regions
+- CHUNK-06: Handle partial failures gracefully with error messages
+- CHUNK-07: First chunk includes document-wide checks; subsequent chunks skip them
+
+**Success Criteria:**
+1. 105-page PDF successfully reviews without token limit error
+2. Results stream progressively as chunks complete
+3. Page numbers in findings are accurate (actual page numbers, not chunk-relative)
+4. No duplicate issues from chunk overlaps
+5. Clear error message if any chunk fails
+6. Small PDFs (<40 pages) work unchanged (no chunking)
+
+**Dependencies:** Phase 8 (current codebase as starting point)
+
+**Research Notes:**
+- Gemini 2.5 Flash has 1M token context limit
+- PyMuPDF `select()` method for on-demand chunk generation
+- asyncio.Semaphore for concurrency limiting
+- Chunk prompts need actual page range context
+- Only first chunk checks: ISBN, DOI, copyright, disclaimer, colophon
+
+---
+
 ## Progress
 
 | Phase | Name | Status | Requirements |
@@ -302,10 +402,12 @@ Plans:
 | 4 | AI Verification | Complete | 3 |
 | 5 | Review Interface | Complete | 5 |
 | 6 | Learning System & Output Generation | Complete | 5 |
-| 7 | AI-First Architecture Overhaul | In Progress | 7 |
+| 7 | AI-First Architecture Overhaul | Complete | 7 |
 | 7.1 | AI Review Fixes | Complete | 5 |
+| 8 | Ant Design Frontend Refactor | Complete | 20 |
+| 9 | Chunked Document Review | Complete | 7 |
 
-**Total:** 57 requirement mappings (OUTP-02 descoped)
+**Total:** 84 requirement mappings (OUTP-02 descoped)
 
 ---
 
@@ -331,8 +433,15 @@ Phase 6: Learning & Output <-- Phase 5 (issue selection)
     |
     v
 Phase 7: AI-First Architecture <-- Phase 6 (codebase refactor)
+    |
+    v
+Phase 8: Ant Design Frontend Refactor <-- Phase 7.1 (current UI)
+    |
+    v
+Phase 9: Chunked Document Review <-- Phase 8 (current codebase)
 ```
 
 ---
 *Roadmap created: 2026-01-31*
+*Phase 9 planned: 2026-02-05*
 *Depth: standard (5-8 phases)*
