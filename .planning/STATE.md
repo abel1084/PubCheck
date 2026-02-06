@@ -189,11 +189,12 @@ Last activity: 2026-02-05 - Completed 09-04-PLAN.md (chunk progress wiring)
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 001 | Basic HTTP auth landing page (one shared password) | 2026-02-01 | 3b7afd1 | [001-basic-http-auth-landing-page](./quick/001-basic-http-auth-landing-page/) |
+| 002 | Settings modal full-width rules + collapsed sections | 2026-02-06 | b193ed5 | [002-settings-modal-full-width-rules-coll](./quick/002-settings-modal-full-width-rules-coll/) |
 
 ## Session Continuity
 
-Last session: 2026-02-05T18:20:00Z
-Stopped at: Completed 09-04-PLAN.md (chunk progress wiring)
+Last session: 2026-02-06T06:08:00Z
+Stopped at: Completed quick-002 (Settings modal fixes)
 Resume file: None
 
 ## Session Log
