@@ -45,8 +45,8 @@ CMD gunicorn app.main:app \
     --worker-class uvicorn.workers.UvicornWorker \
     --workers 1 \
     --bind 0.0.0.0:${PORT:-8003} \
-    --max-requests 5 \
-    --max-requests-jitter 2 \
+    --max-requests 50 \
+    --max-requests-jitter 10 \
     --timeout 600 \
     --graceful-timeout 30
 
