@@ -6,7 +6,7 @@ from typing import Optional
 from fastapi import APIRouter, Cookie, Response
 from pydantic import BaseModel
 
-from .middleware import check_password, create_session, invalidate_session, _valid_sessions
+from .middleware import check_password, create_signed_token, verify_signed_token
 
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -23,12 +23,12 @@ class AuthStatus(BaseModel):
 @router.post("/login")
 async def login(request: LoginRequest, response: Response) -> AuthStatus:
     """
-    Login with password and set session cookie.
+    Login with password and set signed session cookie.
     """
     if not check_password(request.password):
         return AuthStatus(authenticated=False)
 
-    token = create_session()
+    token = create_signed_token()
     response.set_cookie(
         key="pubcheck_session",
         value=token,
@@ -40,16 +40,10 @@ async def login(request: LoginRequest, response: Response) -> AuthStatus:
 
 
 @router.post("/logout")
-async def logout(
-    response: Response,
-    pubcheck_session: Optional[str] = Cookie(None),
-) -> AuthStatus:
+async def logout(response: Response) -> AuthStatus:
     """
     Logout and clear session cookie.
     """
-    if pubcheck_session:
-        invalidate_session(pubcheck_session)
-
     response.delete_cookie(key="pubcheck_session")
     return AuthStatus(authenticated=False)
 
@@ -61,5 +55,5 @@ async def check_auth(
     """
     Check if current session is authenticated.
     """
-    authenticated = pubcheck_session is not None and pubcheck_session in _valid_sessions
+    authenticated = bool(pubcheck_session and verify_signed_token(pubcheck_session))
     return AuthStatus(authenticated=authenticated)
